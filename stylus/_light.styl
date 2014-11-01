@@ -1,0 +1,40 @@
+game-object-background = #eee
+game-object-color = #333
+game-object-notvisible-color = lighten(game-object-color, 75%)
+game-object-visible-background = #F0EFEB //game-object-background
+
+game-object-player-color = #f00
+game-object-player-background = game-object-background
+
+game-object-tree-background = #00bb00
+game-object-tree-color = #fff
+
+game-object-rock-color = game-object-background
+game-object-rock-background = game-object-background
+
+#game-wrapper
+	color game-object-color
+	background-color game-object-background
+
+	.game-object 
+		color game-object-color
+		background-color game-object-background
+
+	.game-object.notvisible
+		color game-object-notvisible-color
+
+	.game-object.visible
+		background-color game-object-visible-background
+		
+	.game-object-tree
+		color game-object-tree-color
+		background-color game-object-tree-background
+		
+	.game-object-rock
+		color game-object-rock-color
+		background-color game-object-rock-background
+		
+	.game-object-player
+		color game-object-player-color
+		background-color game-object-player-background
+		border-radius(10px)

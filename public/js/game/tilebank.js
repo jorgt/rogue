@@ -5,13 +5,13 @@ define(["helpers/log"], function(
 
 	var _bank = new TileBank();
 
-	_bank.add('player', '@', 1, true, true);
-	_bank.add('tree', '^', 0, false, true);
-	_bank.add('floor', '.', 1, false, false);
-	_bank.add('door', '.', 1, true, false);
-	_bank.add('road', '.', 50, true, false);
-	_bank.add('rock', ' ', 99, true, true); // speed 0
-	_bank.add('wall', '#', 0, false, true);
+	_bank.add('player', '@', 1, true, true, true);
+	_bank.add('tree', '^', 0, false, false, true);
+	_bank.add('floor', '.', 1, true, false, false);
+	_bank.add('door', '.', 1, true, true, false);
+	_bank.add('road', '.', 50, true, true, false);
+	_bank.add('rock', ' ', 99, false, true, true); // speed 0
+	_bank.add('wall', '#', 0, false, false, true);
 
 	return _bank;
 
@@ -20,14 +20,14 @@ define(["helpers/log"], function(
 		log.med('[TILEBANK:'+_guid+']:', 'Creating a tile repository');
 		var _bank = {};
 
-		this.add = function(name, sign, speed, diggable, blocking) {
+		this.add = function(name, sign, speed, walkable, diggable, blocking) {
 			_bank[name] = {
 				name: name,
 				sign: sign,
 				blocking: blocking,
 				speed: speed,
+				walkable: walkable,
 				diggable: diggable,
-				remove: false
 			};
 		};
 
@@ -40,11 +40,9 @@ define(["helpers/log"], function(
 			this.sign = opt.sign;
 			this.blocking = opt.blocking;
 			this.speed = opt.speed;
-			this.walkable = opt.speed > 0;
+			this.walkable = opt.walkable;
 			this.diggable = opt.diggable;
 			this.remove = opt.remove;
-			this.visited = false;
-			this.visible = false;
 		}
 	}
 

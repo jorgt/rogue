@@ -1,0 +1,24 @@
+border-radius() {
+	-webkit-border-radius arguments
+	-moz-border-radius    arguments
+	border-radius         arguments
+}
+
+animate() {
+	-webkit-animation: 	  arguments /* Safari 4+ */
+	-moz-animation:       arguments /* Fx 5+ */
+	-o-animation:         arguments /* Opera 12+ */
+	animation:            arguments /* IE 10+, Fx 29+ */
+}
+
+@keyframes pulselight {
+  0%   { opacity: 1 }
+  10%  { opacity: 0.85 }
+  20%   { opacity: 0.95 }
+  80%  { opacity: 0.75 }
+  100% { opacity: 0.85 }
+}
+
+lights() {
+	animate(pulselight 5s linear infinite alternate)
+}

@@ -26,7 +26,7 @@ define(["helpers/log"], function(
 		this.calculateOctant = function(cx, cy, row, start, end, radius, xx, xy, yx, yy, id) {
 			map.assets().get(cx, cy).visible(true);
 			map.assets().get(cx, cy).visited(true);
-			map.assets().get(cx, cy).parseData();
+			map.assets().get(cx, cy).draw();
 			this.tiles.push(map.assets().get(cx, cy));
 
 			var new_start = 0;
@@ -61,13 +61,12 @@ define(["helpers/log"], function(
 							if (dx * dx + dy * dy < radius_squared) {
 								map.assets().get(X, Y).visible(true);
 								map.assets().get(X, Y).visited(true);
-								map.assets().get(X, Y).parseData();
+								map.assets().get(X, Y).draw();
 								this.tiles.push(map.assets().get(X, Y));
 							}
 
 							if (blocked) {
-								console.log(map.assets().get(X, Y))
-								if (map.assets().get(X, Y).blocking) {
+								if (map.level().get(X, Y).blocking) {
 									new_start = r_slope;
 									continue;
 								} else {
@@ -75,7 +74,7 @@ define(["helpers/log"], function(
 									start = new_start;
 								}
 							} else {
-								if (map.assets().get(X, Y).blocking && i < radius) {
+								if (map.level().get(X, Y).blocking && i < radius) {
 									blocked = true;
 									this.calculateOctant(cx, cy, i + 1, start, l_slope, radius, xx, xy, yx, yy, id + 1);
 
@@ -94,7 +93,7 @@ define(["helpers/log"], function(
 		this.clear = function() {
 			for (var i = 0; i < this.tiles.length; i++) {
 				this.tiles[i].visible(false);
-				this.tiles[i].parseData();
+				this.tiles[i].draw();
 			}
 
 			this.tiles = [];
@@ -111,7 +110,7 @@ define(["helpers/log"], function(
 
 			map.assets().get(this.position).visible(true);
 			map.assets().get(this.position).visited(true);
-			map.assets().get(this.position).parseData();
+			map.assets().get(this.position).draw();
 			this.tiles.push(map.assets().get(this.position));
 		}
 

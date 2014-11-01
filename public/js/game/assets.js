@@ -23,7 +23,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 
 			txt.dataset.visible = true;
 			txt.dataset.visited = true;
-			txt.parseData();
+			txt.draw();
 			return txt;
 		};
 
@@ -46,7 +46,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 			_assets[x][y] = obj;
 			//_assets[obj.dataset.name].push(obj);
 
-			obj.parseData = function() {
+			obj.draw = function() {
 				var px = ['top', 'fontSize', 'left'];
 				for (var o in px) {
 					if (px.hasOwnProperty(o)) {
@@ -59,15 +59,8 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 						var bool = this.dataset[cls[o]];
 						var addcls = (bool === "true") ? cls[o] : 'not' + cls[o];
 						var removecls = (bool === "false") ? cls[o] : 'not' + cls[o];
-						this.className =
-							this.className
-							.replace(removecls, "")
-							.replace(/\s{2}/, " ")
-							.replace(/^\s|\s$/, "");
-
-						if (this.className.indexOf(addcls) === -1) {
-							this.className += ' ' + addcls
-						}
+						this.classList.remove(removecls)
+						this.classList.add(addcls)
 					}
 				}
 			};
@@ -101,7 +94,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 				return parseInt(n);
 			}
 
-			obj.parseData();
+			obj.draw();
 			return obj;
 		};
 
@@ -112,7 +105,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 				player.dataset.visited = true;
 				player.visited = function() {}
 				player.visible = function() {}
-				player.view = new LightSource(map, [x, y], 15);
+				player.view = new LightSource(map, [x, y], 7);
 				_actors.player = player;
 				return _moveable(player);
 			} else {

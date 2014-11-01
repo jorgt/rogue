@@ -1,3 +1,71 @@
+@-moz-keyframes pulselight {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+@-webkit-keyframes pulselight {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+@-o-keyframes pulselight {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+@keyframes pulselight {
+  0% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
 body,
 html {
   padding: 0;
@@ -44,20 +112,33 @@ pre {
 #game-wrapper .game-screen .notvisited {
   visibility: hidden;
 }
+#game-wrapper {
+  color: #999;
+  background-color: #000;
+}
 .game-object {
-  background-color: #fff;
-  color: #666;
+  color: #999;
+  background-color: #000;
+}
+.game-object.notvisible {
+  color: #4d4d4d;
+}
+.game-object.visible {
+  background-color: #473600;
+  -webkit-animation: pulselight 5s linear infinite alternate;
+  -moz-animation: pulselight 5s linear infinite alternate;
+  -o-animation: pulselight 5s linear infinite alternate;
+  animation: pulselight 5s linear infinite alternate;
 }
 .game-object-tree {
-  background-color: #060;
+  color: #fff;
+  background-color: #0b0;
 }
 .game-object-rock {
-  color: #666;
+  color: #000;
+  background-color: #000;
 }
 .game-object-player {
-  color: #fff;
-  background-color: #f00;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
+  color: #f00;
+  background-color: #000;
 }

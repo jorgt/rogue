@@ -26,12 +26,25 @@ module.exports = function(grunt) {
 				},
 				reporter: require('jshint-stylish')
 			}
+		},
+		shell: {
+			styluswatch: {
+				command: 'stylus -w -u nib stylus/game.styl -o public/css'
+			},
+			stylusgenerate: {
+				command: 'stylus -u nib stylus/game.styl -o public/css'
+			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-shell');
 
 	grunt.registerTask('default', [
-		'jshint',
+		'jshint'
+	]);
+
+	grunt.registerTask('stylus', [
+		'shell:styluswatch'
 	]);
 };

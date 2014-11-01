@@ -34,12 +34,18 @@ define([
 				}
 			}
 
-			scrn.add(_asset.player(3, 6, this));
+			scrn.add(_asset.player(0,0, this));
+			//_asset.get(_level.enter().start[0], _level.enter().start[1]).visited(true);
+			//_asset.get(_level.enter().start[0], _level.enter().start[1]).visible(true);
+			//_asset.get(_level.enter().start[0], _level.enter().start[1]).draw();
 			_setupMovementEvents();
-
 			scrn.setSize(grid[0].length * _size, grid.length * _size);
-			_asset.player().view.calculate();
-			_asset.player().parseData();
+
+			_asset.player().move(_level.getGrid(), _level.enter().start[0], _level.enter().start[1]);
+			_asset.player().draw();
+			_asset.player().view.update(_asset.player().position());
+			_asset.player().draw();
+			_scroll(_asset.player(), _asset.player.position()[0], _asset.player.position()[1]);
 			log.urgent('[GAME:' + _guid + ']', 'game running!');
 
 		};
@@ -86,7 +92,7 @@ define([
 				//always move player
 				_player.move(_level.getGrid(), x, y);
 				_player.view.update(_player.position());
-				_player.parseData();
+				_player.draw();
 				_scroll(_player, x, y);
 
 			}.bind(this));

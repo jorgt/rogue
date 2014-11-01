@@ -14,16 +14,26 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 		var _floorspace = 0;
 		var _totalfloorspace = uneven(random(_surface * 0.3, _surface * 0.4));
 		var _doors = [];
+		var _start = null;
+		var _end = null;
 
 		log.high('[DUNGEON:' + _guid + ']',
 			'dimensions', _height, 'x', _width, 'blocks');
 
 		_initializeRooms();
 		_connectDoors();
+		_getStartAndEndTiles();
 
 		this.getGrid = function() {
 			return _grid;
 		};
+
+		this.enter = function() {
+			return {
+				start: _start,
+				end: _end
+			}
+		}
 
 		this.size = function() {
 			return {
@@ -32,10 +42,12 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			}
 		}
 
-		this.tile = function(pos) {
-			if (_grid[pos[0]] && _grid[pos[0]][pos[1]]) {
-				return _grid[pos[0]][pos[1]];
+		this.get = function(x, y) {
+			if (x instanceof Array) {
+				y = x[1];
+				x = x[0];
 			}
+			return _grid[x][y];
 		}
 
 		function _fill(tile) {
@@ -79,6 +91,21 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			}
 		}
 
+		function _getStartAndEndTiles() {
+			var start = null;
+			var end = null;
+			while (_start === null || _end === null) {
+				var sx = random(0, _grid.length - 1);
+				var sy = random(0, _grid[0].length - 1)
+				var ex = random(0, _grid.length - 1);
+				var ey = random(0, _grid[0].length - 1)
+				start = _grid[sx][sy];
+				end = _grid[ex][ey];
+				_start = (start.walkable === true) ? [sx, sy] : null;
+				_end = (end.walkable === true) ? [ex, ey] : null;
+			}
+		}
+
 		function _makeRoom() {
 			var grid = clone(_grid);
 			var w = uneven(random(5, 20));
@@ -114,10 +141,9 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 				}
 			}
 
-			//log.low('  room success!')
 			doors.push(walls[random(0, walls.length - 1)]);
 			doors.push(walls[random(0, walls.length - 1)]);
-			//console.log(_doors);
+
 			_doors.push(doors);
 			_grid = grid;
 			return w * h;

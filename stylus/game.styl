@@ -1,23 +1,5 @@
 //stylus -w -u nib stylus/game.styl -o public/css
+
+@import '_functions'
 @import '_structure'
-
-border-radius()
-  -webkit-border-radius arguments
-  -moz-border-radius arguments
-  border-radius arguments
-
-.game-object 
-	background-color #fff
-	color: #666
-	
-.game-object-tree
-	background-color #006600
-	
-.game-object-rock
-	color #666
-	
-.game-object-player
-	color #fff
-	background-color #f00
-	border-radius(10px)
-	
+@import '_dark'

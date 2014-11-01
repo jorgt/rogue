@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Engine</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/game.css">
+    </head>
+    <body>
+
+        <script src="screen.js"></script>
+        <script>
+            var play = mainScreen.sub('play');
+            var world = play.sub('world');
+            var dungeon = world.independent('hey', 1150, 1150);
+            world.style.backgroundColor = 'red';
+            dungeon.style.backgroundColor = 'green';
+            var side = play.sub('side', true, 200).position('left');
+            side.style.backgroundColor = 'blue';
+
+            console.log(world.dimensions());
+
+        </script>
+    </body>
+</html>
