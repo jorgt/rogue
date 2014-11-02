@@ -1,3 +1,6 @@
+### rogue specific ###
+*.css
+
 ### Node ###
 # Logs
 logs
