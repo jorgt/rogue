@@ -1,7 +1,7 @@
 
 game-object-background = #000
 game-object-color = #999
-game-object-notvisible-color = darken(game-object-color, 50%)
+game-object-notvisible-color = darken(game-object-color, 70%)
 game-object-visible-background = #473600
 
 game-object-player-color = #f00
@@ -13,8 +13,16 @@ game-object-tree-color = #fff
 game-object-rock-color = game-object-background
 game-object-rock-background = game-object-background
 
+/*
+	Sidebar
+*/
+#game-playing-sidebar 
+	border-left 1px solid white
 
-#game-wrapper
+/*
+	All Game Objects
+*/
+.game-screen
 	color game-object-color
 	background-color game-object-background
 
@@ -27,6 +35,7 @@ game-object-rock-background = game-object-background
 
 .game-object.visible
 	background-color game-object-visible-background
+	//color: yellow;
 	lights()
 	
 .game-object-tree

@@ -1,146 +1,198 @@
-define(["helpers/log", "settings"], function(
-	log, settings) {
+define(["helpers/log","helpers/events", "settings"], function(
+	log, Events, settings) {
 
 	'use strict';
-	/*
-		module variables
-	*/
-	var _canvasses = {};
-	var _active = null;
-	var _screen = document.createElement('div');
-	var _width = 0;
-	var _height = 0;
 
-	_screen.id = 'game-wrapper';
-	_screen.className = 'center'
-	_screen.style.fontSize = settings.font + 'px';
-	document.body.appendChild(_screen);
-	document.body.style.className = 'game';
+	var _parent = null;
 
-	var Screen = {
-		get: function(name) {
-			var canvas = _canvasses[_name(name)];
-			if (typeof canvas === 'undefined') {
-				var canvas = new Canvas(_name(name));
-				_canvasses[_name(name)] = canvas;
-			}
-
-			return canvas;
-		},
-		hide: function(elem) {
-			if (typeof elem === 'string') {
-				elem = _canvasses[_name(name)];
-			} else if(elem instanceof Canvas) {
-				elem = elem;
-			}
-
-			_screen.removeChild(elem.get())
-		},
-
-		show: function(elem) {
-			if (typeof elem === 'string') {
-				elem = _canvasses[_name(name)];
-			} else if(elem instanceof Canvas) {
-				elem = elem;
-			}
-			_screen.appendChild(elem.get())
-			_active = elem;
-			//log.high('[SCREEN]:', 'activating canvas:', elem.get().id)
-		},
-
-		setSize: function(h, w) {
-			_width = _docWidth();
-			_height = _docHeight();
-			_screen.style.width = this.width + 'px';
-			_screen.style.height = this.height + 'px';
+	function _screenDecorator(parent, name, h, w) {
+		var elem = document.createElement('div');
+		if (parent.id) {
+			elem.id = parent.id + '-'
 		}
-	}
+		elem.id += name;
+		elem.parent = parent;
+		elem.style.position = 'absolute';
+		elem.dataset.top = 0;
+		elem.dataset.left = 0;
+		elem.classList.add('game-screen');
+		elem.classList.add('center');
+		var z = parseInt(parent.style.zIndex) || 0;
+		elem.style.zIndex = z + 1;
+		elem.subs = [];
 
+		if (typeof w !== 'number') {
+			w = parent.dataset.width
+			elem.dataset.widthtype = 'dynamic';
+		} else {
+			elem.dataset.widthtype = 'fixed';
+		}
+		if (typeof h !== 'number') {
+			h = parent.dataset.height
+			elem.dataset.heighttype = 'dynamic';
+		} else {
+			elem.dataset.heighttype = 'fixed';
+		}
 
-	function Canvas(name) {
+		elem.position = function(opt) {
+			var movew = this.dataset.width / (this.parent.subs.length - 1)
+			for (var x = 0; x < this.parent.subs.length; x++) {
+				if (this.parent.subs[x] === this) {
+					if (opt === 'left') {
+						this.dataset.left = (this.parent.dataset.width - this.dataset.width);
+					} else if (opt === 'right') {
+						this.dataset.left = 0;
+					}
+					this.dataset.position = opt;
+				} else {
+					this.parent.subs[x].dataset.width -= movew;
+					if (opt === 'right') {
+						this.parent.subs[x].dataset.left = movew;
+					}
+				}
+				this.parent.subs[x].parse();
+			}
+			return this;
+		}
 
-		var _canvas = document.createElement('pre');
-		_canvas.id = name;
-		_canvas.dataset.top = 0;
-		_canvas.dataset.left = 0;
-		_canvas.className = 'game-screen';
+		elem.size = function(h, w) {
+			this.dataset.width = w;
+			this.dataset.height = h;
 
-		this.add = function(obj) {
-			_canvas.appendChild(obj);
+			var sw = 0;
+			var sh = 0;
+			for (var x = 0; x < this.subs.length; x++) {
+				if (this.subs[x].dataset.widthtype === 'dynamic') {
+					sw = w;
+				} else {
+					sw = parseInt(this.subs[x].dataset.width);
+				}
+				if (this.subs[x].dataset.heighttype === 'dynamic') {
+					sh = h;
+				} else {
+					sh = parseInt(this.subs[x].dataset.height);
+				}
+				this.subs[x].size(sh, sw);
+				if (this.subs[x].dataset.position) {
+					this.subs[x].position(this.subs[x].dataset.position);
+				}
+				this.subs[x].parse();
+			}
+			return this;
 		};
 
-		this.remove = function(obj) {
-			_canvas.removeChild(obj);
+		elem.parse = function() {
+			this.style.height = this.dataset.height + 'px';
+			this.style.width = this.dataset.width + 'px';
+			this.style.top = this.dataset.top + 'px';
+			this.style.left = this.dataset.left + 'px';
 		};
 
-		
-		this.setSize = function(h, w) {
-			_canvas.style.width = h + 'px';
-			_canvas.style.height = w + 'px';
-		};
-		
-		this.scroll = function(x, y) {
-			_canvas.dataset.top = parseInt(_canvas.dataset.top) + x;
-			_canvas.dataset.left = parseInt(_canvas.dataset.left) + y;
-			_canvas.style.top = _canvas.dataset.top +'px';
-			_canvas.style.left = _canvas.dataset.left +'px';
+		elem.get = function(name, h, w) {
+			var sub = this.independent(name, h, w);
+			this.subs.push(sub);
+			return sub;
 		};
 
-		this.get = function() {
-			return _canvas;
+		elem.independent = function(name, h, w) {
+			if (typeof name === 'undefined') {
+				throw new Error('name is mandatory');
+			}
+			var child = _screenDecorator(this, name, h, w);
+			return child;
+		}
+
+		elem.remove = function(e) {
+			if (typeof e === 'string') {
+				e = document.getElementById(this.id + '-' + e);
+			}
+			this.removeChild(e);
 		};
 
-		this.dimensions = function() {
-			return _dimensions();
+		elem.add = function(elem) {
+			this.appendChild(elem);
+			return this;
 		};
 
-		this.center = function() {
+		elem.show = function() {
+			this.parent.appendChild(this);
+			return this;
+		}
+
+		elem.hide = function() {
+			this.parent.removeChild(this);
+			return this;
+		}
+
+		elem.scroll = function(x, y) {
+			this.dataset.top = parseInt(this.dataset.top) + x;
+			this.dataset.left = parseInt(this.dataset.left) + y;
+			this.parse();
+		};
+
+		elem.dimensions = function() {
 			return {
-				height: _canvas.offsetHeight / 2 / settings.square,
-				width: _canvas.offsetWidth / 2 / settings.square
+				window: viewport(),
+				canvas: {
+					width: this.offsetWidth,
+					height: this.offsetHeight,
+					top: parseInt(this.dataset.top),
+					left: parseInt(this.dataset.left)
+				},
+				parent: {
+					width: this.parent.offsetWidth,
+					height: this.parent.offsetHeight,
+					top: parseInt(this.parent.dataset.top),
+					left: parseInt(this.parent.dataset.left)
+				},
+				screen: {
+					width: this.parent.offsetWidth,
+					height: this.parent.offsetHeight
+				},
+				top: {
+					width: _parent.offsetWidth,
+					height: _parent.offsetHeight
+				}
+			}
+		};
+
+		elem.center = function() {
+			return {
+				height: this.offsetHeight / 2,
+				width: this.offsetWidth / 2
 			};
 		};
+
+		elem.size(h, w);
+		elem.parent.appendChild(elem);
+		elem.parse();
+		if (_parent === null) {
+			_parent = elem;
+			_parent.id = 'game'
+			//_parent.classList.remove('game-screen');
+		}
+		return elem;
 	}
 
-	function _name(name) {
-		return 'screen-' + name;
+	window.onresize = function(e) {
+		var port = viewport();
+		_parent.size(port.height, port.width);
+		_parent.parse();
+		Events.raise('game.screen.resize', {dimensions:_parent.dimensions()})
 	}
 
-	function _docHeight() {
-		return Math.max(
-			document.body.scrollHeight, document.documentElement.scrollHeight,
-			document.body.offsetHeight, document.documentElement.offsetHeight,
-			document.body.clientHeight, document.documentElement.clientHeight
-		);
-	}
+	return _screenDecorator(document.body, 'game', viewport().height, viewport().width)
 
-	function _docWidth() {
-		return Math.max(
-			document.body.scrollWidth, document.documentElement.scrollWidth,
-			document.body.offsetWidth, document.documentElement.offsetWidth,
-			document.body.clientWidth, document.documentElement.clientWidth
-		);
-	}
-
-	function _dimensions() {
+	function viewport() {
+		var e = window,
+			a = 'inner';
+		if (!('innerWidth' in window)) {
+			a = 'client';
+			e = document.documentElement || document.body;
+		}
 		return {
-			window: {
-				width: _docWidth(),
-				height: _docHeight()
-			},
-			canvas: {
-				width: _active.get().offsetWidth,
-				height: _active.get().offsetHeight,
-				top: parseInt(_active.get().dataset.top),
-				left: parseInt(_active.get().dataset.left)
-			},
-			screen: {
-				width: _screen.offsetWidth,
-				height: _screen.offsetHeight 
-			}
+			width: e[a + 'Width'],
+			height: e[a + 'Height']
 		}
 	}
-
-	Screen.setSize();
-	return Screen;
 });

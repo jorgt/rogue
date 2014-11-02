@@ -4,7 +4,7 @@ define(["helpers/log", "engine/states", "game/assets", "game/screen"], function(
 	Assets,
 	Screen) {
 
-	var menu = Screen.get('menu');
+	var menu = Screen.get('menu').hide();
 	var assets = new Assets('menu', 15)
 
 	states.add({
@@ -17,10 +17,10 @@ define(["helpers/log", "engine/states", "game/assets", "game/screen"], function(
 			menu.add(assets.text('Press [ENTER] to start', 10, 15));
 		},
 		start: function() {
-			Screen.show(menu);
+			menu.show()
 		},
 		stop: function() {
-			Screen.hide(menu);
+			menu.hide();
 		}
 	});
 });

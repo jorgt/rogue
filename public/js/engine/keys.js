@@ -147,7 +147,7 @@ define(["helpers/log"], function(
 								}
 							}
 							if (ok) {
-								this.callbacks[ns][c]();
+								this.callbacks[ns][c](keys);
 							}
 						}
 					}

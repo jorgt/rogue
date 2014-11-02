@@ -3,6 +3,8 @@ define(["helpers/log"], function(
 
 	'use strict';
 
+	var _event = new Events();
+
 	function Events() {
 		var _guid = guid();
 		var _main = document.body;
@@ -37,6 +39,6 @@ define(["helpers/log"], function(
 		};
 	}
 
-	return Events;
+	return _event;
 
 });
