@@ -6,13 +6,16 @@
     opacity: 0.85;
   }
   20% {
-    opacity: 0.95;
+    opacity: 0.9;
   }
-  80% {
+  50% {
+    opacity: 0.85;
+  }
+  75% {
     opacity: 0.75;
   }
   100% {
-    opacity: 0.85;
+    opacity: 0.95;
   }
 }
 @-webkit-keyframes pulselight {
@@ -23,13 +26,16 @@
     opacity: 0.85;
   }
   20% {
-    opacity: 0.95;
+    opacity: 0.9;
   }
-  80% {
+  50% {
+    opacity: 0.85;
+  }
+  75% {
     opacity: 0.75;
   }
   100% {
-    opacity: 0.85;
+    opacity: 0.95;
   }
 }
 @-o-keyframes pulselight {
@@ -40,13 +46,16 @@
     opacity: 0.85;
   }
   20% {
-    opacity: 0.95;
+    opacity: 0.9;
   }
-  80% {
+  50% {
+    opacity: 0.85;
+  }
+  75% {
     opacity: 0.75;
   }
   100% {
-    opacity: 0.85;
+    opacity: 0.95;
   }
 }
 @keyframes pulselight {
@@ -57,13 +66,16 @@
     opacity: 0.85;
   }
   20% {
-    opacity: 0.95;
+    opacity: 0.9;
   }
-  80% {
+  50% {
+    opacity: 0.85;
+  }
+  75% {
     opacity: 0.75;
   }
   100% {
-    opacity: 0.85;
+    opacity: 0.95;
   }
 }
 body,
@@ -76,6 +88,9 @@ html {
 pre {
   margin: 0;
   padding: 0;
+  position: absolute;
+  vertical-align: middle;
+  text-align: center;
 }
 .center {
   margin: auto auto;
@@ -87,32 +102,31 @@ pre {
   bottom: 0;
   right: 0;
 }
-#game-wrapper {
+#game {
   max-width: 100%;
   max-height: 100%;
   overflow: hidden;
 }
-#game-wrapper pre {
+#game pre {
   position: absolute;
 }
-#game-wrapper .game-screen {
+#game .game-screen {
   display: inline-block;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
 }
-#game-wrapper .game-screen .game-object {
-  vertical-align: middle;
-  text-align: center;
-}
-#game-wrapper .game-screen .visited {
+#game .game-screen .visited {
   visibility: visible;
 }
-#game-wrapper .game-screen .notvisited {
+#game .game-screen .notvisited {
   visibility: hidden;
 }
-#game-wrapper {
+#game-playing-sidebar {
+  border-left: 1px solid #fff;
+}
+.game-screen {
   color: #999;
   background-color: #000;
 }
@@ -121,7 +135,7 @@ pre {
   background-color: #000;
 }
 .game-object.notvisible {
-  color: #4d4d4d;
+  color: #2e2e2e;
 }
 .game-object.visible {
   background-color: #473600;

@@ -15,10 +15,15 @@ define([
 
 	'use strict';
 
-	function Game(scrn) {
+	function Game(parentScreen) {
 		var _guid = guid();
 		log.urgent('[GAME:' + _guid + ']', 'initializing game');
 
+		var _mainscreen = parentScreen.get('main')
+		var _screen = _mainscreen.independent('dungeon');
+		var _sidebar = parentScreen.get('sidebar', true, 300).position('left')
+		_mainscreen.classList.remove('center');
+		_screen.classList.remove('center');
 		var _level = new Level();
 		var _size = settings.square;
 		var _asset = new Assets('game', bank);
@@ -30,22 +35,19 @@ define([
 
 			for (var x = 0; x < grid.length; x++) {
 				for (var y = 0; y < grid[x].length; y++) {
-					scrn.add(_asset.object(grid[x][y], x, y));
+					_screen.add(_asset.object(grid[x][y], x, y));
 				}
 			}
 
-			scrn.add(_asset.player(0,0, this));
-			//_asset.get(_level.enter().start[0], _level.enter().start[1]).visited(true);
-			//_asset.get(_level.enter().start[0], _level.enter().start[1]).visible(true);
-			//_asset.get(_level.enter().start[0], _level.enter().start[1]).draw();
+			_screen.add(_asset.player(0,0, this));
 			_setupMovementEvents();
-			scrn.setSize(grid[0].length * _size, grid.length * _size);
-
-			_asset.player().move(_level.getGrid(), _level.enter().start[0], _level.enter().start[1]);
-			_asset.player().draw();
-			_asset.player().view.update(_asset.player().position());
-			_asset.player().draw();
-			_scroll(_asset.player(), _asset.player.position()[0], _asset.player.position()[1]);
+			_screen.size(grid.length * _size, grid[0].length * _size);
+			var player = _asset.player();
+			player.move(_level.getGrid(), _level.enter().start[0], _level.enter().start[1]);
+			player.draw();
+			player.view.update(player.position());
+			player.draw();
+			_scroll(player, player.position()[0], player.position()[1]);
 			log.urgent('[GAME:' + _guid + ']', 'game running!');
 
 		};
@@ -100,22 +102,22 @@ define([
 
 		function _scroll(player, x, y) {
 
-			var dim = scrn.dimensions();
+			var dim = _screen.dimensions();
 			var ph = player.get('top') + dim.canvas.top;
 			var pw = player.get('left') + dim.canvas.left;
-			var halfH = dim.screen.height / 2;
-			var halfW = dim.screen.width / 2;
+			var halfH = dim.parent.height / 2;
+			var halfW = dim.parent.width / 2;
 			var top = 0;
 			var left = 0
-			if (x === 1 && ph >= halfH && !(dim.canvas.height + dim.canvas.top <= dim.screen.height)) {
+			if (x === 1 && ph >= halfH && !(dim.canvas.height + dim.canvas.top <= dim.parent.height)) {
 				top = -1 * _size
 			}
 
 			if (x === -1 && dim.canvas.top !== 0 && ph <= halfH) { //down
-				scrn.scroll(_size, 0)
+				_screen.scroll(_size, 0)
 			}
 
-			if (y === 1 && pw >= halfW && !(dim.canvas.width + dim.canvas.left <= dim.screen.width)) { //down
+			if (y === 1 && pw >= halfW && !(dim.canvas.width + dim.canvas.left <= dim.parent.width)) { //down
 				left = -1 * _size;
 			}
 
@@ -123,7 +125,7 @@ define([
 				left = _size;
 			}
 
-			scrn.scroll(top, left)
+			_screen.scroll(top, left)
 		}
 
 		function _toBlock(n) {

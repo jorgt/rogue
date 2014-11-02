@@ -13,9 +13,9 @@ define([
 		Assets) {
 
 		var game = null;
-		var playing = Screen.get('playing');
-		var loading = Screen.get('loading');
-		var assets = new Assets('loading', 15)
+		var playing = Screen.get('playing').hide();
+		var loading = Screen.get('loading').hide();
+		var assets = new Assets('loading', 15);
 
 		states.add({
 			name: 'play',
@@ -23,12 +23,13 @@ define([
 				loading.add(assets.text('Loading game...', 10, 15));
 			},
 			start: function() {
-				Screen.show(loading);
+				loading.show();
 				//doing this in a 1 ms timeout ensures that the 
 				//loading screen is properly displayed: dom updates
 				//pause while js is crunching otherwise. 
 				window.setTimeout(function() {
 					game = new Game(playing);
+
 					this.keys.press('esc', function() {
 						states.switch('exit');
 					});
@@ -46,15 +47,15 @@ define([
 						game.fire('movement', 'down');
 					});
 
-					Screen.hide(loading);
-					Screen.show(playing);
+					loading.hide();
+					playing.show()
 
 					game.start();
 				}.bind(this), 1)
 
 			},
 			stop: function() {
-				Screen.hide(playing);
+				playing.hide();
 			},
 			update: function() {
 				if (game !== null) {

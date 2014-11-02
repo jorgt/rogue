@@ -9,12 +9,12 @@ require(['helpers/log', 'util'], function(log) {
 	log.urgent('[MAIN]', 'fetching engine, gathering parts');
 
 	require(['engine/engine'], function(engine) {
-		try {
+		//try {
 			engine.start('menu');
-		} catch (e) {
-			log.error(e.message)
-			engine.stop();	
-		} 
+		//} catch (e) {
+		//	log.error(e.message)
+		//	engine.stop();	
+		//} 
 	});
 
 });
