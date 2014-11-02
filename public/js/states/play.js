@@ -3,14 +3,16 @@ define([
 		"engine/states",
 		"game/game",
 		"game/screen",
-		"game/assets"
+		"game/assets",
+		"helpers/events"
 	],
 	function(
 		log,
 		states,
 		Game,
 		Screen,
-		Assets) {
+		Assets,
+		Events) {
 
 		var game = null;
 		var playing = Screen.get('playing').hide();
@@ -30,22 +32,28 @@ define([
 				window.setTimeout(function() {
 					game = new Game(playing);
 
-					this.keys.press('esc', function() {
+					this.keys.press('esc', function(e) {
 						states.switch('exit');
 					});
 
-					this.keys.press('left', function() {
-						game.fire('movement', 'left');
+					this.keys.press('left', function(e) {
+						raiseMovementEvent(e[0])
 					});
-					this.keys.press('right', function() {
-						game.fire('movement', 'right');
+					this.keys.press('right', function(e) {
+						raiseMovementEvent(e[0])
 					});
-					this.keys.press('up', function() {
-						game.fire('movement', 'up');
+					this.keys.press('up', function(e) {
+						raiseMovementEvent(e[0])
 					});
-					this.keys.press('down', function() {
-						game.fire('movement', 'down');
+					this.keys.press('down', function(e) {
+						raiseMovementEvent(e[0])
 					});
+
+					function raiseMovementEvent(dir) {
+						Events.raise('game.movement', {
+							direction: dir
+						});
+					}
 
 					loading.hide();
 					playing.show()

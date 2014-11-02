@@ -1,5 +1,5 @@
-define(["helpers/log", "settings"], function(
-	log, settings) {
+define(["helpers/log","helpers/events", "settings"], function(
+	log, Events, settings) {
 
 	'use strict';
 
@@ -178,6 +178,7 @@ define(["helpers/log", "settings"], function(
 		var port = viewport();
 		_parent.size(port.height, port.width);
 		_parent.parse();
+		Events.raise('game.screen.resize', {dimensions:_parent.dimensions()})
 	}
 
 	return _screenDecorator(document.body, 'game', viewport().height, viewport().width)

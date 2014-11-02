@@ -28,8 +28,6 @@ define([
 		var _size = settings.square;
 		var _asset = new Assets('game', bank);
 
-		var _events = new Events();
-
 		this.start = function() {
 			var grid = _level.getGrid();
 
@@ -64,15 +62,9 @@ define([
 
 		};
 
-		this.fire = function(evt, direction) {
-			_events.raise('game.movement', {
-				direction: direction
-			});
-		};
-
 		function _setupMovementEvents() {
 			var _player = _asset.player();
-			_events.on('game.movement', function(evt) {
+			Events.on('game.movement', function(evt) {
 				var x = 0,
 					y = 0;
 				switch (evt.detail.direction) {
@@ -98,6 +90,10 @@ define([
 				_scroll(_player, x, y);
 
 			}.bind(this));
+
+			Events.on('game.screen.resize', function(e) {
+				//console.log(e)
+			});
 		}
 
 		function _scroll(player, x, y) {

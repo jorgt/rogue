@@ -4,9 +4,8 @@ Boo boo bla bla
 
 ## TO DO
 
-Major technical hurdles:
-- Rewrite screen handling to allow seperately positionable and resizable subscreens.
-- Rewrite grid/assets. No need for two grids, can be incorporated. Do not want to store it in assets. Increase visibility / ease of use on element decorators in assets.
+- Rewrite grid/assets. No need for two grids, can be incorporated. Do not want to store it in assets. Increase visibility / ease of use on element decorators in assets
+- Fix div position on game initialization
 
 ## IDEAS
 
