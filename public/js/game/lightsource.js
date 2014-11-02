@@ -25,10 +25,10 @@ define(["helpers/log", "game/tilebank"], function(
 
 		// calculates an octant. Called by the this.calculate when calculating lighting
 		this.calculateOctant = function(cx, cy, row, start, end, radius, xx, xy, yx, yy, id) {
-			map.level().get(cx, cy).visible(true);
-			map.level().get(cx, cy).visited(true);
-			map.level().get(cx, cy).draw();
-			this.tiles.push(map.level().get(cx, cy));
+			map.dungeon().get(cx, cy).visible(true);
+			map.dungeon().get(cx, cy).visited(true);
+			map.dungeon().get(cx, cy).draw();
+			this.tiles.push(map.dungeon().get(cx, cy));
 
 			var new_start = 0;
 
@@ -49,7 +49,7 @@ define(["helpers/log", "game/tilebank"], function(
 					var X = cx + dx * xx + dy * xy;
 					var Y = cy + dx * yx + dy * yy;
 
-					if (X < map.level().size().x && X >= 0 && Y < map.level().size().y && Y >= 0) {
+					if (X < map.dungeon().size().x && X >= 0 && Y < map.dungeon().size().y && Y >= 0) {
 
 						var l_slope = (dx - 0.5) / (dy + 0.5);
 						var r_slope = (dx + 0.5) / (dy - 0.5);
@@ -60,14 +60,14 @@ define(["helpers/log", "game/tilebank"], function(
 							break;
 						} else {
 							if (dx * dx + dy * dy < radius_squared) {
-								map.level().get(X, Y).visible(true);
-								map.level().get(X, Y).visited(true);
-								map.level().get(X, Y).draw();
-								this.tiles.push(map.level().get(X, Y));
+								map.dungeon().get(X, Y).visible(true);
+								map.dungeon().get(X, Y).visited(true);
+								map.dungeon().get(X, Y).draw();
+								this.tiles.push(map.dungeon().get(X, Y));
 							}
 
 							if (blocked) {
-								if (bank.get(map.level().get(X, Y).tile).blocking) {
+								if (bank.get(map.dungeon().get(X, Y).tile).blocking) {
 									new_start = r_slope;
 									continue;
 								} else {
@@ -75,7 +75,7 @@ define(["helpers/log", "game/tilebank"], function(
 									start = new_start;
 								}
 							} else {
-								if (bank.get(map.level().get(X, Y).tile).blocking && i < radius) {
+								if (bank.get(map.dungeon().get(X, Y).tile).blocking && i < radius) {
 									blocked = true;
 									this.calculateOctant(cx, cy, i + 1, start, l_slope, radius, xx, xy, yx, yy, id + 1);
 
@@ -109,10 +109,10 @@ define(["helpers/log", "game/tilebank"], function(
 					this.mult[0][i], this.mult[1][i], this.mult[2][i], this.mult[3][i], 0);
 			}
 
-			map.level().get(this.position).visible(true);
-			map.level().get(this.position).visited(true);
-			map.level().get(this.position).draw();
-			this.tiles.push(map.level().get(this.position));
+			map.dungeon().get(this.position).visible(true);
+			map.dungeon().get(this.position).visited(true);
+			map.dungeon().get(this.position).draw();
+			this.tiles.push(map.dungeon().get(this.position));
 		}
 
 		// update the position of the light source

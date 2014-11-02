@@ -2,7 +2,7 @@ define([
 	"helpers/log",
 	"game/tilebank",
 	"game/assets",
-	"game/dungeon/Dungeon",
+	"game/dungeon/level",
 	"helpers/events",
 	"settings"
 ], function(
