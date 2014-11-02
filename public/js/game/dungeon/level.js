@@ -5,7 +5,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 
 	'use strict';
 
-	function Dungeon() {
+	function Dungeon(assets) {
 		var _guid = guid();
 		var _height = uneven(random(35, 50));
 		var _width = uneven(random(60, 80));
@@ -54,7 +54,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			for (var x = 0; x < _height; x++) {
 				_grid[x] = _grid[x] || [];
 				for (var y = 0; y < _width; y++) {
-					_grid[x][y] = tile;
+					_grid[x][y] = assets.object(tile, x, y);
 				}
 			}
 		}
@@ -71,6 +71,10 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			log.med('[DUNGEON:' + _guid + ']', _doors.length,
 				'rooms in', x, 'attemps covering', _totalfloorspace,
 				'of', _surface, 'surface area');
+
+			if (_floorspace === 0) {
+				log.throw('No rooms created')
+			}
 		}
 
 		function _connectDoors() {
@@ -79,19 +83,19 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			for (var x = 0; x < _doors.length - 1; x++) {
 				var d1 = _doors[x][0];
 				var d2 = _doors[x + 1][1];
-				//console.log(d1, d2);
-				_grid[d1[0]][d1[1]] = bank.get('door');
-				_grid[d2[0]][d2[1]] = bank.get('door');
+				_grid[d1[0]][d1[1]] = assets.object(bank.get('door'), d1[0], d1[1]);
+				_grid[d2[0]][d2[1]] = assets.object(bank.get('door'), d2[0], d2[1]);
 				var result = AStar.search(clone(_grid), d1, d2);
 				for (var r in result) {
 					if (result.hasOwnProperty(r)) {
-						_grid[result[r].x][result[r].y] = bank.get('road');
+						_grid[result[r].x][result[r].y] = assets.object(bank.get('road'), result[r].x, result[r].y);
 					}
 				}
 			}
 		}
 
 		function _getStartAndEndTiles() {
+			log.med('[DUNGEON:' + _guid + ']', 'getting start- and end tiles');
 			var start = null;
 			var end = null;
 			while (_start === null || _end === null) {
@@ -101,8 +105,8 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 				var ey = random(0, _grid[0].length - 1)
 				start = _grid[sx][sy];
 				end = _grid[ex][ey];
-				_start = (start.walkable === true) ? [sx, sy] : null;
-				_end = (end.walkable === true) ? [ex, ey] : null;
+				_start = (bank.get(start.tile).walkable === true) ? [sx, sy] : null;
+				_end = (bank.get(end.tile).walkable === true) ? [ex, ey] : null;
 			}
 		}
 
@@ -121,9 +125,9 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 
 			for (var x = sh; x < h + sh; x++) {
 				for (var y = sw; y < w + sw; y++) {
-					if (grid[x][y].diggable === true) {
+					if (bank.get(grid[x][y].tile).diggable === true) {
 						if (x === sh || x === sh + h - 1 || y === sw || y === sw + w - 1) {
-							grid[x][y] = bank.get('wall');
+							grid[x][y] = assets.object(bank.get('wall'), x, y);
 							if (x === sh && y === sw ||
 								x === sh && y === sw + w - 1 ||
 								x === sh + h - 1 && y === sw ||
@@ -133,7 +137,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 								walls.push([x, y]);
 							}
 						} else {
-							grid[x][y] = bank.get('floor');
+							grid[x][y] = assets.object(bank.get('floor'), x, y);
 						}
 					} else {
 						return 0;
@@ -154,17 +158,8 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 
 	function clone(array) {
 		var newObj = (array instanceof Array) ? [] : {};
-		for (var i in array) {
-			if (array.hasOwnProperty(i)) {
-				if (i === 'clone') {
-					continue;
-				}
-				if (array[i] && typeof array[i] === "object") {
-					newObj[i] = clone(array[i]);
-				} else {
-					newObj[i] = array[i];
-				}
-			}
+		for (var x = 0; x < array.length; x++) {
+			newObj[x] = array[x].slice(0)
 		}
 		return newObj;
 	}

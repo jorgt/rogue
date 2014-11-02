@@ -5,7 +5,7 @@ define(["helpers/log", "engine/states", "game/assets", "game/screen"], function(
 	Screen) {
 
 	var menu = Screen.get('menu').hide();
-	var assets = new Assets('menu', 15)
+	var assets = new Assets('menu')
 
 	states.add({
 		name: 'menu',

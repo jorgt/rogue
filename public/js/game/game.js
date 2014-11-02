@@ -2,14 +2,14 @@ define([
 	"helpers/log",
 	"game/tilebank",
 	"game/assets",
-	"game/dungeon/level",
+	"game/dungeon/Dungeon",
 	"helpers/events",
 	"settings"
 ], function(
 	log,
 	bank,
 	Assets,
-	Level,
+	Dungeon,
 	Events,
 	settings) {
 
@@ -24,24 +24,25 @@ define([
 		var _sidebar = parentScreen.get('sidebar', true, 300).position('left')
 		_mainscreen.classList.remove('center');
 		_screen.classList.remove('center');
-		var _level = new Level();
+
+		var _assets = new Assets('game');
+		var _current = new Dungeon(_assets);
 		var _size = settings.square;
-		var _asset = new Assets('game', bank);
 
 		this.start = function() {
-			var grid = _level.getGrid();
+			var grid = _current.getGrid();
 
 			for (var x = 0; x < grid.length; x++) {
 				for (var y = 0; y < grid[x].length; y++) {
-					_screen.add(_asset.object(grid[x][y], x, y));
+					_screen.add(grid[x][y], x, y);
 				}
 			}
 
-			_screen.add(_asset.player(0,0, this));
+			_screen.add(_assets.player(0, 0, this));
 			_setupMovementEvents();
 			_screen.size(grid.length * _size, grid[0].length * _size);
-			var player = _asset.player();
-			player.move(_level.getGrid(), _level.enter().start[0], _level.enter().start[1]);
+			var player = _assets.player();
+			player.move(_current.getGrid(), _current.enter().start[0], _current.enter().start[1]);
 			player.draw();
 			player.view.update(player.position());
 			player.draw();
@@ -50,12 +51,8 @@ define([
 
 		};
 
-		this.level = function() {
-			return _level;
-		}
-
-		this.assets = function() {
-			return _asset;
+		this.dungeon = function() {
+			return _current;
 		}
 
 		this.update = function() {
@@ -63,7 +60,7 @@ define([
 		};
 
 		function _setupMovementEvents() {
-			var _player = _asset.player();
+			var _player = _assets.player();
 			Events.on('game.movement', function(evt) {
 				var x = 0,
 					y = 0;
@@ -84,7 +81,7 @@ define([
 						throw new Error('Game:', 'direction not defined', evt.detail.direction);
 				}
 				//always move player
-				_player.move(_level.getGrid(), x, y);
+				_player.move(_current.getGrid(), x, y);
 				_player.view.update(_player.position());
 				_player.draw();
 				_scroll(_player, x, y);

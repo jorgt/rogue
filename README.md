@@ -4,8 +4,11 @@ Boo boo bla bla
 
 ## TO DO
 
-- Rewrite grid/assets. No need for two grids, can be incorporated. Do not want to store it in assets. Increase visibility / ease of use on element decorators in assets
+- Increase visibility / ease of use on element decorators in assets
 - Fix div position on game initialization
+- Try to generate and switch between two grids. 
+- Generator for worlds. should not matter if dungeon or overworld etc
+- Add different types of landscapes
 
 ## IDEAS
 

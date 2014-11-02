@@ -1,5 +1,6 @@
-define(["helpers/log", "helpers/binaryheap"], function(
+define(["helpers/log", "game/tilebank", "helpers/binaryheap"], function(
 	log,
+	bank,
 	BinaryHeap) {
 
 	'use strict';
@@ -14,8 +15,8 @@ define(["helpers/log", "helpers/binaryheap"], function(
 					node.f = 0;
 					node.g = 0;
 					node.h = 0;
-					node.speed = grid[x][y].speed;
-					node.blocking = !grid[x][y].diggable;
+					node.speed = bank.get(grid[x][y].tile).speed;
+					node.blocking = !bank.get(grid[x][y].tile).diggable;
 					node.visited = false;
 					node.closed = false;
 					node.parent = null;

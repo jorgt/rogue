@@ -1,5 +1,6 @@
-define(["helpers/log"], function(
-	log) {
+define(["helpers/log", "game/tilebank"], function(
+	log,
+	bank) {
 
 	'use strict';
 
@@ -24,10 +25,10 @@ define(["helpers/log"], function(
 
 		// calculates an octant. Called by the this.calculate when calculating lighting
 		this.calculateOctant = function(cx, cy, row, start, end, radius, xx, xy, yx, yy, id) {
-			map.assets().get(cx, cy).visible(true);
-			map.assets().get(cx, cy).visited(true);
-			map.assets().get(cx, cy).draw();
-			this.tiles.push(map.assets().get(cx, cy));
+			map.level().get(cx, cy).visible(true);
+			map.level().get(cx, cy).visited(true);
+			map.level().get(cx, cy).draw();
+			this.tiles.push(map.level().get(cx, cy));
 
 			var new_start = 0;
 
@@ -59,14 +60,14 @@ define(["helpers/log"], function(
 							break;
 						} else {
 							if (dx * dx + dy * dy < radius_squared) {
-								map.assets().get(X, Y).visible(true);
-								map.assets().get(X, Y).visited(true);
-								map.assets().get(X, Y).draw();
-								this.tiles.push(map.assets().get(X, Y));
+								map.level().get(X, Y).visible(true);
+								map.level().get(X, Y).visited(true);
+								map.level().get(X, Y).draw();
+								this.tiles.push(map.level().get(X, Y));
 							}
 
 							if (blocked) {
-								if (map.level().get(X, Y).blocking) {
+								if (bank.get(map.level().get(X, Y).tile).blocking) {
 									new_start = r_slope;
 									continue;
 								} else {
@@ -74,7 +75,7 @@ define(["helpers/log"], function(
 									start = new_start;
 								}
 							} else {
-								if (map.level().get(X, Y).blocking && i < radius) {
+								if (bank.get(map.level().get(X, Y).tile).blocking && i < radius) {
 									blocked = true;
 									this.calculateOctant(cx, cy, i + 1, start, l_slope, radius, xx, xy, yx, yy, id + 1);
 
@@ -108,10 +109,10 @@ define(["helpers/log"], function(
 					this.mult[0][i], this.mult[1][i], this.mult[2][i], this.mult[3][i], 0);
 			}
 
-			map.assets().get(this.position).visible(true);
-			map.assets().get(this.position).visited(true);
-			map.assets().get(this.position).draw();
-			this.tiles.push(map.assets().get(this.position));
+			map.level().get(this.position).visible(true);
+			map.level().get(this.position).visited(true);
+			map.level().get(this.position).draw();
+			this.tiles.push(map.level().get(this.position));
 		}
 
 		// update the position of the light source

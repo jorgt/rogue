@@ -17,7 +17,7 @@ define([
 		var game = null;
 		var playing = Screen.get('playing').hide();
 		var loading = Screen.get('loading').hide();
-		var assets = new Assets('loading', 15);
+		var assets = new Assets('loading');
 
 		states.add({
 			name: 'play',
