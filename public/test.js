@@ -1,15 +1,32 @@
 function World() {
+	var _grid;
+	
+	this.getGrid = function() {
+		return _grid;
+	}
 
+	this.createGrid = function() {
+		_grid = 'grid'
+	}
+
+	this.createGrid();
 }
 
 
 function Land() {
 
+	this.createGrid = function() {
+		_grid = 'land'
+	}
 }
+
+Land.prototype = Object.create(World.prototype);
 
 function Dungeon() {
 
 }
+
+Dungeon.prototype = new World();
 
 var stack = [World, Land, Dungeon]
 
