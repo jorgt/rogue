@@ -144,6 +144,9 @@ pre {
   -o-animation: pulselight 5s linear infinite alternate;
   animation: pulselight 5s linear infinite alternate;
 }
+.game-object.highlight {
+  background-color: #ff0;
+}
 .game-object-tree {
   color: #fff;
   background-color: #0b0;

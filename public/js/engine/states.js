@@ -1,5 +1,6 @@
-define(["engine/keys", "helpers/log"], function(
+define(["engine/keys", "engine/mouse", "helpers/log"], function(
 	Keys,
+	Mouse,
 	log) {
 
 	'use strict';
@@ -11,6 +12,7 @@ define(["engine/keys", "helpers/log"], function(
 		var _object = obj;
 
 		this.keys = new Keys(false);
+		this.mouse = new Mouse();
 
 		this.update = function(time) {
 			this.keys.update();

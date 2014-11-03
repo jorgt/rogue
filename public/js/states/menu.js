@@ -17,10 +17,19 @@ define(["helpers/log", "engine/states", "game/assets", "game/screen"], function(
 			menu.add(assets.text('Press [ENTER] to start', 10, 15));
 		},
 		start: function() {
-			menu.show()
+			menu.show();
+			
 		},
 		stop: function() {
 			menu.hide();
 		}
 	});
+
+	function _keys() {
+
+	}
+
+	function _mouse() {
+
+	}
 });

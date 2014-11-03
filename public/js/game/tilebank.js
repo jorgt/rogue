@@ -5,12 +5,41 @@ define(["helpers/log"], function(
 
 	var _bank = new TileBank();
 
+	/*
+		actors
+	*/
 	_bank.add('player', '@', 1, true, true, true);
 	_bank.add('tree', '^', 0, false, false, true);
+
+	/*
+		worlds
+	*/
+	_bank.add('ice', '.', 1, true, false, false);
+	_bank.add('frozenland', '.', 1, true, false, false);
+	_bank.add('drymountain', '.', 1, true, false, false);
+	_bank.add('snowymountain', '.', 1, true, false, false);
+	_bank.add('deepsea', '.', 1, true, false, false);
+	_bank.add('shallowsea', '.', 1, true, false, false);
+	_bank.add('wettundra', '.', 1, true, false, false);
+	_bank.add('moisttundra', '.', 1, true, false, false);
+	_bank.add('drytundra', '.', 1, true, false, false);
+	_bank.add('rainforest', '.', 1, true, false, false);
+	_bank.add('wetforest', '.', 1, true, false, false);
+	_bank.add('mostforest', '.', 1, true, false, false);
+	_bank.add('dryforest', '.', 1, true, false, false);
+	_bank.add('dryscrub', '.', 1, true, false, false);
+	_bank.add('desertscrub', '.', 1, true, false, false);
+	_bank.add('steppe', '.', 1, true, false, false);
+	_bank.add('woodland', '.', 1, true, false, false);
+
+
+	/*
+		dungeons and caves
+	*/
 	_bank.add('floor', '.', 1, true, false, false);
 	_bank.add('door', '.', 1, true, true, false);
 	_bank.add('road', '.', 50, true, true, false);
-	_bank.add('rock', ' ', 99, false, true, true); // speed 0
+	_bank.add('rock', ' ', 99, false, true, true);
 	_bank.add('wall', '#', 0, false, false, true);
 
 	return _bank;

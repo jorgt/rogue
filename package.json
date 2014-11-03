@@ -15,5 +15,9 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-shell": "^1.1.1",
     "jshint-stylish": "^1.0.0"
+  },
+  "dependencies": {
+    "bunyan": "^1.2.1",
+    "restify": "^2.8.3"
   }
 }

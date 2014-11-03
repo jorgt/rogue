@@ -33,6 +33,9 @@ module.exports = function(grunt) {
 			},
 			stylusgenerate: {
 				command: 'stylus -u nib stylus/game.styl -o public/css'
+			},
+			server: {
+				command: 'http-server ./public/'
 			}
 		}
 	});
@@ -46,5 +49,9 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('stylus', [
 		'shell:styluswatch'
+	]);
+
+	grunt.registerTask('serve', [
+		'shell:server'
 	]);
 };

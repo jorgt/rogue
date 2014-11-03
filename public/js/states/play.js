@@ -59,6 +59,13 @@ define([
 					playing.show()
 
 					game.start();
+
+					this.mouse.setup(playing);
+					this.mouse.up(function(e) {
+						Events.raise('game.click', {
+							location: e.tile
+						});
+					})
 				}.bind(this), 1)
 
 			},

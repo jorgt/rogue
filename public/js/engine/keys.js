@@ -78,10 +78,15 @@ define(["helpers/log"], function(
 		}
 	}
 
+	/**
+		consider adding an element to Keys constructor so it can be 
+		bound to a specific element. Makes switching easier if it's
+		bound to different aspects of the game screen?
+	*/
 	function Keys(rt) {
 		var _guid = guid();
 		log.med('[KEYS:' + _guid + ']', 'getting a new key object');
-		var _realtime = rt;
+		var _realtime = rt || false;
 
 		this.keys = new Array(222);
 		this.callbacks = {
