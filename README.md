@@ -5,13 +5,14 @@ Boo boo bla bla
 ## TO DO
 
 Techy stuff
-- Mouse events to recognise block - hover, click and select etc. 
+- Mousemove, grrr. 
 
 Game stuff
 - Increase visibility / ease of use on element decorators in assets
 - Fix div position on game initialization
 - Try to generate and switch between two grids. 
-- Generator for worlds. should not matter if dungeon or overworld etc
+- Make worlds as wrap-arounds. Use the tileable noise algorithm. 
+- Make worlds more realistic in terms of biomes: temp more equator - polar, altitude still as noise, percipitation as noise. 
 - Add different types of landscapes
 
 ## IDEAS

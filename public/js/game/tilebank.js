@@ -21,8 +21,6 @@ define(["helpers/log"], function(
 	_bank.add('frozenland', '.', 1, true, false, false);
 	_bank.add('drymountain', '.', 1, true, false, false);
 	_bank.add('snowymountain', '.', 1, true, false, false);
-	_bank.add('deepsea', '.', 1, true, false, false);
-	_bank.add('shallowsea', '.', 1, true, false, false);
 	_bank.add('wettundra', '.', 1, true, false, false);
 	_bank.add('moisttundra', '.', 1, true, false, false);
 	_bank.add('drytundra', '.', 1, true, false, false);

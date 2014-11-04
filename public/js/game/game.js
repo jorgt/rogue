@@ -21,12 +21,15 @@ define([
 
 		var _mainscreen = parentScreen.get('main');
 		_mainscreen.classList.remove('center');
+
 		var _screen = null;
-		var _sidebar = parentScreen.get('sidebar', true, 300).position('left')
+		var _sidebar = parentScreen.get('sidebar', true, 300).position('left');
 		var _assets = new Assets('game');
 		var _current = Planes.createPlane({
 			type: 'world',
-			options: _assets
+			options: {
+				assets: _assets
+			}
 		});
 
 		this.start = function() {
@@ -39,15 +42,23 @@ define([
 				}
 			}
 
-			_screen.add(_assets.player(0, 0, this));
+			_screen.add(_assets.player(_current.enter().start[0], _current.enter().start[1], this));
 			_setupMovementEvents();
 			_screen.size(grid.length * settings.square, grid[0].length * settings.square);
 			var player = _assets.player();
 			player.move(_current.getGrid(), _current.enter().start[0], _current.enter().start[1]);
-			player.draw();
 			player.view.update(player.position());
 			player.draw();
 			_scroll(player, player.position()[0], player.position()[1]);
+
+			var dim = _screen.dimensions();
+			if(dim.canvas.height < dim.parent.height) {
+				_screen.classList.add('center-vert')
+			}
+			if(dim.canvas.width < dim.parent.width) {
+				_screen.classList.add('center-hori')
+			}
+
 			log.urgent('[GAME:' + _guid + ']', 'game running!');
 		};
 
@@ -55,8 +66,7 @@ define([
 			return _current;
 		}
 
-		this.update = function() {
-		};
+		this.update = function() {};
 
 		function _setupScreen(type) {
 			if (_screen !== null) {
@@ -64,7 +74,7 @@ define([
 			}
 			_screen = _mainscreen.independent('dungeon');
 			_screen.classList.remove('center');
-			_screen.classList.add('game-screen-'+type)
+			_screen.classList.add('game-screen-' + type)
 		}
 
 		function _setupMovementEvents() {
@@ -94,6 +104,7 @@ define([
 				_player.draw();
 				_scroll(_player, x, y);
 
+				Events.raise('game.update');
 			}.bind(this));
 
 			Events.on('game.screen.resize', function(e) {

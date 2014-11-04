@@ -103,6 +103,26 @@ pre {
   bottom: 0;
   right: 0;
 }
+.center-vert {
+  margin: 0 auto;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.center-hori {
+  margin: auto 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
 #game {
   max-width: 100%;
   max-height: 100%;
@@ -150,8 +170,8 @@ pre {
   color: #f00;
 }
 .game-screen-world .game-object-ice {
-  background-color: #fff;
-  color: #e6e6e6;
+  background-color: #eee;
+  color: #d6d6d6;
 }
 .game-screen-world .game-object-shallowsea {
   background-color: #2743c2;
@@ -166,16 +186,16 @@ pre {
   color: #0020af;
 }
 .game-screen-world .game-object-frozenland {
-  background-color: #eef;
-  color: #bdbdff;
+  background-color: #bbe;
+  color: #9999e6;
 }
 .game-screen-world .game-object-drymountain {
-  background-color: #00198a;
-  color: #0020af;
+  background-color: #666;
+  color: #757575;
 }
 .game-screen-world .game-object-snowymountain {
-  background-color: #eee;
-  color: #d6d6d6;
+  background-color: #bbb;
+  color: #a8a8a8;
 }
 .game-screen-world .game-object-raintundra {
   background-color: #2080c4;
