@@ -14,10 +14,17 @@ define(["helpers/log"], function(
 	/*
 		worlds
 	*/
+<<<<<<< .merge_file_a09412
+=======
+	_bank.add('sea', '~', 1, false, false, false);
+	_bank.add('deepsea', '~', 1, false, false, false);
+	_bank.add('shallowsea', '~', 1, false, false, false);
+>>>>>>> .merge_file_a07528
 	_bank.add('ice', '.', 1, true, false, false);
 	_bank.add('frozenland', '.', 1, true, false, false);
 	_bank.add('drymountain', '.', 1, true, false, false);
 	_bank.add('snowymountain', '.', 1, true, false, false);
+<<<<<<< .merge_file_a09412
 	_bank.add('deepsea', '.', 1, true, false, false);
 	_bank.add('shallowsea', '.', 1, true, false, false);
 	_bank.add('wettundra', '.', 1, true, false, false);
@@ -28,6 +35,18 @@ define(["helpers/log"], function(
 	_bank.add('mostforest', '.', 1, true, false, false);
 	_bank.add('dryforest', '.', 1, true, false, false);
 	_bank.add('dryscrub', '.', 1, true, false, false);
+=======
+	_bank.add('wettundra', '.', 1, true, false, false);
+	_bank.add('moisttundra', '.', 1, true, false, false);
+	_bank.add('drytundra', '.', 1, true, false, false);
+	_bank.add('rainforest', '^', 1, true, false, false);
+	_bank.add('wetforest', '^', 1, true, false, false);
+	_bank.add('moistforest', '^', 1, true, false, false);
+	_bank.add('dryforest', '^', 1, true, false, false);
+	_bank.add('verydryforest', '^', 1, true, false, false);
+	_bank.add('dryscrub', '.', 1, true, false, false);
+	_bank.add('desert', '.', 1, true, false, false);
+>>>>>>> .merge_file_a07528
 	_bank.add('desertscrub', '.', 1, true, false, false);
 	_bank.add('steppe', '.', 1, true, false, false);
 	_bank.add('woodland', '.', 1, true, false, false);
