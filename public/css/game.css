@@ -161,6 +161,10 @@ pre {
 #game .game-screen-world .notvisited {
   visibility: visible;
 }
+#game .game-screen-world .notvisible {
+  color: ;
+  background-color: #000;
+}
 .game-screen-world .game-object {
   color: #fff;
   background-color: #fff;
@@ -171,83 +175,83 @@ pre {
 }
 .game-screen-world .game-object-ice {
   background-color: #eee;
-  color: #d6d6d6;
+  color: #bebebe;
 }
 .game-screen-world .game-object-shallowsea {
   background-color: #2743c2;
-  color: #2f4dd5;
+  color: #4661da;
 }
 .game-screen-world .game-object-sea {
   background-color: #142ea6;
-  color: #1736c3;
+  color: #1b3ee0;
 }
 .game-screen-world .game-object-deepsea {
   background-color: #00198a;
-  color: #0020af;
+  color: #0026d4;
 }
 .game-screen-world .game-object-frozenland {
   background-color: #bbe;
-  color: #9999e6;
+  color: #77d;
 }
 .game-screen-world .game-object-drymountain {
   background-color: #666;
-  color: #757575;
+  color: #858585;
 }
 .game-screen-world .game-object-snowymountain {
   background-color: #bbb;
-  color: #a8a8a8;
+  color: #969696;
 }
 .game-screen-world .game-object-raintundra {
   background-color: #2080c4;
-  color: #2590db;
+  color: #3d9cdf;
 }
 .game-screen-world .game-object-wettundra {
   background-color: #408090;
-  color: #4993a5;
+  color: #58a2b5;
 }
 .game-screen-world .game-object-moisttundra {
   background-color: #608080;
-  color: #6c9090;
+  color: #7c9d9d;
 }
 .game-screen-world .game-object-drytundra {
   background-color: #808080;
-  color: #737373;
+  color: #666;
 }
 .game-screen-world .game-object-rainforest {
   background-color: #20c0c0;
-  color: #24d9d9;
+  color: #3bdede;
 }
 .game-screen-world .game-object-wetforest {
   background-color: #40a090;
-  color: #48b4a2;
+  color: #5cbead;
 }
 .game-screen-world .game-object-moistforest {
   background-color: #60a080;
-  color: #569073;
+  color: #4d8066;
 }
 .game-screen-world .game-object-dryforest {
   background-color: #80e080;
-  color: #64d964;
+  color: #47d247;
 }
 .game-screen-world .game-object-verydryforest {
   background-color: #a0ff80;
-  color: #83ff5a;
+  color: #67ff33;
 }
 .game-screen-world .game-object-dryscrub {
   background-color: #80a080;
-  color: #709470;
+  color: #638463;
 }
 .game-screen-world .game-object-desertscrub {
   background-color: #e0ff80;
-  color: #d7ff5a;
+  color: #cdff33;
 }
 .game-screen-world .game-object-steppe {
   background-color: #c0c080;
-  color: #b5b56b;
+  color: #abab55;
 }
 .game-screen-world .game-object-woodland {
   background-color: #c0ff80;
-  color: #adff5a;
+  color: #9aff33;
 }
 .game-screen-dungeon .game-object {
   color: #999;
