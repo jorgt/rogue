@@ -5,19 +5,6 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 
 	'use strict';
 
-<<<<<<< .merge_file_a08388
-	function Dungeon(assets) {
-		var _guid = guid();
-		var _height = uneven(random(35, 50));
-		var _width = uneven(random(60, 80));
-		var _surface = _height * _width;
-		var _grid = [];
-		var _floorspace = 0;
-		var _totalfloorspace = uneven(random(_surface * 0.3, _surface * 0.4));
-		var _doors = [];
-		var _start = null;
-		var _end = null;
-=======
 	return function dungeon(assets) {
 		var _guid = guid();
 		var _height = uneven(random(35, 50));
@@ -30,42 +17,12 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 		var _totalfloorspace = uneven(random(_surface * 0.3, _surface * 0.4));
 		var _doors = [];
 
->>>>>>> .merge_file_a05644
-
 		log.high('[DUNGEON:' + _guid + ']',
 			'dimensions', _height, 'x', _width, 'blocks');
 
 		_initializeRooms();
 		_connectDoors();
 		_getStartAndEndTiles();
-
-<<<<<<< .merge_file_a08388
-		this.getGrid = function() {
-			return _grid;
-		};
-
-		this.enter = function() {
-			return {
-				start: _start,
-				end: _end
-			}
-		}
-
-		this.size = function() {
-			return {
-				x: _height,
-				y: _width
-			}
-		}
-
-		this.get = function(x, y) {
-			if (x instanceof Array) {
-				y = x[1];
-				x = x[0];
-			}
-			return _grid[x][y];
-		}
-=======
 
 		return {
 			grid: _grid,
@@ -74,7 +31,6 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			height: _height,
 			width: _width
 		};
->>>>>>> .merge_file_a05644
 
 		function _fill(tile) {
 			for (var x = 0; x < _height; x++) {
@@ -178,13 +134,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			_grid = grid;
 			return w * h;
 		}
-<<<<<<< .merge_file_a08388
-	}
-
-	return Dungeon;
-=======
 	};
->>>>>>> .merge_file_a05644
 
 	function clone(array) {
 		var newObj = (array instanceof Array) ? [] : {};

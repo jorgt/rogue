@@ -18,11 +18,7 @@ if (typeof define !== 'undefined') {
     define([], function() {
         'use strict';
 
-<<<<<<< .merge_file_a08184
-        return SimplexNoise;
-=======
         return Simplex;
->>>>>>> .merge_file_a07028
     });
 }
 

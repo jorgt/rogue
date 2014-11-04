@@ -35,11 +35,7 @@ module.exports = function(grunt) {
 				command: 'stylus -u nib stylus/game.styl -o public/css'
 			},
 			server: {
-<<<<<<< .merge_file_a07400
-				command: 'http-server ./public/'
-=======
 				command: 'http-server -s ./public/'
->>>>>>> .merge_file_a08512
 			}
 		}
 	});
