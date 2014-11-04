@@ -1,5 +1,15 @@
-define(["helpers/log", "helpers/settings", "game/worlds/climate"], function(
-	log, settings, Climate) {
+define([
+	"helpers/log",
+	"settings",
+	"game/worlds/climate",
+	"libs/simplex",
+	"game/tilebank"
+], function(
+	log,
+	settings,
+	Climate,
+	Simplex,
+	bank) {
 
 
 	var height = 1000;
@@ -19,7 +29,7 @@ define(["helpers/log", "helpers/settings", "game/worlds/climate"], function(
 			max: 16000
 		},
 		temperature: {
-			min: -50,
+			min: -25,
 			max: 50
 		}
 	}
@@ -43,26 +53,40 @@ define(["helpers/log", "helpers/settings", "game/worlds/climate"], function(
 		level: 0.06
 	});
 
-	function World() {
-		var gAlt = _chunk(sAlt, ranges.altitude, chunk, 0, 0);
-		var gPre = _chunk(sPre, ranges.precipitation, chunk, 0, 0);
-		var gTem = _chunk(sTem, ranges.temperature, chunk);
+	return function world(assets) {
+		var _height = uneven(random(35, 50));
+		var _width = uneven(random(60, 80));
+		var _grid = [];
+		var _start = null;
+		var _end = null;
+		var gAlt = _chunk(sAlt, ranges.altitude, _height, _width, 0, 0);
+		var gPre = _chunk(sPre, ranges.precipitation, _height, _width, 0, 0);
+		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0);
 
-		var world = [];
-		for (var x = 0; x < 50; x++) {
-			world[x] = [];
-			for (var y = 0; y < 50; y++) {
-				world[x][y] = Climate.getClimateInfo(Climate.get(gTem[x][y], gPre[x][y], gAlt[x][y]))
+		for (var x = 0; x < _height; x++) {
+			_grid[x] = [];
+			for (var y = 0; y < _width; y++) {
+				var c = Climate.getClimateInfo(Climate.get(gTem[x][y], gPre[x][y], gAlt[x][y]));
+				_grid[x][y] = assets.object(bank.get(c.replace(/\s/g, '')), x, y);
 			}
 		}
 
-		function _chunk(noise, range, size, startx, starty) {
+
+		return {
+			grid: _grid,
+			start: [10,10],
+			end: [20,20],
+			height: _height,
+			width: _width
+		};
+
+		function _chunk(noise, range, w, h, startx, starty) {
 			var grid = [];
-			var sx = startx * size;
-			var sy = starty * size;
-			for (var x = 0; x < size; x++) {
+			var sx = startx * h;
+			var sy = starty * w;
+			for (var x = 0; x < w; x++) {
 				grid[x] = [];
-				for (var y = 0; y < size; y++) {
+				for (var y = 0; y < h; y++) {
 					grid[x][y] = Math.floor(_range(range, noise.noise((sx + x) * noise.level, (sy + y) * noise.level)));
 				}
 			}
@@ -72,6 +96,8 @@ define(["helpers/log", "helpers/settings", "game/worlds/climate"], function(
 		function _range(range, n) {
 			return (range.max - range.min) * n + range.min;
 		}
+
+
 	}
 
 });

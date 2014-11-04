@@ -18,7 +18,7 @@ if (typeof define !== 'undefined') {
     define([], function() {
         'use strict';
 
-        return SimplexNoise;
+        return Simplex;
     });
 }
 

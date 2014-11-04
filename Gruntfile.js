@@ -35,7 +35,7 @@ module.exports = function(grunt) {
 				command: 'stylus -u nib stylus/game.styl -o public/css'
 			},
 			server: {
-				command: 'http-server ./public/'
+				command: 'http-server -s ./public/'
 			}
 		}
 	});

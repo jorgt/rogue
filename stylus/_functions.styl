@@ -11,6 +11,12 @@ animate() {
 	animation:            arguments /* IE 10+, Fx 29+ */
 }
 
+fg(color, percent = 10%)
+	if light(color)
+		darken(color, percent)
+	else
+		lighten(color, percent)
+
 @keyframes pulselight {
   0%   { opacity: 1 }
   10%  { opacity: 0.85 }

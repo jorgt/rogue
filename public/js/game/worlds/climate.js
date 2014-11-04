@@ -1,6 +1,7 @@
 define(["helpers/log"], function(
 	log) {
 
+	'use strict';
 
 	var Climate = {
 		_temp: ['tropical', 'subtropical', 'warm', 'cool', 'boreal', 'subpolar', 'polar'],
@@ -105,7 +106,7 @@ define(["helpers/log"], function(
 			return Climate._climates[climate];
 		},
 		checkConsistency: function() {
-			console.warn('MAP: checking consistency');
+			log.low('[CLIMATE]: checking consistency');
 			var used = [];
 			for (var a = 0; a < Climate._temp.length; a++) {
 				for (var b = 0; b < Climate._hum.length; b++) {
@@ -119,8 +120,10 @@ define(["helpers/log"], function(
 				}
 			}
 			used.sort();
-			console.warn('MAP: done checking. Found: ', used);
+			log.low('[CLIMATE]: done checking. Found: ', used);
 		}
 	};
+
+	return Climate;
 
 });

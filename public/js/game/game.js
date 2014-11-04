@@ -2,14 +2,14 @@ define([
 	"helpers/log",
 	"game/tilebank",
 	"game/assets",
-	"game/worlds/dungeon",
+	"game/worlds/planes",
 	"helpers/events",
 	"settings"
 ], function(
 	log,
 	bank,
 	Assets,
-	Dungeon,
+	Planes,
 	Events,
 	settings) {
 
@@ -19,17 +19,18 @@ define([
 		var _guid = guid();
 		log.urgent('[GAME:' + _guid + ']', 'initializing game');
 
-		var _mainscreen = parentScreen.get('main')
-		var _screen = _mainscreen.independent('dungeon');
-		var _sidebar = parentScreen.get('sidebar', true, 300).position('left')
+		var _mainscreen = parentScreen.get('main');
 		_mainscreen.classList.remove('center');
-		_screen.classList.remove('center');
-
+		var _screen = null;
+		var _sidebar = parentScreen.get('sidebar', true, 300).position('left')
 		var _assets = new Assets('game');
-		var _current = new Dungeon(_assets);
-		var _size = settings.square;
+		var _current = Planes.createPlane({
+			type: 'world',
+			options: _assets
+		});
 
 		this.start = function() {
+			_setupScreen(_current.type);
 			var grid = _current.getGrid();
 
 			for (var x = 0; x < grid.length; x++) {
@@ -40,7 +41,7 @@ define([
 
 			_screen.add(_assets.player(0, 0, this));
 			_setupMovementEvents();
-			_screen.size(grid.length * _size, grid[0].length * _size);
+			_screen.size(grid.length * settings.square, grid[0].length * settings.square);
 			var player = _assets.player();
 			player.move(_current.getGrid(), _current.enter().start[0], _current.enter().start[1]);
 			player.draw();
@@ -49,6 +50,8 @@ define([
 			_scroll(player, player.position()[0], player.position()[1]);
 			log.urgent('[GAME:' + _guid + ']', 'game running!');
 
+			//this.start();
+
 		};
 
 		this.dungeon = function() {
@@ -56,8 +59,17 @@ define([
 		}
 
 		this.update = function() {
-
+			// monster stuff
 		};
+
+		function _setupScreen(type) {
+			if (_screen !== null) {
+				_screen.hide();
+			}
+			_screen = _mainscreen.independent('dungeon');
+			_screen.classList.remove('center');
+			_screen.classList.add('game-screen-'+type)
+		}
 
 		function _setupMovementEvents() {
 			var _player = _assets.player();
@@ -103,26 +115,26 @@ define([
 			var top = 0;
 			var left = 0
 			if (x === 1 && ph >= halfH && !(dim.canvas.height + dim.canvas.top <= dim.parent.height)) {
-				top = -1 * _size
+				top = -1 * settings.square
 			}
 
 			if (x === -1 && dim.canvas.top !== 0 && ph <= halfH) { //down
-				_screen.scroll(_size, 0)
+				_screen.scroll(settings.square, 0)
 			}
 
 			if (y === 1 && pw >= halfW && !(dim.canvas.width + dim.canvas.left <= dim.parent.width)) { //down
-				left = -1 * _size;
+				left = -1 * settings.square;
 			}
 
 			if (y === -1 && dim.canvas.left !== 0 && pw <= halfW) { //down
-				left = _size;
+				left = settings.square;
 			}
 
 			_screen.scroll(top, left)
 		}
 
 		function _toBlock(n) {
-			return Math.floor(n / _size);
+			return Math.floor(n / settings.square);
 		}
 	}
 

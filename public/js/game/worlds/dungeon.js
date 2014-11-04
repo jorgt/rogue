@@ -5,17 +5,18 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 
 	'use strict';
 
-	function Dungeon(assets) {
+	return function dungeon(assets) {
 		var _guid = guid();
 		var _height = uneven(random(35, 50));
 		var _width = uneven(random(60, 80));
-		var _surface = _height * _width;
 		var _grid = [];
+		var _start = null;
+		var _end = null;
+		var _surface = _height * _width;
 		var _floorspace = 0;
 		var _totalfloorspace = uneven(random(_surface * 0.3, _surface * 0.4));
 		var _doors = [];
-		var _start = null;
-		var _end = null;
+
 
 		log.high('[DUNGEON:' + _guid + ']',
 			'dimensions', _height, 'x', _width, 'blocks');
@@ -24,31 +25,14 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 		_connectDoors();
 		_getStartAndEndTiles();
 
-		this.getGrid = function() {
-			return _grid;
+
+		return {
+			grid: _grid,
+			start: _start,
+			end: _end,
+			height: _height,
+			width: _width
 		};
-
-		this.enter = function() {
-			return {
-				start: _start,
-				end: _end
-			}
-		}
-
-		this.size = function() {
-			return {
-				x: _height,
-				y: _width
-			}
-		}
-
-		this.get = function(x, y) {
-			if (x instanceof Array) {
-				y = x[1];
-				x = x[0];
-			}
-			return _grid[x][y];
-		}
 
 		function _fill(tile) {
 			for (var x = 0; x < _height; x++) {
@@ -152,9 +136,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			_grid = grid;
 			return w * h;
 		}
-	}
-
-	return Dungeon;
+	};
 
 	function clone(array) {
 		var newObj = (array instanceof Array) ? [] : {};
