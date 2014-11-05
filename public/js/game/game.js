@@ -32,6 +32,11 @@ define([
 			}
 		});
 
+		_setupMovementEvents();
+		_setupDelving();
+
+		var _navigation = [];
+
 		this.start = function() {
 			_setupScreen(_current.type);
 			var grid = _current.getGrid();
@@ -41,21 +46,20 @@ define([
 					_screen.add(grid[x][y], x, y);
 				}
 			}
-
 			_screen.add(_assets.player(_current.enter().start[0], _current.enter().start[1], this));
-			_setupMovementEvents();
 			_screen.size(grid.length * settings.square, grid[0].length * settings.square);
 			var player = _assets.player();
+
 			player.move(_current.getGrid(), _current.enter().start[0], _current.enter().start[1]);
-			player.view.update(player.position());
+			player.view.update(player.position(), this);
 			player.draw();
 			_scroll(player, player.position()[0], player.position()[1]);
 
 			var dim = _screen.dimensions();
-			if(dim.canvas.height < dim.parent.height) {
+			if (dim.canvas.height < dim.parent.height) {
 				_screen.classList.add('center-vert')
 			}
-			if(dim.canvas.width < dim.parent.width) {
+			if (dim.canvas.width < dim.parent.width) {
 				_screen.classList.add('center-hori')
 			}
 
@@ -77,34 +81,29 @@ define([
 			_screen.classList.add('game-screen-' + type)
 		}
 
-		function _setupMovementEvents() {
-			var _player = _assets.player();
-			Events.on('game.movement', function(evt) {
-				var x = 0,
-					y = 0;
-				switch (evt.detail.direction) {
-					case 'left':
-						y = -1;
-						break;
-					case 'up':
-						x = -1;
-						break;
-					case 'right':
-						y = 1;
-						break;
-					case 'down':
-						x = 1;
-						break;
-					default:
-						throw new Error('Game:', 'direction not defined', evt.detail.direction);
-				}
-				//always move player
-				_player.move(_current.getGrid(), x, y);
-				_player.view.update(_player.position());
-				_player.draw();
-				_scroll(_player, x, y);
+		function _setupDelving() {
+			//var player = _assets.player();
+			//console.log(_current)
+		}
 
-				Events.raise('game.update');
+		function _setupMovementEvents() {
+			Events.on('game.movement', function(evt) {
+				var player = _assets.player();
+				var dir = evt.detail.direction;
+				var x = (dir === 'up') ? -1 : (dir === 'down') ? 1 : 0;
+				var y = (dir === 'left') ? -1 : (dir === 'right') ? 1 : 0;
+				var old = player.position();
+				//move player
+				if (x !== 0 || y !== 0) {
+					player.move(_current.getGrid(), x, y);
+					if (player.position().toString() !== old.toString()) {
+						player.view.update(player.position(), _current);
+						player.draw();
+						_scroll(player, x, y);
+
+						Events.raise('game.update');
+					}
+				}
 			}.bind(this));
 
 			Events.on('game.screen.resize', function(e) {

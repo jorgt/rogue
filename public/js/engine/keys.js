@@ -33,6 +33,7 @@ define(["helpers/log"], function(
 	'use strict';
 
 	var MAP = {
+		//letters
 		65: 'a',
 		66: 'b',
 		67: 'c',
@@ -59,6 +60,7 @@ define(["helpers/log"], function(
 		88: 'x',
 		89: 'y',
 		90: 'z',
+		//modifiers
 		13: 'enter',
 		16: 'shift',
 		17: 'ctrl',
@@ -68,7 +70,14 @@ define(["helpers/log"], function(
 		37: 'left',
 		38: 'up',
 		39: 'right',
-		40: 'down'
+		40: 'down',
+		//special keys
+		45: 'ins',
+		46: 'del',
+		36: 'home',
+		35: 'end',
+		33: 'pagedown',
+		34: 'pageup',
 	};
 
 	var MAP_INVERSE = {};

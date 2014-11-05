@@ -138,12 +138,6 @@ pre {
   height: 100%;
   width: 100%;
 }
-#game .game-screen .visited {
-  visibility: visible;
-}
-#game .game-screen .notvisited {
-  visibility: hidden;
-}
 #game-playing-sidebar {
   border-left: 1px solid #fff;
 }
@@ -161,117 +155,123 @@ pre {
 #game .game-screen-world .notvisited {
   visibility: visible;
 }
-#game .game-screen-world .notvisible {
-  color: ;
-  background-color: #000;
-}
-.game-screen-world .game-object {
+#game .game-screen-world .game-object {
   color: #fff;
   background-color: #fff;
 }
-.game-screen-world .game-object-player {
+#game .game-screen-world .game-object-player {
   background-color: transparent;
   color: #f00;
 }
-.game-screen-world .game-object-ice {
+#game .game-screen-world .game-object-ice {
   background-color: #eee;
   color: #bebebe;
 }
-.game-screen-world .game-object-shallowsea {
+#game .game-screen-world .game-object-beach {
+  background-color: #fff830;
+  color: #f2ea00;
+}
+#game .game-screen-world .game-object-shallowsea {
   background-color: #2743c2;
   color: #4661da;
 }
-.game-screen-world .game-object-sea {
+#game .game-screen-world .game-object-sea {
   background-color: #142ea6;
   color: #1b3ee0;
 }
-.game-screen-world .game-object-deepsea {
+#game .game-screen-world .game-object-deepsea {
   background-color: #00198a;
   color: #0026d4;
 }
-.game-screen-world .game-object-frozenland {
+#game .game-screen-world .game-object-frozenland {
   background-color: #bbe;
   color: #77d;
 }
-.game-screen-world .game-object-drymountain {
-  background-color: #666;
-  color: #858585;
+#game .game-screen-world .game-object-drymountain {
+  background-color: #333;
+  color: #5c5c5c;
 }
-.game-screen-world .game-object-snowymountain {
-  background-color: #bbb;
-  color: #969696;
+#game .game-screen-world .game-object-snowymountain {
+  background-color: #bbe;
+  color: #77d;
 }
-.game-screen-world .game-object-raintundra {
+#game .game-screen-world .game-object-raintundra {
   background-color: #2080c4;
   color: #3d9cdf;
 }
-.game-screen-world .game-object-wettundra {
+#game .game-screen-world .game-object-wettundra {
   background-color: #408090;
   color: #58a2b5;
 }
-.game-screen-world .game-object-moisttundra {
+#game .game-screen-world .game-object-moisttundra {
   background-color: #608080;
   color: #7c9d9d;
 }
-.game-screen-world .game-object-drytundra {
+#game .game-screen-world .game-object-drytundra {
   background-color: #808080;
   color: #666;
 }
-.game-screen-world .game-object-rainforest {
+#game .game-screen-world .game-object-rainforest {
   background-color: #20c0c0;
   color: #3bdede;
 }
-.game-screen-world .game-object-wetforest {
+#game .game-screen-world .game-object-wetforest {
   background-color: #40a090;
   color: #5cbead;
 }
-.game-screen-world .game-object-moistforest {
+#game .game-screen-world .game-object-moistforest {
   background-color: #60a080;
   color: #4d8066;
 }
-.game-screen-world .game-object-dryforest {
+#game .game-screen-world .game-object-dryforest {
   background-color: #80e080;
   color: #47d247;
 }
-.game-screen-world .game-object-verydryforest {
+#game .game-screen-world .game-object-verydryforest {
   background-color: #a0ff80;
   color: #67ff33;
 }
-.game-screen-world .game-object-dryscrub {
+#game .game-screen-world .game-object-dryscrub {
   background-color: #80a080;
   color: #638463;
 }
-.game-screen-world .game-object-desertscrub {
+#game .game-screen-world .game-object-desertscrub {
   background-color: #e0ff80;
   color: #cdff33;
 }
-.game-screen-world .game-object-steppe {
+#game .game-screen-world .game-object-steppe {
   background-color: #c0c080;
   color: #abab55;
 }
-.game-screen-world .game-object-woodland {
+#game .game-screen-world .game-object-woodland {
   background-color: #c0ff80;
   color: #9aff33;
 }
-.game-screen-dungeon .game-object {
+#game .game-screen-dungeon .visited {
+  visibility: visible;
+}
+#game .game-screen-dungeon .notvisited {
+  visibility: hidden;
+}
+#game .game-screen-dungeon .game-object {
   color: #999;
   background-color: #000;
 }
-.game-screen-dungeon .game-object.notvisible {
+#game .game-screen-dungeon .game-object.notvisible {
   color: #2e2e2e;
 }
-.game-screen-dungeon .game-object.visible {
+#game .game-screen-dungeon .game-object.visible {
   background-color: #473600;
   -webkit-animation: pulselight 5s linear infinite alternate;
   -moz-animation: pulselight 5s linear infinite alternate;
   -o-animation: pulselight 5s linear infinite alternate;
   animation: pulselight 5s linear infinite alternate;
 }
-.game-screen-dungeon .game-object-tree {
+#game .game-screen-dungeon .game-object-tree {
   color: #fff;
   background-color: #0b0;
 }
-.game-screen-dungeon .game-object-rock {
+#game .game-screen-dungeon .game-object-rock {
   color: #000;
   background-color: #000;
 }

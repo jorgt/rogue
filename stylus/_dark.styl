@@ -43,117 +43,127 @@ game-object-rock-background = game-object-background
 		//.notvisible
 		//	filter gray
 		//	-webkit-filter grayscale(100%); /* Chrome 19+, Safari 6+, Safari 6+ iOS */
-		.notvisible
-			color @background-color
-			background-color #000
+		//.notvisible
+		//	color @background-color
+		//	background-color #000
 /*
 	Tile Types
 */
-.game-screen-world			
-	.game-object
-		color: #fff
-		background-color #fff
-		
-	.game-object-player
-		background-color transparent
-		color red
-		
-	.game-object-ice 
-		background-color #eee
-		color fg(@background-color, 20%)
+#game
+	.game-screen-world			
+		.game-object
+			color: #fff
+			background-color #fff
+			
+		.game-object-player
+			background-color transparent
+			color red
+			
+		.game-object-ice 
+			background-color #eee
+			color fg(@background-color, 20%)
 
-	.game-object-shallowsea 
-		background-color #2743C2
-		color fg(@background-color, 20%)
-		
-	.game-object-sea 
-		background-color #142EA6
-		color fg(@background-color, 20%)
-		
-	.game-object-deepsea 
-		background-color #00198A
-		color fg(@background-color, 20%)
-		
-	.game-object-frozenland
-		background-color #bbe 
-		color fg(@background-color, 20%)
-		
-	.game-object-drymountain 
-		background-color #666
-		color fg(@background-color, 20%)
-		
-	.game-object-snowymountain 
-		background-color #bbb
-		color fg(@background-color, 20%)
-		
-	.game-object-raintundra 
-		background-color rgb(32,128,196)
-		color fg(@background-color, 20%)
-		
-	.game-object-wettundra 
-		background-color rgb(64,128,144)
-		color fg(@background-color, 20%)
-		
-	.game-object-moisttundra 
-		background-color rgb(96,128,128)
-		color fg(@background-color, 20%)		
+		.game-object-beach 
+			background-color #FFF830
+			color fg(@background-color, 20%)
+			
+		.game-object-shallowsea 
+			background-color #2743C2
+			color fg(@background-color, 20%)
+			
+		.game-object-sea 
+			background-color #142EA6
+			color fg(@background-color, 20%)
+			
+		.game-object-deepsea 
+			background-color #00198A
+			color fg(@background-color, 20%)
+			
+		.game-object-frozenland
+			background-color #bbe 
+			color fg(@background-color, 20%)
+			
+		.game-object-drymountain 
+			background-color #333
+			color fg(@background-color, 20%)
+			
+		.game-object-snowymountain 
+			background-color #bbe
+			color fg(@background-color, 20%)
+			
+		.game-object-raintundra 
+			background-color rgb(32,128,196)
+			color fg(@background-color, 20%)
+			
+		.game-object-wettundra 
+			background-color rgb(64,128,144)
+			color fg(@background-color, 20%)
+			
+		.game-object-moisttundra 
+			background-color rgb(96,128,128)
+			color fg(@background-color, 20%)		
 
-	.game-object-drytundra 
-		background-color rgb(128,128,128)
-		color fg(@background-color, 20%)
-		
-	.game-object-rainforest 
-		background-color rgb(32,192,192)
-		color fg(@background-color, 20%)
-		
-	.game-object-wetforest 
-		background-color rgb(64,160,144)
-		color fg(@background-color, 20%)
-		
-	.game-object-moistforest 
-		background-color rgb(96,160,128)
-		color fg(@background-color, 20%)
-		
-	.game-object-dryforest 
-		background-color rgb(128,224,128)
-		color fg(@background-color, 20%)
+		.game-object-drytundra 
+			background-color rgb(128,128,128)
+			color fg(@background-color, 20%)
+			
+		.game-object-rainforest 
+			background-color rgb(32,192,192)
+			color fg(@background-color, 20%)
+			
+		.game-object-wetforest 
+			background-color rgb(64,160,144)
+			color fg(@background-color, 20%)
+			
+		.game-object-moistforest 
+			background-color rgb(96,160,128)
+			color fg(@background-color, 20%)
+			
+		.game-object-dryforest 
+			background-color rgb(128,224,128)
+			color fg(@background-color, 20%)
 
-	.game-object-verydryforest
-		background-color rgb(160,255,128) 
-		color fg(@background-color, 20%)
-		
-	.game-object-dryscrub 
-		background-color rgb(128,160,128)
-		color fg(@background-color, 20%)
-		
-	.game-object-desertscrub 
-		background-color rgb(224,255,128)
-		color fg(@background-color, 20%)
-		
-	.game-object-steppe 
-		background-color rgb(192,192,128)
-		color fg(@background-color, 20%)
-		
-	.game-object-woodland 
-		background-color rgb(192,255,128)
-		color fg(@background-color, 20%)
-		
-.game-screen-dungeon	
-	.game-object 
-		color game-object-color
-		background-color game-object-background
+		.game-object-verydryforest
+			background-color rgb(160,255,128) 
+			color fg(@background-color, 20%)
+			
+		.game-object-dryscrub 
+			background-color rgb(128,160,128)
+			color fg(@background-color, 20%)
+			
+		.game-object-desertscrub 
+			background-color rgb(224,255,128)
+			color fg(@background-color, 20%)
+			
+		.game-object-steppe 
+			background-color rgb(192,192,128)
+			color fg(@background-color, 20%)
+			
+		.game-object-woodland 
+			background-color rgb(192,255,128)
+			color fg(@background-color, 20%)
 
-	.game-object.notvisible
-		color game-object-notvisible-color
+#game		
+	.game-screen-dungeon	
+		.visited
+			visibility visible
+		.notvisited
+			visibility hidden
+		.game-object 
+			color game-object-color
+			background-color game-object-background
 
-	.game-object.visible
-		background-color game-object-visible-background
-		lights()
-		
-	.game-object-tree
-		color game-object-tree-color
-		background-color game-object-tree-background
-		
-	.game-object-rock
-		color game-object-rock-color
-		background-color game-object-rock-background
+		.game-object.notvisible
+			color game-object-notvisible-color
+
+		.game-object.visible
+			background-color game-object-visible-background
+			lights()
+			
+		.game-object-tree
+			color game-object-tree-color
+			background-color game-object-tree-background
+			
+		.game-object-rock
+			color game-object-rock-color
+			background-color game-object-rock-background

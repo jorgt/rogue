@@ -19,8 +19,8 @@ define(["helpers/log", "game/tilebank"], function(
 			[1, 0, 0, 1, -1, 0, 0, -1]
 		];
 
-		this.setMap = function(map) {
-			_map = map;
+		this.setMap = function(m) {
+			map = m;
 		}
 
 		// calculates an octant. Called by the this.calculate when calculating lighting
@@ -116,7 +116,10 @@ define(["helpers/log", "game/tilebank"], function(
 		}
 
 		// update the position of the light source
-		this.update = function(position) {
+		this.update = function(position, map) {
+			if(typeof map !== 'undefined') {
+				this.setMap(map);
+			}
 			this.position = position;
 			this.clear();
 			this.calculate();

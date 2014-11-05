@@ -37,17 +37,27 @@ define([
 					});
 
 					this.keys.press('left', function(e) {
-						raiseMovementEvent(e[0])
+						raiseMovementEvent(e[0]);
 					});
 					this.keys.press('right', function(e) {
-						raiseMovementEvent(e[0])
+						raiseMovementEvent(e[0]);
 					});
 					this.keys.press('up', function(e) {
-						raiseMovementEvent(e[0])
+						raiseMovementEvent(e[0]);
 					});
 					this.keys.press('down', function(e) {
-						raiseMovementEvent(e[0])
+						raiseMovementEvent(e[0]);
 					});
+					this.keys.press('pagedown', function(e) {
+						Events.raise('game.delve', {
+							direction: 'down'
+						});
+					})
+					this.keys.press('pageup', function(e) {
+						Events.raise('game.delve', {
+							direction: 'up'
+						});
+					})
 
 					function raiseMovementEvent(dir) {
 						Events.raise('game.movement', {

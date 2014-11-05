@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Engine</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/game.css">
+    </head>
+    <body>
+
+	<script type="text/javascript">
+		var _temp = ['tropical', 'subtropical', 'warm', 'cool', 'boreal', 'subpolar', 'polar'],
+			_hum = ['super-humid', 'per-humid', 'humid', 'sub-humid', 'semi-arid', 'arid', 'per-arid', 'super-arid'],
+			_alt = ['alvar', 'alpine', 'subalpine', 'montane', 'lower montane', 'premontane', 'shallow sea', 'sea', 'deep sea'],
+			_climates = [
+				'deep sea',  //0
+				'sea', 		//1
+				'shallow sea',//2 
+				'ice', //3
+				'polar', //4
+				'tundra', //5
+				'taiga', //6
+				'savanna', //7
+				'shrubland', //8
+				'forest', //9
+				'swamp', //10
+				'desert', //11
+				'plains', //12
+				'seasonal forest', //13
+				'rain forest', //14
+				'mountain', //15
+				'snowy mountain'//16
+			];
+
+			var tr = [-20, 50];
+			var hr = [50, 16000];
+			var ar = [-10000,8000];
+
+
+			for(var x = 0; x < 100; x++) {
+				var t = _range(tr, Math.random())
+				var h = _range(hr, Math.random())
+				var a = _range(ar, Math.random())
+
+				//temp lapse 6.4c per 1000m altitude
+				if(a > 0) t = ~~ (t - Math.abs(a * 0.0064));
+
+				//below sea level, normalize temp to 2 at -5000m altitude
+				if(a < 0 && a > -5000) t = ~~(t + a * ((t - 2) / 5000));
+
+				console.log(t, h, a, _climates[_get(t, h, a)], _get(t, h, a));
+			}
+
+			function _get(t, h, a) {
+				// water
+				if(a < 1800) 			return 0; 		//deep sea
+				if(a < 100 && t < 10) 	return 3; 		//ice
+				if(a < 100)				return 1; 		//sea
+				if(a < 0 && t < 0)		return 3;		//ice
+				if(a < 0 && t < 0)		return 2;		//shallow sea
+				
+				// colder climates. trees struggle under 7c ,taiga's and tundra's. 
+				// taiga's are wetter and support coniferious forests
+				if(t < 7 && t >= 2 && h > 5000) return 6;//taiga
+				if(t < -10 ) return 4;					//tundra
+				if(t < 2) return 5;						//polar
+				
+				//hot climates
+				if(t > 20 && h > 12000) return 14; 		// rain forest
+				if(t > 20 && h > 8000) 	return 13; 		// seasonal forest
+				if(t > 20 && h > 4000) 	return 12; 		// plains
+				if(t > 20 && h > 0) 	return 11; 		// desert
+				
+				//moderate climates
+				if(h > 6000)			return 9; 		//forest
+				if(h > 3000)			return 8; 		//shrubland
+				if(h > 0)				return 7; 		//savannah
+				//rest
+				return 10								//swamp
+			}
+
+			function _range(range, n) {
+				return ~~((range[1] - range[0]) * n + range[0]);
+			}
+	</script>
+    </body>
+</html>
+

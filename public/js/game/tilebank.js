@@ -42,6 +42,7 @@ define(["helpers/log"], function(
 	_bank.add('desertscrub', '.', 1, true, false, false);
 	_bank.add('steppe', '.', 1, true, false, false);
 	_bank.add('woodland', '.', 1, true, false, false);
+	_bank.add('beach', '.', 1, true, false, false);
 
 
 	/*

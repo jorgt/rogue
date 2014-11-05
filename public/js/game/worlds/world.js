@@ -1,15 +1,17 @@
 define([
 	"helpers/log",
 	"settings",
-	"game/worlds/climate",
+	"game/worlds/climate2",
 	"libs/simplex",
-	"game/tilebank"
+	"game/tilebank",
+	"game/worlds/grids"
 ], function(
 	log,
 	settings,
-	Climate,
+	climate,
 	Simplex,
-	bank) {
+	bank,
+	Grids) {
 
 	'use strict';
 
@@ -23,33 +25,34 @@ define([
 			max: 16000
 		},
 		temperature: {
-			min: 0,
-			max: 50
+			min: -25,
+			max: 40
 		}
 	}
 	var chunk = 50;
 
 	var sAlt = new Simplex({
-		octaves: 6,
+		octaves: 20,
 		persistence: 0.4,
-		level: 0.04
+		level: 0.0105
 	});
 
 	var sPre = new Simplex({
 		octaves: 6,
 		persistence: 0.4,
-		level: 0.05
+		level: 0.0075
 	});
 
 	var sTem = new Simplex({
 		octaves: 6,
 		persistence: 0.4,
-		level: 0.06
+		level: 0.0085
 	});
 
 	return function world(opt) {
-		var _height = opt.height || uneven(random(35, 50));
-		var _width = opt.width || uneven(random(60, 80));
+		var _size = opt.width || uneven(random(80, 100));
+		var _width = _size;
+		var _height = _size;
 		var _grid = [];
 		var _start = null;
 		var _end = null;
@@ -60,7 +63,8 @@ define([
 		for (var x = 0; x < _height; x++) {
 			_grid[x] = [];
 			for (var y = 0; y < _width; y++) {
-				var c = Climate.getClimateInfo(Climate.get(gTem[x][y], gPre[x][y], gAlt[x][y]));
+				//var c = Climate.getClimateInfo(Climate.get(gTem[x][y], gPre[x][y], gAlt[x][y]));
+				var c = climate(gTem[x][y], gPre[x][y], gAlt[x][y]);
 				_grid[x][y] = opt.assets.object(bank.get(c.replace(/\s/g, '')), x, y);
 			}
 		}
@@ -75,17 +79,27 @@ define([
 			width: _width
 		};
 
-		function _chunk(noise, range, w, h, startx, starty) {
-			var grid = [];
-			var sx = startx * h;
-			var sy = starty * w;
-			for (var x = 0; x < w; x++) {
-				grid[x] = [];
-				for (var y = 0; y < h; y++) {
-					grid[x][y] = Math.floor(_range(range, noise.noise((sx + x) * noise.level, (sy + y) * noise.level)));
+		function _chunk(noise, range, h, w, startx, starty) {
+            var generator = Grids({
+                type: Grids.tileable,
+                h: h,
+                w: w,
+                noise: noise.noise,
+                scale: noise.level,
+                repeats: 0
+            });
+
+            var grid = generator.grid();
+            var world = [];
+			//var sx = startx * h;
+			//var sy = starty * w;
+			for (var x = 0; x < grid.length; x++) {
+				world[x] = [];
+				for (var y = 0; y < grid[x].length; y++) {
+					world[x][y] = Math.floor(_range(range, grid[x][y]));
 				}
 			}
-			return grid;
+			return world;
 		}
 
 		function _range(range, n) {
