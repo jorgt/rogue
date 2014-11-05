@@ -11,7 +11,7 @@ define(["helpers/log"], function(
 		'polar', //4
 		'tundra', //5
 		'taiga', //6
-		'savanna', //7
+		'savannah', //7
 		'shrubland', //8
 		'forest', //9
 		'swamp', //10
@@ -28,24 +28,27 @@ define(["helpers/log"], function(
 	}
 
 	function _get(t, h, a) {
-		if(t instanceof Array) {
+		if (t instanceof Array) {
 			a = t[2];
 			h = t[1];
 			t = t[0];
 		}
-		
+		//console.log(a, t, t < -20)
 		// water
-		if (a < 1800) return 0; //deep sea
-		if (a < 100 && t < 10) return 3; //ice
-		if (a < 100) return 1; //sea
-		if (a < 0 && t < 0) return 3; //ice
+		if (a < -1800) return 0; //deep sea
+		if (a < -100 && t < -10) return 3; //ice
+		if (a < -100) return 1; //sea
+		if (a < 0 && t < -5) return 3; //ice
 		if (a < 0 && t < 0) return 2; //shallow sea
+		//mountains
+		if(a > 5000 && h > 9000) return 16; //snowy mountain
+		if(a > 5000 && h > 0) return 15; //mountain
 
 		// colder climates. trees struggle under 7c ,taiga's and tundra's. 
 		// taiga's are wetter and support coniferious forests
 		if (t < 7 && t >= 2 && h > 5000) return 6; //taiga
-		if (t < -10) return 4; //tundra
-		if (t < 2) return 5; //polar
+		if (t < -5) return 4; //polar
+		if (t < 0) return 5; //tundra
 
 		//hot climates
 		if (t > 20 && h > 12000) return 14; // rain forest
@@ -54,8 +57,8 @@ define(["helpers/log"], function(
 		if (t > 20 && h > 0) return 11; // desert
 
 		//moderate climates
-		if (h > 6000) return 9; //forest
-		if (h > 3000) return 8; //shrubland
+		if (h > 9000) return 9; //forest
+		if (h > 4500) return 8; //shrubland
 		if (h > 0) return 7; //savannah
 		//rest
 		return 10 //swamp

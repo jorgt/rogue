@@ -13,7 +13,6 @@ define(["helpers/log"], function(
 
 	/*
 		worlds
-	*/
 	_bank.add('sea', '~', 1, false, false, false);
 	_bank.add('deepsea', '~', 1, false, false, false);
 	_bank.add('shallowsea', '~', 1, false, false, false);
@@ -43,7 +42,25 @@ define(["helpers/log"], function(
 	_bank.add('steppe', '.', 1, true, false, false);
 	_bank.add('woodland', '.', 1, true, false, false);
 	_bank.add('beach', '.', 1, true, false, false);
+	*/
 
+	_bank.add('sea', '~', 1, false, false, false);
+	_bank.add('deepsea', '~', 1, false, false, false);
+	_bank.add('shallowsea', '~', 1, false, false, false);
+	_bank.add('ice', '~', 1, true, false, false);
+	_bank.add('polar', '.', 1, true, false, false);
+	_bank.add('tundra', '.', 1, true, false, false);
+	_bank.add('taiga', '.', 1, true, false, false);
+	_bank.add('savannah', '.', 1, true, false, false);
+	_bank.add('shrubland', '.', 1, true, false, false);
+	_bank.add('forest', '*', 1, true, false, false);
+	_bank.add('swamp', '.', 1, true, false, false);
+	_bank.add('desert', '.', 1, true, false, false);
+	_bank.add('plains', '.', 1, true, false, false);
+	_bank.add('seasonalforest', '*', 1, true, false, false);
+	_bank.add('rainforest', '*', 1, true, false, false);
+	_bank.add('mountain', '^', 1, true, false, false);
+	_bank.add('snowymountain', '^', 1, true, false, false);
 
 	/*
 		dungeons and caves

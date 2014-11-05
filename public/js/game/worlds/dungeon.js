@@ -5,7 +5,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 
 	'use strict';
 
-	return function dungeon(assets) {
+	return function dungeon(opt) {
 		var _guid = guid();
 		var _height = uneven(random(35, 50));
 		var _width = uneven(random(60, 80));
@@ -36,7 +36,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			for (var x = 0; x < _height; x++) {
 				_grid[x] = _grid[x] || [];
 				for (var y = 0; y < _width; y++) {
-					_grid[x][y] = assets.object(tile, x, y);
+					_grid[x][y] = opt.assets.object(tile, x, y);
 				}
 			}
 		}
@@ -65,12 +65,12 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 			for (var x = 0; x < _doors.length - 1; x++) {
 				var d1 = _doors[x][0];
 				var d2 = _doors[x + 1][1];
-				_grid[d1[0]][d1[1]] = assets.object(bank.get('door'), d1[0], d1[1]);
-				_grid[d2[0]][d2[1]] = assets.object(bank.get('door'), d2[0], d2[1]);
+				_grid[d1[0]][d1[1]] = opt.assets.object(bank.get('door'), d1[0], d1[1]);
+				_grid[d2[0]][d2[1]] = opt.assets.object(bank.get('door'), d2[0], d2[1]);
 				var result = AStar.search(clone(_grid), d1, d2);
 				for (var r in result) {
 					if (result.hasOwnProperty(r)) {
-						_grid[result[r].x][result[r].y] = assets.object(bank.get('road'), result[r].x, result[r].y);
+						_grid[result[r].x][result[r].y] = opt.assets.object(bank.get('road'), result[r].x, result[r].y);
 					}
 				}
 			}
@@ -109,7 +109,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 				for (var y = sw; y < w + sw; y++) {
 					if (bank.get(grid[x][y].tile).diggable === true) {
 						if (x === sh || x === sh + h - 1 || y === sw || y === sw + w - 1) {
-							grid[x][y] = assets.object(bank.get('wall'), x, y);
+							grid[x][y] = opt.assets.object(bank.get('wall'), x, y);
 							if (x === sh && y === sw ||
 								x === sh && y === sw + w - 1 ||
 								x === sh + h - 1 && y === sw ||
@@ -119,7 +119,7 @@ define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
 								walls.push([x, y]);
 							}
 						} else {
-							grid[x][y] = assets.object(bank.get('floor'), x, y);
+							grid[x][y] = opt.assets.object(bank.get('floor'), x, y);
 						}
 					} else {
 						return 0;

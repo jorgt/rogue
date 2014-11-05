@@ -32,9 +32,11 @@ game-object-rock-background = game-object-background
 .game-object-player
 	color game-object-player-color
 	background-color game-object-player-background
+	font-weight bold
 
 /*
 	Plane specific
+	include #game will make this more specific ie. overwriting
 */
 #game
 	.game-screen-world 
@@ -49,99 +51,83 @@ game-object-rock-background = game-object-background
 /*
 	Tile Types
 */
-#game
-	.game-screen-world			
-		.game-object
-			color: #fff
-			background-color #fff
-			
-		.game-object-player
-			background-color transparent
-			color red
-			
-		.game-object-ice 
-			background-color #eee
-			color fg(@background-color, 20%)
+.game-screen-world			
+	.game-object
+		color: #fff
+		background-color #fff
+		
+	.game-object-player
+		background-color transparent
+		color red
+		
+	.game-object-ice 
+		background-color #eee
+		color fg(@background-color, 20%)
+		
+	.game-object-polar 
+		background-color #bbf
+		color fg(@background-color, 20%)
 
-		.game-object-beach 
-			background-color #FFF830
-			color fg(@background-color, 20%)
+	.game-object-beach 
+		background-color #FFF830
+		color fg(@background-color, 20%)
+		
+	.game-object-shallowsea 
+		background-color #2743C2
+		color fg(@background-color, 20%)
+		
+	.game-object-sea 
+		background-color #142EA6
+		color fg(@background-color, 20%)
+		
+	.game-object-deepsea 
+		background-color #00198A
+		color fg(@background-color, 20%)
+		
+	.game-object-mountain 
+		background-color #333
+		color fg(@background-color, 20%)
+		
+	.game-object-snowymountain 
+		background-color #aab
+		color fg(@background-color, 20%)
+		
+	.game-object-tundra 
+		background-color rgb(128,128,196)
+		color fg(@background-color, 20%)
+		
+	.game-object-taiga 
+		background-color rgb(64,128,144)
+		color fg(@background-color, 20%)
+		
+	.game-object-savannah 
+		background-color #88B05D
+		color fg(@background-color, 20%)
+		
+	.game-object-rainforest 
+		background-color rgb(32,192,192)
+		color fg(@background-color, 20%)
+		
+	.game-object-seasonalforest 
+		background-color rgb(64,160,144)
+		color fg(@background-color, 20%)
+		
+	.game-object-forest 
+		background-color rgb(96,160,128)
+		color fg(@background-color, 20%)
+		
+	.game-object-shrubland
+		background-color rgb(128,160,128)
+		color fg(@background-color, 20%)
+		
+	.game-object-plains
+		background-color rgb(25,255,25)
+		color fg(@background-color, 20%)
+		
+	.game-object-desert 
+		background-color rgb(224,255,128)
+		color fg(@background-color, 20%)
 			
-		.game-object-shallowsea 
-			background-color #2743C2
-			color fg(@background-color, 20%)
-			
-		.game-object-sea 
-			background-color #142EA6
-			color fg(@background-color, 20%)
-			
-		.game-object-deepsea 
-			background-color #00198A
-			color fg(@background-color, 20%)
-			
-		.game-object-frozenland
-			background-color #bbe 
-			color fg(@background-color, 20%)
-			
-		.game-object-drymountain 
-			background-color #333
-			color fg(@background-color, 20%)
-			
-		.game-object-snowymountain 
-			background-color #bbe
-			color fg(@background-color, 20%)
-			
-		.game-object-raintundra 
-			background-color rgb(32,128,196)
-			color fg(@background-color, 20%)
-			
-		.game-object-wettundra 
-			background-color rgb(64,128,144)
-			color fg(@background-color, 20%)
-			
-		.game-object-moisttundra 
-			background-color rgb(96,128,128)
-			color fg(@background-color, 20%)		
-
-		.game-object-drytundra 
-			background-color rgb(128,128,128)
-			color fg(@background-color, 20%)
-			
-		.game-object-rainforest 
-			background-color rgb(32,192,192)
-			color fg(@background-color, 20%)
-			
-		.game-object-wetforest 
-			background-color rgb(64,160,144)
-			color fg(@background-color, 20%)
-			
-		.game-object-moistforest 
-			background-color rgb(96,160,128)
-			color fg(@background-color, 20%)
-			
-		.game-object-dryforest 
-			background-color rgb(128,224,128)
-			color fg(@background-color, 20%)
-
-		.game-object-verydryforest
-			background-color rgb(160,255,128) 
-			color fg(@background-color, 20%)
-			
-		.game-object-dryscrub 
-			background-color rgb(128,160,128)
-			color fg(@background-color, 20%)
-			
-		.game-object-desertscrub 
-			background-color rgb(224,255,128)
-			color fg(@background-color, 20%)
-			
-		.game-object-steppe 
-			background-color rgb(192,192,128)
-			color fg(@background-color, 20%)
-			
-		.game-object-woodland 
-			background-color rgb(192,255,128)
-			color fg(@background-color, 20%)
 
 #game		
 	.game-screen-dungeon	

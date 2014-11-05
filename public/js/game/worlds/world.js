@@ -17,8 +17,8 @@ define([
 
 	var ranges = {
 		altitude: {
-			min: -5000,
-			max: 6000
+			min: -9000,//-10000,
+			max: 9000
 		},
 		precipitation: {
 			min: 50,
@@ -32,25 +32,25 @@ define([
 	var chunk = 50;
 
 	var sAlt = new Simplex({
-		octaves: 20,
-		persistence: 0.4,
-		level: 0.0105
-	});
-
-	var sPre = new Simplex({
-		octaves: 6,
+		octaves: 5,
 		persistence: 0.4,
 		level: 0.0075
 	});
 
-	var sTem = new Simplex({
-		octaves: 6,
+	var sPre = new Simplex({
+		octaves: 1,
 		persistence: 0.4,
-		level: 0.0085
+		level: 0.0045
+	});
+
+	var sTem = new Simplex({
+		octaves: 1,
+		persistence: 0.6,
+		level: 0.0065
 	});
 
 	return function world(opt) {
-		var _size = opt.width || uneven(random(80, 100));
+		var _size = opt.width || uneven(random(60, 70));
 		var _width = _size;
 		var _height = _size;
 		var _grid = [];
@@ -63,7 +63,6 @@ define([
 		for (var x = 0; x < _height; x++) {
 			_grid[x] = [];
 			for (var y = 0; y < _width; y++) {
-				//var c = Climate.getClimateInfo(Climate.get(gTem[x][y], gPre[x][y], gAlt[x][y]));
 				var c = climate(gTem[x][y], gPre[x][y], gAlt[x][y]);
 				_grid[x][y] = opt.assets.object(bank.get(c.replace(/\s/g, '')), x, y);
 			}

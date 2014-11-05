@@ -97,7 +97,7 @@ define([
 				if (x !== 0 || y !== 0) {
 					player.move(_current.getGrid(), x, y);
 					if (player.position().toString() !== old.toString()) {
-						player.view.update(player.position(), _current);
+						player.view.update(player.position(), this);
 						player.draw();
 						_scroll(player, x, y);
 
