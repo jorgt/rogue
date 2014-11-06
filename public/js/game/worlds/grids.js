@@ -157,7 +157,6 @@ define([], function() {
                 var c = _opt.rads * Math.sin(fRdy)
                 var d = _opt.rads * Math.cos(fRdy)
                 var v = _opt.noise(123 + a * _opt.scale, 231 + b * _opt.scale, 312 + c * _opt.scale, 273 + d * _opt.scale);
-
                 return opt.decorator(v);
             };
         }

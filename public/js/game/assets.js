@@ -31,8 +31,8 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 				obj.id = id;
 			}
 
-			obj.dataset.top = _int(_loc(x));
-			obj.dataset.left = _int(_loc(y));
+			obj.dataset.top = _int(_loc(x||0));
+			obj.dataset.left = _int(_loc(y||0));
 			obj.dataset.name = _createName(type.name);
 
 			obj.className = _createName() + ' ' + obj.dataset.name;
@@ -45,7 +45,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 			return obj;
 		};
 
-		this.player = function(x, y, map) {
+		this.player = function(map, x, y) {
 			if (_actors.player === null) {
 				var player = this.object(bank.get('player'), x, y, 'player');
 				_actors.player = player;
@@ -81,8 +81,8 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 		obj.dataset.visible = true;
 		obj.dataset.visited = true;
 		//unlike everything else, player is always visible
-		obj.visited = function() {}
-		obj.visible = function() {}
+		obj.visited = function() {};
+		obj.visible = function() {};
 		obj.view = new LightSource(map, [x, y], 7);
 		return obj;
 	}
@@ -110,11 +110,16 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 		};
 
 		obj.set = function(data, value, offset) {
-			offset = offset || true;
-			if (offset) {
-				this.dataset[data] = _int(this.dataset[data]) + _int(_loc(value));
+
+			if (typeof value === 'number') {
+				offset = offset || true;
+				if (offset) {
+					this.dataset[data] = _int(this.dataset[data]) + _int(_loc(value));
+				} else {
+					this.dataset[data] = _loc(value);
+				}
 			} else {
-				this.dataset[data] = _loc(value);
+				this.dataset[data] = value
 			}
 		};
 
@@ -131,8 +136,11 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 		}
 
 		obj.get = function(data) {
-			return _int(this.dataset[data]);
+			var v = _int(this.dataset[data]);
+			return (isNaN(v)) ? this.dataset[data] : v;
 		};
+
+		obj.set('child', false);
 		return obj;
 	}
 

@@ -33,7 +33,6 @@ define(["helpers/log"], function(
 			h = t[1];
 			t = t[0];
 		}
-		//console.log(a, t, t < -20)
 		// water
 		if (a < -1800) return 0; //deep sea
 		if (a < -100 && t < -10) return 3; //ice
@@ -60,7 +59,8 @@ define(["helpers/log"], function(
 		if (h > 9000) return 9; //forest
 		if (h > 4500) return 8; //shrubland
 		if (h > 0) return 7; //savannah
-		//rest
+		
+		//rest. this doesn't happen, it'll be savannah instead.
 		return 10 //swamp
 	}
 });

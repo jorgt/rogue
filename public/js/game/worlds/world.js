@@ -17,7 +17,7 @@ define([
 
 	var ranges = {
 		altitude: {
-			min: -9000,//-10000,
+			min: -9000, //-10000,
 			max: 9000
 		},
 		precipitation: {
@@ -26,31 +26,31 @@ define([
 		},
 		temperature: {
 			min: -25,
-			max: 40
+			max: 50
 		}
 	}
 	var chunk = 50;
 
 	var sAlt = new Simplex({
-		octaves: 5,
+		octaves: 20,
 		persistence: 0.4,
 		level: 0.0075
 	});
 
 	var sPre = new Simplex({
-		octaves: 1,
-		persistence: 0.4,
+		octaves: 20,
+		persistence: 0.2,
 		level: 0.0045
 	});
 
 	var sTem = new Simplex({
-		octaves: 1,
-		persistence: 0.6,
+		octaves: 20,
+		persistence: 0.4,
 		level: 0.0065
 	});
 
 	return function world(opt) {
-		var _size = opt.width || uneven(random(60, 70));
+		var _size = opt.size || uneven(random(60, 70));
 		var _width = _size;
 		var _height = _size;
 		var _grid = [];
@@ -60,10 +60,12 @@ define([
 		var gPre = _chunk(sPre, ranges.precipitation, _height, _width, 0, 0);
 		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0);
 
+		var aa = 0, ap = 0, at = 0;
+
 		for (var x = 0; x < _height; x++) {
 			_grid[x] = [];
 			for (var y = 0; y < _width; y++) {
-				var c = climate(gTem[x][y], gPre[x][y], gAlt[x][y]);
+				var c = climate(~~(gTem[x][y] * 1.2), ~~ (gPre[x][y]), ~~ (gAlt[x][y] * 1.5));
 				_grid[x][y] = opt.assets.object(bank.get(c.replace(/\s/g, '')), x, y);
 			}
 		}
@@ -72,24 +74,24 @@ define([
 
 		return {
 			grid: _grid,
-			start: [10, 10],
-			end: [20, 20],
+			start: _start,
+			end: _end,
 			height: _height,
 			width: _width
 		};
 
 		function _chunk(noise, range, h, w, startx, starty) {
-            var generator = Grids({
-                type: Grids.tileable,
-                h: h,
-                w: w,
-                noise: noise.noise,
-                scale: noise.level,
-                repeats: 0
-            });
+			var generator = Grids({
+				type: Grids.tileable,
+				h: h,
+				w: w,
+				noise: noise.noise,
+				scale: noise.level,
+				repeats: 0
+			});
 
-            var grid = generator.grid();
-            var world = [];
+			var grid = generator.grid();
+			var world = [];
 			//var sx = startx * h;
 			//var sy = starty * w;
 			for (var x = 0; x < grid.length; x++) {

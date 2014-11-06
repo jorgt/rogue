@@ -34,6 +34,13 @@ define([
 			return plane.grid;
 		};
 
+		this.dimensions = function() {
+			return {
+				height: plane.height,
+				width: plane.width
+			}
+		}
+
 		this.enter = function() {
 			return {
 				start: plane.start,

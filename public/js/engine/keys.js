@@ -76,8 +76,8 @@ define(["helpers/log"], function(
 		46: 'del',
 		36: 'home',
 		35: 'end',
-		33: 'pagedown',
-		34: 'pageup',
+		34: 'pagedown',
+		33: 'pageup',
 	};
 
 	var MAP_INVERSE = {};

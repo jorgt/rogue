@@ -32,37 +32,15 @@ define([
 			}
 		});
 
+		var _lastposition = null;
+
 		_setupMovementEvents();
 		_setupDelving();
 
 		var _navigation = [];
 
 		this.start = function() {
-			_setupScreen(_current.type);
-			var grid = _current.getGrid();
-
-			for (var x = 0; x < grid.length; x++) {
-				for (var y = 0; y < grid[x].length; y++) {
-					_screen.add(grid[x][y], x, y);
-				}
-			}
-			_screen.add(_assets.player(_current.enter().start[0], _current.enter().start[1], this));
-			_screen.size(grid.length * settings.square, grid[0].length * settings.square);
-			var player = _assets.player();
-
-			player.move(_current.getGrid(), _current.enter().start[0], _current.enter().start[1]);
-			player.view.update(player.position(), this);
-			player.draw();
-			_scroll(player, player.position()[0], player.position()[1]);
-
-			var dim = _screen.dimensions();
-			if (dim.canvas.height < dim.parent.height) {
-				_screen.classList.add('center-vert')
-			}
-			if (dim.canvas.width < dim.parent.width) {
-				_screen.classList.add('center-hori')
-			}
-
+			_setupScreen(_current);
 			log.urgent('[GAME:' + _guid + ']', 'game running!');
 		};
 
@@ -72,23 +50,79 @@ define([
 
 		this.update = function() {};
 
-		function _setupScreen(type) {
+		function _setupScreen(cur) {
+
 			if (_screen !== null) {
 				_screen.hide();
 			}
 			_screen = _mainscreen.independent('dungeon');
 			_screen.classList.remove('center');
-			_screen.classList.add('game-screen-' + type)
+			_screen.classList.add('game-screen-' + cur.type);
+			var grid = cur.getGrid();
+
+			for (var x = 0; x < grid.length; x++) {
+				for (var y = 0; y < grid[x].length; y++) {
+					_screen.add(grid[x][y], x, y);
+				}
+			}
+
+			_screen.add(_assets.player(_current));
+			_screen.size(grid.length * settings.square, grid[0].length * settings.square);
+			var player = _assets.player(_current);
+
+			var start = (_lastposition === null)?_current.enter().start:_lastposition;
+			player.move(_current.getGrid(), start[0], start[1]);
+			player.view.update(player.position(), _current);
+			player.draw();
+			_scroll(player, player.position()[0], player.position()[1]);
+
+			var dim = _screen.dimensions();
+			if (dim.canvas.width < dim.parent.width) {
+				//_screen.classList.add('center-vert')
+			}
+			if (dim.canvas.height < dim.parent.height) {
+				//_screen.classList.add('center-hori')
+			}
 		}
 
 		function _setupDelving() {
-			//var player = _assets.player();
-			//console.log(_current)
+			var order = ['world', 'dungeon'];
+			Events.on('game.delve', function(e) {
+				var next = null;
+				var player = _assets.player(_current);
+				var land = _current.get(player.position()).get('child');
+				if (land === "false") {
+					if (e.detail.direction === 'down') {
+						if (order.indexOf(_current.type) < order.length - 1 && order.indexOf(_current.type) > -1) {
+							next = order[order.indexOf(_current.type) + 1]
+						}
+					} else if (e.detail.direction === 'up') {
+						if (order.indexOf(_current.type) > 0) {
+							next = order[order.indexOf(_current.type) - 1]
+						}
+					}
+					if (next !== null) {
+						//get a new dungeon
+						_lastposition = player.position();
+						_current = Planes.createPlane({
+							type: next,
+							options: {
+								assets: _assets
+							}
+						});
+						_setupScreen(_current);
+					}
+				} else {
+					_current = Planes.getPlane(land);
+				}
+			})
 		}
 
 		function _setupMovementEvents() {
+
+
 			Events.on('game.movement', function(evt) {
-				var player = _assets.player();
+				var player = _assets.player(_current);
 				var dir = evt.detail.direction;
 				var x = (dir === 'up') ? -1 : (dir === 'down') ? 1 : 0;
 				var y = (dir === 'left') ? -1 : (dir === 'right') ? 1 : 0;

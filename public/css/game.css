@@ -165,12 +165,12 @@ pre {
   color: #f00;
 }
 .game-screen-world .game-object-ice {
-  background-color: #eee;
-  color: #bebebe;
+  background-color: #fff;
+  color: #ccc;
 }
 .game-screen-world .game-object-polar {
-  background-color: #bbf;
-  color: #6363ff;
+  background-color: #eee;
+  color: #bebebe;
 }
 .game-screen-world .game-object-beach {
   background-color: #fff830;
@@ -193,44 +193,44 @@ pre {
   color: #5c5c5c;
 }
 .game-screen-world .game-object-snowymountain {
-  background-color: #aab;
-  color: #82829b;
+  background-color: #aaa;
+  color: #888;
 }
 .game-screen-world .game-object-tundra {
-  background-color: #8080c4;
-  color: #5454af;
+  background-color: #ccdbc3;
+  color: #a0bc8f;
 }
 .game-screen-world .game-object-taiga {
-  background-color: #408090;
-  color: #58a2b5;
+  background-color: #c3dadb;
+  color: #8fbabc;
 }
 .game-screen-world .game-object-savannah {
-  background-color: #88b05d;
-  color: #6d9147;
+  background-color: #d3de00;
+  color: #f4ff19;
 }
 .game-screen-world .game-object-rainforest {
-  background-color: #20c0c0;
-  color: #3bdede;
+  background-color: #006900;
+  color: #00ba00;
 }
 .game-screen-world .game-object-seasonalforest {
-  background-color: #40a090;
-  color: #5cbead;
+  background-color: #00a300;
+  color: #00e800;
 }
 .game-screen-world .game-object-forest {
-  background-color: #60a080;
-  color: #4d8066;
+  background-color: #33b500;
+  color: #46f700;
 }
 .game-screen-world .game-object-shrubland {
-  background-color: #80a080;
-  color: #638463;
+  background-color: #8ee600;
+  color: #a9ff1f;
 }
 .game-screen-world .game-object-plains {
-  background-color: #19ff19;
-  color: #00e000;
+  background-color: #d4ff00;
+  color: #ac0;
 }
 .game-screen-world .game-object-desert {
-  background-color: #e0ff80;
-  color: #cdff33;
+  background-color: #ffbf00;
+  color: #c90;
 }
 #game .game-screen-dungeon .visited {
   visibility: visible;
