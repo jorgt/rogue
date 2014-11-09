@@ -3,6 +3,7 @@ define([
 	"game/tilebank",
 	"game/assets",
 	"game/worlds/planes",
+	"game/text",
 	"helpers/events",
 	"settings"
 ], function(
@@ -10,6 +11,7 @@ define([
 	bank,
 	Assets,
 	Planes,
+	Txt,
 	Events,
 	settings) {
 
@@ -28,14 +30,18 @@ define([
 		var _current = Planes.createPlane({
 			type: 'world',
 			options: {
-				assets: _assets
+				assets: _assets,
+				size: 45
 			}
 		});
 
+		var _txt = new Txt(_sidebar, _assets);
+
 		var _lastposition = null;
 
-		_setupMovementEvents();
+		_setupEvents();
 		_setupDelving();
+		_setupSidebar();
 
 		var _navigation = [];
 
@@ -70,19 +76,11 @@ define([
 			_screen.size(grid.length * settings.square, grid[0].length * settings.square);
 			var player = _assets.player(_current);
 
-			var start = (_lastposition === null)?_current.enter().start:_lastposition;
+			var start = (_lastposition === null) ? _current.enter().start : _lastposition;
 			player.move(_current.getGrid(), start[0], start[1]);
 			player.view.update(player.position(), _current);
 			player.draw();
 			_scroll(player, player.position()[0], player.position()[1]);
-
-			var dim = _screen.dimensions();
-			if (dim.canvas.width < dim.parent.width) {
-				//_screen.classList.add('center-vert')
-			}
-			if (dim.canvas.height < dim.parent.height) {
-				//_screen.classList.add('center-hori')
-			}
 		}
 
 		function _setupDelving() {
@@ -115,11 +113,22 @@ define([
 				} else {
 					_current = Planes.getPlane(land);
 				}
-			})
+			});
 		}
 
-		function _setupMovementEvents() {
+		function _setupSidebar() {
+			var player = _assets.player();
+			_txt.set('current-pos-txt', 'Current Position:', 2, 2)
+			_txt.next('current-pos', player.position().toString(), 2);
 
+			_txt.set('current-tile-txt', 'Current Tile:', 3, 2);
+			//_txt.next('current-tile', _current.get(player.position()).toString(), 2);
+		}
+
+		function _setupEvents() {
+			Events.on('game.update', function(e) {
+				_setupSidebar();
+			}.bind(this));
 
 			Events.on('game.movement', function(evt) {
 				var player = _assets.player(_current);
@@ -146,7 +155,6 @@ define([
 		}
 
 		function _scroll(player, x, y) {
-
 			var dim = _screen.dimensions();
 			var ph = player.get('top') + dim.canvas.top;
 			var pw = player.get('left') + dim.canvas.left;

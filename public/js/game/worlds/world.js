@@ -33,7 +33,7 @@ define([
 
 	var sAlt = new Simplex({
 		octaves: 20,
-		persistence: 0.4,
+		persistence: 0.3,
 		level: 0.0075
 	});
 

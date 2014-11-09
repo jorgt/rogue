@@ -169,6 +169,8 @@ define(["helpers/log","helpers/events", "settings"], function(
 		if (_parent === null) {
 			_parent = elem;
 			_parent.id = 'game'
+			_parent.size(540, 960);
+			_parent.parse();
 			//_parent.classList.remove('game-screen');
 		}
 		return elem;
@@ -176,7 +178,6 @@ define(["helpers/log","helpers/events", "settings"], function(
 
 	window.onresize = function(e) {
 		var port = viewport();
-		_parent.size(port.height, port.width);
 		_parent.parse();
 		Events.raise('game.screen.resize', {dimensions:_parent.dimensions()})
 	}

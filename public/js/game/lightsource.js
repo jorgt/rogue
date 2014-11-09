@@ -5,9 +5,7 @@ define(["helpers/log", "game/tilebank"], function(
 	'use strict';
 
 	function LightSource(m, position, radius) {
-		//debugger;
 		var map = m;
-		console.log(map)
 		this.tiles = [];
 		this.position = position;
 		this.radius = radius;

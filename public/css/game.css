@@ -138,6 +138,12 @@ pre {
   height: 100%;
   width: 100%;
 }
+html,
+body,
+#game {
+  background-color: #000;
+  border: 1px solid #fff;
+}
 #game-playing-sidebar {
   border-left: 1px solid #fff;
 }
@@ -241,6 +247,10 @@ pre {
 #game .game-screen-dungeon .game-object {
   color: #999;
   background-color: #000;
+}
+#game .game-screen-dungeon .game-object-player {
+  background-color: transparent;
+  color: #f00;
 }
 #game .game-screen-dungeon .game-object.notvisible {
   color: #2e2e2e;

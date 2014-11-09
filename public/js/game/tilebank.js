@@ -9,41 +9,10 @@ define(["helpers/log"], function(
 		actors
 	*/
 	_bank.add('player', '@', 1, true, true, true);
-	_bank.add('tree', '^', 0, false, false, true);
 
 	/*
 		worlds
-	_bank.add('sea', '~', 1, false, false, false);
-	_bank.add('deepsea', '~', 1, false, false, false);
-	_bank.add('shallowsea', '~', 1, false, false, false);
-	_bank.add('ice', '.', 1, true, false, false);
-	_bank.add('frozenland', '.', 1, true, false, false);
-	_bank.add('drymountain', '^', 1, true, false, false);
-	_bank.add('snowymountain', '^', 1, true, false, false);
-	_bank.add('wettundra', '.', 1, true, false, false);
-	_bank.add('moisttundra', '.', 1, true, false, false);
-	_bank.add('drytundra', '.', 1, true, false, false);
-	_bank.add('rainforest', '.', 1, true, false, false);
-	_bank.add('wetforest', '.', 1, true, false, false);
-	_bank.add('mostforest', '.', 1, true, false, false);
-	_bank.add('dryforest', '.', 1, true, false, false);
-	_bank.add('dryscrub', '.', 1, true, false, false);
-	_bank.add('wettundra', '.', 1, true, false, false);
-	_bank.add('moisttundra', '.', 1, true, false, false);
-	_bank.add('drytundra', '.', 1, true, false, false);
-	_bank.add('rainforest', '*', 1, true, false, false);
-	_bank.add('wetforest', '*', 1, true, false, false);
-	_bank.add('moistforest', '*', 1, true, false, false);
-	_bank.add('dryforest', '*', 1, true, false, false);
-	_bank.add('verydryforest', '*', 1, true, false, false);
-	_bank.add('dryscrub', '.', 1, true, false, false);
-	_bank.add('desert', '.', 1, true, false, false);
-	_bank.add('desertscrub', '.', 1, true, false, false);
-	_bank.add('steppe', '.', 1, true, false, false);
-	_bank.add('woodland', '.', 1, true, false, false);
-	_bank.add('beach', '.', 1, true, false, false);
 	*/
-
 	_bank.add('sea', '~', 1, false, false, false);
 	_bank.add('deepsea', '~', 1, false, false, false);
 	_bank.add('shallowsea', '~', 1, false, false, false);
@@ -71,11 +40,16 @@ define(["helpers/log"], function(
 	_bank.add('rock', ' ', 99, false, true, true);
 	_bank.add('wall', '#', 0, false, false, true);
 
+	/*
+		objects
+	*/
+	_bank.add('tree', '^', 0, false, false, true);
+
 	return _bank;
 
 	function TileBank() {
 		var _guid = guid();
-		log.med('[TILEBANK:'+_guid+']:', 'Creating a tile repository');
+		log.med('[TILEBANK:' + _guid + ']:', 'Creating a tile repository');
 		var _bank = {};
 
 		this.add = function(name, sign, speed, walkable, diggable, blocking) {

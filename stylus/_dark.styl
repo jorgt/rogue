@@ -13,6 +13,10 @@ game-object-tree-color = #fff
 game-object-rock-color = game-object-background
 game-object-rock-background = game-object-background
 
+html, body, #game
+	background-color #000
+	border 1px solid white
+
 /*
 	Sidebar
 */
@@ -138,6 +142,10 @@ game-object-rock-background = game-object-background
 		.game-object 
 			color game-object-color
 			background-color game-object-background
+		
+		.game-object-player
+			background-color transparent
+			color red
 
 		.game-object.notvisible
 			color game-object-notvisible-color

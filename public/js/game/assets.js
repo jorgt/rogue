@@ -13,10 +13,10 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 		}
 
 		this.text = function(text, x, y) {
-			var txt = this.object({
+			var txt = _decorateText(this.object({
 				sign: text,
 				name: 'text'
-			}, x, y);
+			}, x, y));
 
 			txt.dataset.visible = true;
 			txt.dataset.visited = true;
@@ -84,6 +84,13 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 		obj.visited = function() {};
 		obj.visible = function() {};
 		obj.view = new LightSource(map, [x, y], 7);
+		return obj;
+	}
+
+	function _decorateText(obj) {
+		obj.setText = function(val) {
+			this.innerHTML = val;
+		}
 		return obj;
 	}
 
