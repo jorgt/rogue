@@ -3,128 +3,65 @@ define(["helpers/log"], function(
 
 	'use strict';
 
-	var Climate = {
-		_temp: ['tropical', 'subtropical', 'warm', 'cool', 'boreal', 'subpolar', 'polar'],
-		_hum: ['super-humid', 'per-humid', 'humid', 'sub-humid', 'semi-arid', 'arid', 'per-arid', 'super-arid'],
-		_alt: ['alvar', 'alpine', 'subalpine', 'montane', 'lower montane', 'premontane', 'shallow sea', 'sea', 'deep sea'],
-		_climates: ['ice', 'frozen land', 'dry mountain', 'snowy mountain', 'deep sea', 'sea', 'shallow sea', 'desert', 'rain tundra',
-			'wet tundra', 'moist tundra', 'dry tundra', 'rain forest', 'wet forest', 'moist forest', 'dry forest', 'very dry forest',
-			'dry scrub', 'desert scrub', 'steppe', 'woodland', 'beach'
-		],
-		_getTemp: function(temp) {
-			if (temp < 1.5) return 6;
-			else if (temp < 3) return 5;
-			else if (temp < 6) return 4;
-			else if (temp < 12) return 3;
-			else if (temp < 18) return 2;
-			else if (temp < 24) return 1;
-			else return 0;
+	var _climates = [
+		'deep sea', //0
+		'sea', //1
+		'shallow sea', //2 
+		'ice', //3
+		'polar', //4
+		'tundra', //5
+		'taiga', //6
+		'savannah', //7
+		'shrubland', //8
+		'forest', //9
+		'swamp', //10
+		'desert', //11
+		'plains', //12
+		'seasonal forest', //13
+		'rain forest', //14
+		'mountain', //15
+		'snowy mountain' //16
+	];
 
-			return ret;
-		},
-		_getHumidity: function(precipitation) {
-			if (precipitation < 2000) return 7;
-			else if (precipitation < 4000) return 6;
-			else if (precipitation < 6000) return 5;
-			else if (precipitation < 8000) return 4;
-			else if (precipitation < 10000) return 3;
-			else if (precipitation < 12000) return 2;
-			else if (precipitation < 14000) return 1;
-			else return 0;
+	return function climate(t, p, a) {
+		return _climates[_get(t, p, a)];
+	}
 
-		},
-		_getAltitude: function(altitude) {
-			var ret;
-			if (altitude < -3000) return 9;
-			if (altitude < -500) return 8;
-			else if (altitude < 0) return 7;
-			else if (altitude < 100) return 6;
-			else if (altitude < 1000) return 5;
-			else if (altitude < 2000) return 4;
-			else if (altitude < 3000) return 3;
-			else if (altitude < 4000) return 2;
-			else if (altitude < 5500) return 1;
-			else return 0;
-		},
-		_combine: function(temp, precipitation, altitude) {
-			return [
-				Climate._getTemp(temp),
-				Climate._getHumidity(precipitation),
-				Climate._getAltitude(altitude),
-			];
-		},
-		_getCombined: function(c) {
-			if (c[0] === 6 && (c[2] === 6 || c[2] === 7)) { //polar, not mountainous
-				return (c[2] === 7) ? 0 : 1; //ice or frozen land
-			}
-
-			if (c[2] === 9) return 4; //deep sea
-			if (c[2] === 8) return 5; //sea
-			if (c[2] === 7) return 6; //shallow sea
-			if (c[2] === 6) return 21; //beach
-
-			if (c[1] === 7 && c[0] <= 4) return 7; //deserts
-
-			if (c[1] === 4 && c[0] === 0) return 16; //very dry forest
-
-			if (c[1] === 6) { // per arid, boreal and higher are scrubs
-				if (c[0] <= 3) return 17;
-				if (c[0] >= 4) return 18;
-			}
-
-			if (c[1] === 5) { //arid
-				if (c[0] <= 3) return 19; // steppe
-				if (c[0] >= 4) return 20; // woodland
-			}
-
-			if (c[1] === 0 && c[0] <= 4) return 12; // rain forests
-			if (c[1] === 1 && c[0] <= 4) return 13; // wet forests
-			if (c[1] === 2 && c[0] <= 4) return 14; // moist forests
-			if (c[1] === 3 && c[0] <= 2) return 15; // dry forests
-			if (c[1] === 4 || c[0] <= 3) return 16; // very dry forests
-
-			//if (c[0] >= 5) { //sub polar, all tundras
-				if (c[1] === 0) return 8;
-				else if (c[1] === 1) return 9;
-				else if (c[1] === 2) return 10;
-				else return 11;
-			//}
-
-			//mountains, dry or snowy
-			if (c[2] <= 2) {
-				return (c[0] >= 4) ? 2 : 3; //dry mountain, snowy mountain
-			}
-			console.log(c, Climate.convertToText(c))
-		},
-		get: function(temp, precipitation, altitude) {
-			var c = Climate._combine(temp, precipitation, altitude);
-			return Climate._getCombined(c)
-		},
-		convertToText: function(a) {
-			return [Climate._temp[a[0]], Climate._hum[a[1]], Climate._alt[a[2]]];
-		},
-		getClimateInfo: function(climate) {
-			return Climate._climates[climate];
-		},
-		checkConsistency: function() {
-			log.low('[CLIMATE]: checking consistency');
-			var used = [];
-			for (var a = 0; a < Climate._temp.length; a++) {
-				for (var b = 0; b < Climate._hum.length; b++) {
-					for (var c = 0; c < Climate._alt.length; c++) {
-						var info = Climate._getCombined([a, b, c]);
-						if (used.indexOf(info) < 0) {
-							used.push(info);
-						}
-						console.log([a, b, c], Climate.convertToText([a, b, c]), info, Climate.getClimateInfo(info));
-					}
-				}
-			}
-			used.sort();
-			log.low('[CLIMATE]: done checking. Found: ', used);
+	function _get(t, p, a) {
+		if (t instanceof Array) {
+			a = t[2];
+			p = t[1];
+			t = t[0];
 		}
-	};
+		// water
+		if (a < -2500) return 0; //deep sea
+		if (a < -500 && t < -5) return 3; //ice
+		if (a < -500) return 1; //sea
+		if (a < 0 && t < 0) return 3; //ice
+		if (a < 0) return 2; //shallow sea
 
-	return Climate;
+		//mountains
+		if(a > 5000 && p > 4000 && t < 10) return 16; //snowy mountain
+		if(a > 5000 && p > 0) return 15; //mountain
 
+		// colder climates. trees struggle under 7c ,taiga's and tundra's. 
+		// taiga's are wetter and support coniferious forests
+		if (t < 7 && t >= 2 && p > 5000) return 6; //taiga
+		if (t < -5) return 4; //polar
+		if (t < 0) return 5; //tundra
+
+		//pot climates
+		if (t > 20 && p > 12000) return 14; // rain forest
+		if (t > 20 && p > 8000) return 13; // seasonal forest
+		if (t > 20 && p > 4000) return 12; // plains
+		if (t > 20 && p > 0) return 11; // desert
+
+		//moderate climates
+		if (p > 9000) return 9; //forest
+		if (p > 4500) return 8; //sprubland
+		if (p > 0) return 7; //savannap
+		
+		//rest. this doesn't pappen, it'll be savannah instead.
+		return 10 //swamp
+	}
 });

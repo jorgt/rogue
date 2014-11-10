@@ -31,22 +31,24 @@ define([
 			type: 'world',
 			options: {
 				assets: _assets,
-				size: 45
+				size: 41
 			}
 		});
 
 		var _txt = new Txt(_sidebar, _assets);
 
 		var _lastposition = null;
+		var _selected = null;
 
 		_setupEvents();
 		_setupDelving();
-		_setupSidebar();
+
 
 		var _navigation = [];
 
 		this.start = function() {
 			_setupScreen(_current);
+			_setupSidebar();
 			log.urgent('[GAME:' + _guid + ']', 'game running!');
 		};
 
@@ -116,15 +118,6 @@ define([
 			});
 		}
 
-		function _setupSidebar() {
-			var player = _assets.player();
-			_txt.set('current-pos-txt', 'Current Position:', 2, 2)
-			_txt.next('current-pos', player.position().toString(), 2);
-
-			_txt.set('current-tile-txt', 'Current Tile:', 3, 2);
-			//_txt.next('current-tile', _current.get(player.position()).toString(), 2);
-		}
-
 		function _setupEvents() {
 			Events.on('game.update', function(e) {
 				_setupSidebar();
@@ -139,19 +132,68 @@ define([
 				//move player
 				if (x !== 0 || y !== 0) {
 					player.move(_current.getGrid(), x, y);
-					if (player.position().toString() !== old.toString()) {
-						player.view.update(player.position(), this);
-						player.draw();
-						_scroll(player, x, y);
+					player.view.update(player.position(), this);
+					player.draw();
+					_scroll(player, x, y);
 
-						Events.raise('game.update');
-					}
+					Events.raise('game.update');
 				}
 			}.bind(this));
 
 			Events.on('game.screen.resize', function(e) {
 				//console.log(e)
 			});
+
+			Events.on('game.click', function(e) {
+				if (_selected !== null) {
+					_current.get(_selected).classList.remove('selected');
+				}
+				_selected = [e.detail.location.height, e.detail.location.width];
+				_current.get(_selected).classList.add('selected');
+				_setupSidebar()
+			}.bind(this));
+		}
+
+		function _setupSidebar() {
+			var player = _assets.player();
+
+			var start = 2;
+
+			_txt.set('current-pos-txt', 'Current Position:', start++, 2)
+			_txt.next('current-pos', player.position().toString(), 2);
+
+			_txt.set('line1', '----------------------------------', start++, 2);
+
+			_txt.set('current-climate-txt', 'Climate:', start++, 2);
+			_txt.next('current-climate', _current.get(player.position()).info.climate.climate, 2);
+
+			_txt.set('current-climate-alt-txt', 'Altitude:', start++, 3);
+			_txt.next('current-climate-alt', _current.get(player.position()).info.climate.alt + 'm', 2);
+
+			_txt.set('current-climate-prec-txt', 'Precipitation:', start++, 3);
+			_txt.next('current-climate-prec', _current.get(player.position()).info.climate.prec + 'mm', 2);
+
+			_txt.set('current-climate-temp-txt', 'Temperature:', start++, 3);
+			_txt.next('current-climate-temp', _current.get(player.position()).info.climate.temp + '&deg;', 2);
+
+			start += 1;
+
+			_txt.set('selected-pos-txt', 'Selected Position:', start++, 2);
+			_txt.next('selected-pos', ((_isnull(_selected)) ? 'none' : _selected.toString()), 2);
+
+			_txt.set('line2', '----------------------------------', start++, 2);
+
+			_txt.set('selected-climate-txt', 'Climate:', start++, 2);
+			_txt.next('selected-climate', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.climate), 2);
+
+			_txt.set('selected-climate-alt-txt', 'Altitude:', start++, 3);
+			_txt.next('selected-climate-alt', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.alt + 'm'), 2);
+
+			_txt.set('selected-climate-prec-txt', 'Precipitation:', start++, 3);
+			_txt.next('selected-climate-prec', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.prec + 'mm'), 2);
+
+			_txt.set('selected-climate-temp-txt', 'Temperature:', start++, 3);
+			_txt.next('selected-climate-temp', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.temp + '&deg;'), 2);
 		}
 
 		function _scroll(player, x, y) {
@@ -183,6 +225,10 @@ define([
 
 		function _toBlock(n) {
 			return Math.floor(n / settings.square);
+		}
+
+		function _isnull(v) {
+			return v === null;
 		}
 	}
 

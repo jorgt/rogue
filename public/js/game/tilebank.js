@@ -19,7 +19,7 @@ define(["helpers/log"], function(
 	_bank.add('ice', '~', 1, true, false, false);
 	_bank.add('polar', '.', 1, true, false, false);
 	_bank.add('tundra', '.', 1, true, false, false);
-	_bank.add('taiga', '.', 1, true, false, false);
+	_bank.add('taiga', '*', 1, true, false, false);
 	_bank.add('savannah', '.', 1, true, false, false);
 	_bank.add('shrubland', '.', 1, true, false, false);
 	_bank.add('forest', '*', 1, true, false, false);
@@ -75,6 +75,10 @@ define(["helpers/log"], function(
 			this.walkable = opt.walkable;
 			this.diggable = opt.diggable;
 			this.remove = opt.remove;
+			this.info = {};
+			this.getInfo = function() {
+
+			}
 		}
 	}
 

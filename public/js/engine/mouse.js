@@ -54,22 +54,11 @@ define(["helpers/log", "settings"], function(
 		}
 
 		function _gridHelper(e, func) {
-			var to;
-			for(var i = 0; i < e.path.length; i++) {
-				if(e.path[i].className.indexOf('game-screen') > -1) {
-					to = e.path[i];
-					break;
-				}
-			}
-
-			var oX = e.clientX + (-1 * parseInt(to.dataset.left));
-			var oY = e.clientY + (-1 * parseInt(to.dataset.top));
-
 			var ret = {
 				on: e.srcElement,
 				tile: {
-					height: ~~(oY / settings.square),
-					width: ~~(oX / settings.square)
+					height: ~~(parseInt(e.target.dataset.top) / settings.square),
+					width: ~~(parseInt(e.target.dataset.left) / settings.square)
 				}
 			}
 			func.call(this, ret);

@@ -1,7 +1,6 @@
 define([
 	"helpers/log",
 	"game/worlds/world",
-	//"game/worlds/land",
 	"game/worlds/dungeon",
 	], function(
 	log,

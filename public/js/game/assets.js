@@ -31,16 +31,15 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 				obj.id = id;
 			}
 
-			obj.dataset.top = _int(_loc(x||0));
-			obj.dataset.left = _int(_loc(y||0));
+			obj.dataset.top = _int(_locToPx(x || 0));
+			obj.dataset.left = _int(_locToPx(y || 0));
 			obj.dataset.name = _createName(type.name);
 
 			obj.className = _createName() + ' ' + obj.dataset.name;
 			obj.style.width = settings.square + 'px';
 			obj.style.height = settings.square + 'px';
 
-			obj = _decorateObject(obj, type)
-
+			obj = _decorateObject(obj, type);
 			obj.draw();
 			return obj;
 		};
@@ -66,12 +65,24 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 	function _decorateMoveable(obj) {
 		obj.className += ' game-actor';
 		obj.move = function(grid, x, y) {
-			if (grid[this.get('top') / settings.square + x] && grid[this.get('top') / settings.square + x][this.get('left') / settings.square + y]) {
-				var tile = grid[this.get('top') / settings.square + x][this.get('left') / settings.square + y].tile;
-				if (bank.get(tile).walkable === true) {
-					this.set('left', y, true);
-					this.set('top', x, true);
-				}
+			var newx = 0,
+				newy = 0;
+			if (x > 0) {
+				newx = (_pxToLoc(this.get('top')) === grid.length - 1) ? -1 * (grid.length - 1) : x;
+			} else if (x < 0) {
+				newx = (_pxToLoc(this.get('top')) === 0) ? (grid.length - 1) : x;
+			}
+
+			if (y > 0) {
+				newy = (_pxToLoc(this.get('left')) === grid.length - 1) ? -1 * (grid.length - 1) : y;
+			} else if (y < 0) {
+				newy = (_pxToLoc(this.get('left')) === 0) ? (grid.length - 1) : y;
+			}
+
+			var tile = grid[_pxToLoc(this.get('top')) + newx][_pxToLoc(this.get('left')) + newy].tile;
+			if (bank.get(tile).walkable === true) {
+				this.set('left', newy, true);
+				this.set('top', newx, true);
 			}
 		};
 		return obj;
@@ -96,7 +107,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 
 	function _decorateObject(obj, type) {
 		obj.tile = type.name;
-
+		obj.info = type.info;
 		obj.draw = function() {
 			var px = ['top', 'fontSize', 'left'];
 			for (var o in px) {
@@ -121,9 +132,9 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 			if (typeof value === 'number') {
 				offset = offset || true;
 				if (offset) {
-					this.dataset[data] = _int(this.dataset[data]) + _int(_loc(value));
+					this.dataset[data] = _int(this.dataset[data]) + _int(_locToPx(value));
 				} else {
-					this.dataset[data] = _loc(value);
+					this.dataset[data] = _locToPx(value);
 				}
 			} else {
 				this.dataset[data] = value
@@ -151,8 +162,12 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 		return obj;
 	}
 
-	function _loc(n) {
+	function _locToPx(n) {
 		return parseInt(n) * settings.square;
+	}
+
+	function _pxToLoc(n) {
+		return parseInt(n) / settings.square;
 	}
 
 	function _int(n) {

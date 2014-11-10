@@ -1,7 +1,7 @@
 define([
 	"helpers/log",
 	"settings",
-	"game/worlds/climate2",
+	"game/worlds/climate",
 	"libs/simplex",
 	"game/tilebank",
 	"game/worlds/grids"
@@ -56,17 +56,26 @@ define([
 		var _grid = [];
 		var _start = null;
 		var _end = null;
-		var gAlt = _chunk(sAlt, ranges.altitude, _height, _width, 0, 0);
-		var gPre = _chunk(sPre, ranges.precipitation, _height, _width, 0, 0);
-		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0);
+		var gAlt = _chunk(sAlt, _randomize(ranges.altitude), _height, _width, 0, 0);
+		var gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0);
+		var gTem = _chunk(sTem, _randomize(ranges.temperature), _height, _width, 0, 0);
 
-		var aa = 0, ap = 0, at = 0;
+		var aa = 0,
+			ap = 0,
+			at = 0;
 
 		for (var x = 0; x < _height; x++) {
 			_grid[x] = [];
 			for (var y = 0; y < _width; y++) {
-				var c = climate(~~(gTem[x][y] * 1.2), ~~ (gPre[x][y]), ~~ (gAlt[x][y] * 1.5));
-				_grid[x][y] = opt.assets.object(bank.get(c.replace(/\s/g, '')), x, y);
+				var c = {
+					temp: ~~(gTem[x][y] * 1.2),
+					prec: ~~(gPre[x][y] - (0.065 * (gAlt[x][y] * 1.5))),
+					alt: ~~(gAlt[x][y] * 1.5)
+				}
+				c.climate = climate(c.temp, c.prec, c.alt);
+				var obj = bank.get(c.climate.replace(/\s/g, ''));
+				obj.info.climate = c;
+				_grid[x][y] = opt.assets.object(obj, x, y);
 			}
 		}
 
@@ -101,6 +110,13 @@ define([
 				}
 			}
 			return world;
+		}
+
+		function _randomize(range, variation) {
+			return {
+				min: ~~(range.min * (Math.random() * 0.4 + 0.8)),
+				max: ~~(range.max * (Math.random() * 0.4 + 0.8))
+			}
 		}
 
 		function _range(range, n) {

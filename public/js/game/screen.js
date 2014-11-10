@@ -169,7 +169,7 @@ define(["helpers/log","helpers/events", "settings"], function(
 		if (_parent === null) {
 			_parent = elem;
 			_parent.id = 'game'
-			_parent.size(540, 960);
+			_parent.size(41*15, 41*15+300);
 			_parent.parse();
 			//_parent.classList.remove('game-screen');
 		}
