@@ -4,7 +4,8 @@ define([
 		"game/game",
 		"game/screen",
 		"game/assets",
-		"helpers/events"
+		"helpers/events",
+		"settings"
 	],
 	function(
 		log,
@@ -12,7 +13,8 @@ define([
 		Game,
 		Screen,
 		Assets,
-		Events) {
+		Events,
+		settings) {
 
 		var game = null;
 		var playing = Screen.get('playing').hide();
@@ -22,7 +24,10 @@ define([
 		states.add({
 			name: 'play',
 			init: function() {
-				loading.add(assets.text('Loading game...', 10, 15));
+				var txt = 'Loading game...';
+				var h = ~~ (loading.dataset.height / settings.square / 2) - 0.5;
+				var w = ~~ ((loading.dataset.width / settings.square / 2)) - 4;
+				loading.add(assets.text(txt, h, w));
 			},
 			start: function() {
 				loading.show();
@@ -35,6 +40,10 @@ define([
 					this.keys.press('esc', function(e) {
 						states.switch('exit');
 					});
+
+					this.keys.press('h', function(e) {
+						states.switch('help');
+					})
 
 					this.keys.press('left', function(e) {
 						raiseMovementEvent(e[0]);

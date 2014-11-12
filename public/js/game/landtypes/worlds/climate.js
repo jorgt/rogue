@@ -1,30 +1,14 @@
-define(["helpers/log"], function(
-	log) {
+define([
+	"helpers/log",
+	"game/landtypes/worlds/climateArray"
+], function(
+	log,
+	climates) {
 
 	'use strict';
 
-	var _climates = [
-		'deep sea', //0
-		'sea', //1
-		'shallow sea', //2 
-		'ice', //3
-		'polar', //4
-		'tundra', //5
-		'taiga', //6
-		'savannah', //7
-		'shrubland', //8
-		'forest', //9
-		'swamp', //10
-		'desert', //11
-		'plains', //12
-		'seasonal forest', //13
-		'rain forest', //14
-		'mountain', //15
-		'snowy mountain' //16
-	];
-
 	return function climate(t, p, a) {
-		return _climates[_get(t, p, a)];
+		return climates[_get(t, p, a)];
 	}
 
 	function _get(t, p, a) {
@@ -41,8 +25,8 @@ define(["helpers/log"], function(
 		if (a < 0) return 2; //shallow sea
 
 		//mountains
-		if(a > 5000 && p > 4000 && t < 10) return 16; //snowy mountain
-		if(a > 5000 && p > 0) return 15; //mountain
+		if (a > 5000 && p > 4000 && t < 10) return 16; //snowy mountain
+		if (a > 5000 && p > 0) return 15; //mountain
 
 		// colder climates. trees struggle under 7c ,taiga's and tundra's. 
 		// taiga's are wetter and support coniferious forests
@@ -50,7 +34,7 @@ define(["helpers/log"], function(
 		if (t < -5) return 4; //polar
 		if (t < 0) return 5; //tundra
 
-		//pot climates
+		//hot climates
 		if (t > 20 && p > 12000) return 14; // rain forest
 		if (t > 20 && p > 8000) return 13; // seasonal forest
 		if (t > 20 && p > 4000) return 12; // plains
@@ -60,7 +44,7 @@ define(["helpers/log"], function(
 		if (p > 9000) return 9; //forest
 		if (p > 4500) return 8; //sprubland
 		if (p > 0) return 7; //savannap
-		
+
 		//rest. this doesn't pappen, it'll be savannah instead.
 		return 10 //swamp
 	}

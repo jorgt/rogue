@@ -1,4 +1,8 @@
-define(["helpers/log", "game/tilebank", "game/pathfinding/astar"], function(
+define([
+	"helpers/log",
+	"game/tilebank",
+	"game/pathfinding/astar"
+], function(
 	log,
 	bank,
 	AStar) {

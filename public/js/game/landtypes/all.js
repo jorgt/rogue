@@ -1,11 +1,12 @@
 define([
 	"helpers/log",
-	"game/worlds/world",
-	"game/worlds/dungeon",
-	], function(
+	"game/landtypes/world",
+	"game/landtypes/land",
+	"game/landtypes/dungeon",
+], function(
 	log,
 	world,
-	//Land,
+	land,
 	dungeon) {
 
 	'use strict';
@@ -55,24 +56,26 @@ define([
 		}
 
 		this.get = function(x, y) {
-			if (x instanceof Array) {
-				y = x[1];
-				x = x[0];
+			if (x !== null) {
+				if (x instanceof Array) {
+					y = x[1];
+					x = x[0];
+				}
+				return plane.grid[x][y];
 			}
-			return plane.grid[x][y];
 		}
 	}
 
 	function _world(o) {
-		return world(o)
+		return world(o);
 	}
 
 	function _land(o) {
-
+		return land(o);
 	}
 
 	function _dungeon(o) {
-		return dungeon(o)
+		return dungeon(o);
 	}
 
 	function _guid() {

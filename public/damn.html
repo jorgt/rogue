@@ -4,84 +4,115 @@
         <title>Engine</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="css/game.css">
     </head>
     <body>
-
+    <div id="test"></div>
 	<script type="text/javascript">
-		var _temp = ['tropical', 'subtropical', 'warm', 'cool', 'boreal', 'subpolar', 'polar'],
-			_hum = ['super-humid', 'per-humid', 'humid', 'sub-humid', 'semi-arid', 'arid', 'per-arid', 'super-arid'],
-			_alt = ['alvar', 'alpine', 'subalpine', 'montane', 'lower montane', 'premontane', 'shallow sea', 'sea', 'deep sea'],
-			_climates = [
-				'deep sea',  //0
-				'sea', 		//1
-				'shallow sea',//2 
-				'ice', //3
-				'polar', //4
-				'tundra', //5
-				'taiga', //6
-				'savanna', //7
-				'shrubland', //8
-				'forest', //9
-				'swamp', //10
-				'desert', //11
-				'plains', //12
-				'seasonal forest', //13
-				'rain forest', //14
-				'mountain', //15
-				'snowy mountain'//16
-			];
+	
+		'use strict';
+		var grid = [];
+		var _sizex = 75;
+		var _sizey = 75;
+		var _its = 3000;
+		var _life = Math.sqrt(_sizex * _sizex + _sizey * _sizey);
+		var _edgex = _sizex * 0.2;
+		var _edgey = _sizey * 0.2;
+		var _blur1 = 0.85;
+		var _blur2 = 0.77;
 
-			var tr = [-20, 50];
-			var hr = [50, 16000];
-			var ar = [-10000,8000];
+		for(var x = 0; x < _sizex; x++) {
+			grid[x] = [];
+			for(var y = 0; y < _sizey; y++) {
+				grid[x][y] = 0;
+			}
+		}
 
+		for(var i = 0; i < _its; i++) {
+			var x = ~~(Math.random() * (_sizex-(_edgex*2)) + _edgex);
+			var y = ~~(Math.random() * (_sizey-(_edgey*2)) + _edgey);
 
-			for(var x = 0; x < 100; x++) {
-				var t = _range(tr, Math.random())
-				var h = _range(hr, Math.random())
-				var a = _range(ar, Math.random())
+			for(var j = 0; j < _life; j++) {
+				x += Math.round(Math.random() * 2 - 1);
+				y += Math.round(Math.random() * 2 - 1);
+									
+				if (x < 1 || x > _sizex -2 || y < 1 || y > _sizey - 2) continue;
+				
+				var hood = _next(x, y);
+				
+				for (var k = 0 ; k < hood.length; k++){
+					if (grid[hood[k][0]][hood[k][1]] < grid[x][y]){
+						x = hood[k][0];
+						y = hood[k][1];
+						continue;
+					}
+				}
+					
+				grid[x][y]++;
+			}
+		}
 
-				//temp lapse 6.4c per 1000m altitude
-				if(a > 0) t = ~~ (t - Math.abs(a * 0.0064));
+		var r = _normalize(grid);
+ 		var b =document.getElementById("test");
+ 		b.style.display = 'inline-block';
+		for(var x = 0; x < r.length; x++) {
+			var e = document.createElement('div');
+			for(var y = 0; y < r[0].length; y++) {
+				var d = document.createElement('div');
+				var c = ~~(r[x][y] * 255);
+				d.style.backgroundColor = 'rgb('+c+','+c+','+c+')';
+				d.innerHtml = '&nbps;'
+				d.style.width = '10px';
+				d.style.height = '10px';
+				d.style.float = 'left'
+				e.appendChild(d);
+			}
+			b.appendChild(e);
+			//b.innerHtml += '<br>'
+		}
 
-				//below sea level, normalize temp to 2 at -5000m altitude
-				if(a < 0 && a > -5000) t = ~~(t + a * ((t - 2) / 5000));
+		function _range(min, max) {
+			return ~~ ((max - min) * Math.random() + min);
+		}
 
-				console.log(t, h, a, _climates[_get(t, h, a)], _get(t, h, a));
+		function _next(x, y) {
+			var result = [];
+			
+			for (var a = -1; a <= 1; a++){
+				for (var b = -1; b <= 1; b++){
+					if (a || b && (x + a >= 0 && x + a < _sizex && y + b >= 0 && y + b < _sizey)){
+						result.push([x + a, y + b]);
+					}
+				}
+			}
+			
+			return _shuffle(result);
+		};
+
+		function _shuffle(o){ //v1.0
+		    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+		    return o;
+		};
+
+		function _normalize(grid) {
+			var max = 0;
+			var min = 10000000;
+			for(var x = 0; x < grid.length; x++) {
+				for(var y = 0; y < grid[0].length; y++) {
+					if (x == 0 || x == _sizex -1 || y == 0 || y == _sizey -1) grid[x][y] *= 0.77;
+					else if (x == 1 || x == _sizex -2 || y == 1 || y == _sizey -2) grid[x][y] *= 0.85;
+					var g = grid[x][y];
+					if(g > max) max = g;
+					if(g < min) min = g;
+				}
 			}
 
-			function _get(t, h, a) {
-				// water
-				if(a < 1800) 			return 0; 		//deep sea
-				if(a < 100 && t < 10) 	return 3; 		//ice
-				if(a < 100)				return 1; 		//sea
-				if(a < 0 && t < 0)		return 3;		//ice
-				if(a < 0 && t < 0)		return 2;		//shallow sea
-				
-				// colder climates. trees struggle under 7c ,taiga's and tundra's. 
-				// taiga's are wetter and support coniferious forests
-				if(t < 7 && t >= 2 && h > 5000) return 6;//taiga
-				if(t < -10 ) return 4;					//tundra
-				if(t < 2) return 5;						//polar
-				
-				//hot climates
-				if(t > 20 && h > 12000) return 14; 		// rain forest
-				if(t > 20 && h > 8000) 	return 13; 		// seasonal forest
-				if(t > 20 && h > 4000) 	return 12; 		// plains
-				if(t > 20 && h > 0) 	return 11; 		// desert
-				
-				//moderate climates
-				if(h > 6000)			return 9; 		//forest
-				if(h > 3000)			return 8; 		//shrubland
-				if(h > 0)				return 7; 		//savannah
-				//rest
-				return 10								//swamp
+			for(var x = 0; x < grid.length; x++) {
+				for(var y = 0; y < grid[0].length; y++) {
+					grid[x][y] = (grid[x][y] - min) / (max-min);
+				}
 			}
-
-			function _range(range, n) {
-				return ~~((range[1] - range[0]) * n + range[0]);
-			}
+			return grid;
+		}
 	</script>
     </body>
 </html>

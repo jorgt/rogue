@@ -15,13 +15,17 @@ game-object-rock-background = game-object-background
 
 html, body, #game
 	background-color #000
-	border 1px solid white
+	//border 1px solid white
 
 /*
 	Sidebar
 */
 #game-playing-sidebar 
+	box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
 	border-left 1px solid white
+	background-color #0a0a0a	
 
 /*
 	All Game Objects
@@ -55,88 +59,105 @@ html, body, #game
 /*
 	Tile Types
 */
-.game-screen-world			
-	.game-object
-		color: #FFFFFF
-		background-color #FFFFFF
-	.game-object.selected
+#game
+	.game-screen-world			
+		.game-object
+			color: #FFFFFF
+			background-color #FFFFFF
+		.game-object.selected
 			box-sizing:border-box;
 			-moz-box-sizing:border-box;
 			-webkit-box-sizing:border-box;
 			border 1px solid red
-		
-	.game-object-player
-		background-color transparent
-		color red
-		
-	.game-object-ice 
-		background-color #FFFFFF
-		color fg(@background-color, 20%)
-		
-	.game-object-polar 
-		background-color #EEEEEE
-		color fg(@background-color, 20%)
-
-	.game-object-beach 
-		background-color #FFF830
-		color fg(@background-color, 20%)
-		
-	.game-object-shallowsea 
-		background-color #2743C2
-		color fg(@background-color, 20%)
-		
-	.game-object-sea 
-		background-color #142EA6
-		color fg(@background-color, 20%)
-		
-	.game-object-deepsea 
-		background-color #00198A
-		color fg(@background-color, 20%)
-		
-	.game-object-mountain 
-		background-color #333333
-		color fg(@background-color, 20%)
-		
-	.game-object-snowymountain 
-		background-color #AAAAAA
-		color fg(@background-color, 20%)
-		
-	.game-object-tundra 
-		background-color #CCDBC3
-		color fg(@background-color, 20%)
-		
-	.game-object-taiga 
-		background-color #C3DADB
-		color fg(@background-color, 20%)
-		
-	.game-object-savannah 
-		background-color #D3DE00
-		color fg(@background-color, 20%)
-		
-	.game-object-rainforest 
-		background-color #006900
-		color fg(@background-color, 20%)
-		
-	.game-object-seasonalforest 
-		background-color #00A300
-		color fg(@background-color, 20%)
-		
-	.game-object-forest 
-		background-color #33B500
-		color fg(@background-color, 20%)
-		
-	.game-object-shrubland
-		background-color #8EE600
-		color fg(@background-color, 20%)
-		
-	.game-object-plains
-		background-color #D4FF00
-		color fg(@background-color, 20%)
-		
-	.game-object-desert 
-		background-color #FFBF00
-		color fg(@background-color, 20%)
 			
+		.game-object-player
+			background-color transparent
+			color red
+			
+		.game-object-ice 
+			background-color #FFFFFF
+			color fg(@background-color, 20%)
+			
+		.game-object-polar 
+			background-color #EEEEEE
+			color fg(@background-color, 20%)
+
+		.game-object-beach 
+			background-color #FFF830
+			color fg(@background-color, 20%)
+			
+		.game-object-shallowsea 
+			background-color #2743C2
+			color fg(@background-color, 20%)
+			
+		.game-object-sea 
+			background-color #142EA6
+			color fg(@background-color, 20%)
+			
+		.game-object-deepsea 
+			background-color #00198A
+			color fg(@background-color, 20%)
+			
+		.game-object-mountain 
+			background-color #333333
+			color fg(@background-color, 20%)
+			
+		.game-object-snowymountain 
+			background-color #AAAAAA
+			color fg(@background-color, 20%)
+			
+		.game-object-tundra 
+			background-color #CCDBC3
+			color fg(@background-color, 20%)
+			
+		.game-object-taiga 
+			background-color #C3DADB
+			color fg(@background-color, 20%)
+			
+		.game-object-savannah 
+			background-color #D3DE00
+			color fg(@background-color, 20%)
+			
+		.game-object-rainforest 
+			background-color #006900
+			color fg(@background-color, 20%)
+			
+		.game-object-seasonalforest 
+			background-color #00A300
+			color fg(@background-color, 20%)
+			
+		.game-object-forest 
+			background-color #33B500
+			color fg(@background-color, 20%)
+			
+		.game-object-shrubland
+			background-color #8EE600
+			color fg(@background-color, 20%)
+			
+		.game-object-plains
+			background-color #D4FF00
+			color fg(@background-color, 20%)
+			
+		.game-object-desert 
+			background-color #FFBF00
+			color fg(@background-color, 20%)
+
+/*
+	Lands
+*/	
+#game 
+	.game-screen-land			
+		.game-object
+			color: #FFFFFF
+			background-color #FFFFFF
+		.game-object.selected
+			box-sizing:border-box;
+			-moz-box-sizing:border-box;
+			-webkit-box-sizing:border-box;
+			border-left 1px solid red
+		.game-object-tree
+			background-color #33B500
+			color fg(@background-color, 20%)
 
 #game		
 	.game-screen-dungeon	

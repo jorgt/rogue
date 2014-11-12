@@ -2,7 +2,7 @@ define([
 	"helpers/log",
 	"game/tilebank",
 	"game/assets",
-	"game/worlds/planes",
+	"game/landtypes/all",
 	"game/text",
 	"helpers/events",
 	"settings"
@@ -115,7 +115,7 @@ define([
 				} else {
 					_current = Planes.getPlane(land);
 				}
-			});
+			}.bind(this));
 		}
 
 		function _setupEvents() {
@@ -145,11 +145,24 @@ define([
 			});
 
 			Events.on('game.click', function(e) {
-				if (_selected !== null) {
-					_current.get(_selected).classList.remove('selected');
+				if (e.detail.location.width < _current.size().y) {
+					if (_selected !== null &&
+						_selected[0] === e.detail.location.height &&
+						_selected[1] === e.detail.location.width &&
+						_current.get(_selected) !== null) {
+
+						_current.get(_selected).classList.remove('selected');
+						_selected = null;
+					} else {
+						if (_selected !== null) {
+							_current.get(_selected).classList.remove('selected');
+						}
+						_selected = [e.detail.location.height, e.detail.location.width]
+						_current.get(_selected).classList.add('selected');
+
+					}
 				}
-				_selected = [e.detail.location.height, e.detail.location.width];
-				_current.get(_selected).classList.add('selected');
+
 				_setupSidebar()
 			}.bind(this));
 		}
@@ -164,36 +177,38 @@ define([
 
 			_txt.set('line1', '----------------------------------', start++, 2);
 
-			_txt.set('current-climate-txt', 'Climate:', start++, 2);
-			_txt.next('current-climate', _current.get(player.position()).info.climate.climate, 2);
+			if (_current.type === 'world') {
+				_txt.set('current-climate-txt', 'Climate:', start++, 2);
+				_txt.next('current-climate', _current.get(player.position()).info.climate.climate, 2);
 
-			_txt.set('current-climate-alt-txt', 'Altitude:', start++, 3);
-			_txt.next('current-climate-alt', _current.get(player.position()).info.climate.alt + 'm', 2);
+				_txt.set('current-climate-alt-txt', 'Altitude:', start++, 3);
+				_txt.next('current-climate-alt', _current.get(player.position()).info.climate.alt + 'm', 2);
 
-			_txt.set('current-climate-prec-txt', 'Precipitation:', start++, 3);
-			_txt.next('current-climate-prec', _current.get(player.position()).info.climate.prec + 'mm', 2);
+				_txt.set('current-climate-prec-txt', 'Precipitation:', start++, 3);
+				_txt.next('current-climate-prec', _current.get(player.position()).info.climate.prec + 'mm', 2);
 
-			_txt.set('current-climate-temp-txt', 'Temperature:', start++, 3);
-			_txt.next('current-climate-temp', _current.get(player.position()).info.climate.temp + '&deg;', 2);
+				_txt.set('current-climate-temp-txt', 'Temperature:', start++, 3);
+				_txt.next('current-climate-temp', _current.get(player.position()).info.climate.temp + '&deg;', 2);
 
-			start += 1;
+				start += 1;
 
-			_txt.set('selected-pos-txt', 'Selected Position:', start++, 2);
-			_txt.next('selected-pos', ((_isnull(_selected)) ? 'none' : _selected.toString()), 2);
+				_txt.set('selected-pos-txt', 'Selected Position:', start++, 2);
+				_txt.next('selected-pos', ((_isnull(_selected)) ? 'none' : _selected.toString()), 2);
 
-			_txt.set('line2', '----------------------------------', start++, 2);
+				_txt.set('line2', '----------------------------------', start++, 2);
 
-			_txt.set('selected-climate-txt', 'Climate:', start++, 2);
-			_txt.next('selected-climate', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.climate), 2);
+				_txt.set('selected-climate-txt', 'Climate:', start++, 2);
+				_txt.next('selected-climate', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.climate), 2);
 
-			_txt.set('selected-climate-alt-txt', 'Altitude:', start++, 3);
-			_txt.next('selected-climate-alt', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.alt + 'm'), 2);
+				_txt.set('selected-climate-alt-txt', 'Altitude:', start++, 3);
+				_txt.next('selected-climate-alt', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.alt + 'm'), 2);
 
-			_txt.set('selected-climate-prec-txt', 'Precipitation:', start++, 3);
-			_txt.next('selected-climate-prec', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.prec + 'mm'), 2);
+				_txt.set('selected-climate-prec-txt', 'Precipitation:', start++, 3);
+				_txt.next('selected-climate-prec', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.prec + 'mm'), 2);
 
-			_txt.set('selected-climate-temp-txt', 'Temperature:', start++, 3);
-			_txt.next('selected-climate-temp', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.temp + '&deg;'), 2);
+				_txt.set('selected-climate-temp-txt', 'Temperature:', start++, 3);
+				_txt.next('selected-climate-temp', ((_isnull(_selected)) ? 'n/a' : _current.get(_selected).info.climate.temp + '&deg;'), 2);
+			}
 		}
 
 		function _scroll(player, x, y) {
