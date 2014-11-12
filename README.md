@@ -6,13 +6,13 @@ Boo boo bla bla
 
 Techy stuff
 - Mousemove, grrr. 
-- Fix div position on game initialization
-- Try to generate and switch between two grids.
-- Refactor grid switching to assist player positioning
+- Fix div position on game initialization and player (re) positioning
 
 Game stuff
-- Make worlds as wrap-arounds. Use the tileable noise algorithm. 
-- Make worlds more realistic in terms of biomes: temp more equator - polar, altitude still as noise, percipitation as noise. 
+- world map, fits a single screen. is a zoomed out version of bigger one
+- every world map tile is 1 screen as 'Land', which is a giant continuous map. 
+  this should be made screen by screen though to prevent generating a div with millions of node. 
+- improve dungeons. 
 - Add different types of landscapes
 
 ## IDEAS
