@@ -36,6 +36,12 @@ module.exports = function(grunt) {
 			},
 			server: {
 				command: 'http-server -s ./public/'
+			},
+			cpcss: {
+				command: 'cp ./public/css/* ../rogue_build/css/'
+			},
+			cpjs: {
+				command: 'r.js.cmd -o ./build.js'
 			}
 		}
 	});
@@ -53,5 +59,9 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('serve', [
 		'shell:server'
+	]);
+
+	grunt.registerTask('build', [
+		'shell:cpcss', 'shell:cpjs'
 	]);
 };

@@ -74,11 +74,10 @@ define(["helpers/log"], function(
 			this.speed = opt.speed;
 			this.walkable = opt.walkable;
 			this.diggable = opt.diggable;
-			this.remove = opt.remove;
 			this.info = {};
 			this.getInfo = function() {
 
-			}
+			};
 		}
 	}
 

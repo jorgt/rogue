@@ -19,6 +19,7 @@ define([
 
 	function Game(parentScreen) {
 		var _guid = guid();
+		var _self = this;
 		log.urgent('[GAME:' + _guid + ']', 'initializing game');
 
 		var _mainscreen = parentScreen.get('main');
@@ -34,6 +35,8 @@ define([
 				size: 41
 			}
 		});
+
+		console.log(_current.getGrid())
 
 		var _txt = new Txt(_sidebar, _assets);
 
@@ -121,7 +124,7 @@ define([
 		function _setupEvents() {
 			Events.on('game.update', function(e) {
 				_setupSidebar();
-			}.bind(this));
+			});
 
 			Events.on('game.movement', function(evt) {
 				var player = _assets.player(_current);
@@ -132,13 +135,13 @@ define([
 				//move player
 				if (x !== 0 || y !== 0) {
 					player.move(_current.getGrid(), x, y);
-					player.view.update(player.position(), this);
+					player.view.update(player.position(), _current);
 					player.draw();
 					_scroll(player, x, y);
 
 					Events.raise('game.update');
 				}
-			}.bind(this));
+			});
 
 			Events.on('game.screen.resize', function(e) {
 				//console.log(e)
@@ -164,7 +167,7 @@ define([
 				}
 
 				_setupSidebar()
-			}.bind(this));
+			});
 		}
 
 		function _setupSidebar() {

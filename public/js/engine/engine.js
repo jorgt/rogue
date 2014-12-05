@@ -15,27 +15,27 @@ define(["engine/states", "helpers/log", "states/all"], function(
 				log.urgent('[ENGINE]', 'engine stopping, cleaning up');
 			},
 			loop: function(time) {
-				engine.update(time);
+				if (states.active.isPaused() === false) {
+					engine.update(time);
+				}
 				engine.draw(time);
 				if (states.active.isRunning() === true) {
 					window.requestAnimFrame(function(time) {
 						engine.loop(time);
 					});
 				} else {
-					this.stop();
+					engine.stop();
 				}
 			},
 			update: function(time) {
-				if (states.active.isPaused() === false) {
 					states.active.update(time);
-				}
 			},
 			draw: function(time) {
 				states.active.draw(time);
 			},
 			pause: function() {
 				states.active.pause();
-			},
+			}
 		};
 
 		return engine;

@@ -11,47 +11,10 @@
 	
 		'use strict';
 		var grid = [];
-		var _sizex = 75;
-		var _sizey = 75;
-		var _its = 3000;
-		var _life = Math.sqrt(_sizex * _sizex + _sizey * _sizey);
-		var _edgex = _sizex * 0.2;
-		var _edgey = _sizey * 0.2;
-		var _blur1 = 0.85;
-		var _blur2 = 0.77;
+		var _width = 75;
+		var _height = 75;
 
-		for(var x = 0; x < _sizex; x++) {
-			grid[x] = [];
-			for(var y = 0; y < _sizey; y++) {
-				grid[x][y] = 0;
-			}
-		}
-
-		for(var i = 0; i < _its; i++) {
-			var x = ~~(Math.random() * (_sizex-(_edgex*2)) + _edgex);
-			var y = ~~(Math.random() * (_sizey-(_edgey*2)) + _edgey);
-
-			for(var j = 0; j < _life; j++) {
-				x += Math.round(Math.random() * 2 - 1);
-				y += Math.round(Math.random() * 2 - 1);
-									
-				if (x < 1 || x > _sizex -2 || y < 1 || y > _sizey - 2) continue;
-				
-				var hood = _next(x, y);
-				
-				for (var k = 0 ; k < hood.length; k++){
-					if (grid[hood[k][0]][hood[k][1]] < grid[x][y]){
-						x = hood[k][0];
-						y = hood[k][1];
-						continue;
-					}
-				}
-					
-				grid[x][y]++;
-			}
-		}
-
-		var r = _normalize(grid);
+		var r = _rollingParticles();
  		var b =document.getElementById("test");
  		b.style.display = 'inline-block';
 		for(var x = 0; x < r.length; x++) {
@@ -61,8 +24,8 @@
 				var c = ~~(r[x][y] * 255);
 				d.style.backgroundColor = 'rgb('+c+','+c+','+c+')';
 				d.innerHtml = '&nbps;'
-				d.style.width = '10px';
-				d.style.height = '10px';
+				d.style.width = '5px';
+				d.style.height = '5px';
 				d.style.float = 'left'
 				e.appendChild(d);
 			}
@@ -70,49 +33,93 @@
 			//b.innerHtml += '<br>'
 		}
 
-		function _range(min, max) {
-			return ~~ ((max - min) * Math.random() + min);
-		}
+		function _rollingParticles() {
+			var grid = [];
+			var _its = 2000;
+			var _life = 20;
+			var _edgex = _width * 0.15;
+			var _edgey = _height * 0.15;
+			var _blur1 = 0.85;
+			var _blur2 = 0.77;
 
-		function _next(x, y) {
-			var result = [];
-			
-			for (var a = -1; a <= 1; a++){
-				for (var b = -1; b <= 1; b++){
-					if (a || b && (x + a >= 0 && x + a < _sizex && y + b >= 0 && y + b < _sizey)){
-						result.push([x + a, y + b]);
+			for (var x = 0; x < _width; x++) {
+				grid[x] = [];
+				for (var y = 0; y < _height; y++) {
+					grid[x][y] = 0;
+				}
+			}
+
+			for (var i = 0; i < _its; i++) {
+				var x = ~~(Math.random() * (_width - (_edgex * 2)) + _edgex);
+				var y = ~~(Math.random() * (_height - (_edgey * 2)) + _edgey);
+
+				for (var j = 0; j < _life; j++) {
+					x += Math.round(Math.random() * 2 - 1);
+					y += Math.round(Math.random() * 2 - 1);
+
+					if (x < 1 || x > _width - 2 || y < 1 || y > _height - 2) continue;
+
+					var hood = _next(x, y);
+
+					for (var k = 0; k < hood.length; k++) {
+						if (grid[hood[k][0]][hood[k][1]] < grid[x][y]) {
+							x = hood[k][0];
+							y = hood[k][1];
+							continue;
+						}
+					}
+
+					grid[x][y] ++;
+				}
+			}
+
+			return _normalize(grid);
+
+			function _range(min, max) {
+				return ~~((max - min) * Math.random() + min);
+			}
+
+			function _next(x, y) {
+				var result = [];
+
+				for (var a = -1; a <= 1; a++) {
+					for (var b = -1; b <= 1; b++) {
+						if (a || b && (x + a >= 0 && x + a < _width && y + b >= 0 && y + b < _height)) {
+							result.push([x + a, y + b]);
+						}
 					}
 				}
-			}
-			
-			return _shuffle(result);
-		};
 
-		function _shuffle(o){ //v1.0
-		    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-		    return o;
-		};
+				return _shuffle(result);
+			};
 
-		function _normalize(grid) {
-			var max = 0;
-			var min = 10000000;
-			for(var x = 0; x < grid.length; x++) {
-				for(var y = 0; y < grid[0].length; y++) {
-					if (x == 0 || x == _sizex -1 || y == 0 || y == _sizey -1) grid[x][y] *= 0.77;
-					else if (x == 1 || x == _sizex -2 || y == 1 || y == _sizey -2) grid[x][y] *= 0.85;
-					var g = grid[x][y];
-					if(g > max) max = g;
-					if(g < min) min = g;
+			function _shuffle(o) { //v1.0
+				for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+				return o;
+			};
+
+			function _normalize(grid) {
+				var max = 0;
+				var min = 10000000;
+				for (var x = 0; x < grid.length; x++) {
+					for (var y = 0; y < grid[0].length; y++) {
+						if (x == 0 || x == _width - 1 || y == 0 || y == _height - 1) grid[x][y] *= 0.77;
+						else if (x == 1 || x == _width - 2 || y == 1 || y == _height - 2) grid[x][y] *= 0.85;
+						var g = grid[x][y];
+						if (g > max) max = g;
+						if (g < min) min = g;
+					}
 				}
-			}
 
-			for(var x = 0; x < grid.length; x++) {
-				for(var y = 0; y < grid[0].length; y++) {
-					grid[x][y] = (grid[x][y] - min) / (max-min);
+				for (var x = 0; x < grid.length; x++) {
+					for (var y = 0; y < grid[0].length; y++) {
+						grid[x][y] = (grid[x][y] - min) / (max - min);
+					}
 				}
+				return grid;
 			}
-			return grid;
 		}
+
 	</script>
     </body>
 </html>

@@ -120,7 +120,9 @@ define(["helpers/log","helpers/events", "settings"], function(
 		}
 
 		elem.hide = function() {
-			this.parent.removeChild(this);
+			try {
+				this.parent.removeChild(this);
+			} catch(e) {}
 			return this;
 		}
 

@@ -5,6 +5,8 @@ define(["helpers/log", "engine/states", "game/assets", "game/screen", "settings"
 	Screen,
 	settings) {
 
+	'use strict';
+
 	var menu = Screen.get('menu').hide();
 	var assets = new Assets('menu')
 

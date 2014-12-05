@@ -108,6 +108,7 @@ define(["helpers/log", "game/tilebank", "settings", "game/lightsource"], functio
 	function _decorateObject(obj, type) {
 		obj.tile = type.name;
 		obj.info = type.info;
+		
 		obj.draw = function() {
 			var px = ['top', 'fontSize', 'left'];
 			for (var o in px) {
