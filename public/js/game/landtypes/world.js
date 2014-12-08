@@ -34,7 +34,7 @@ define([
 	var sAlt = new Simplex({
 		octaves: 20,
 		persistence: 0.4,
-		level: 0.0075
+		level: 0.0065
 	});
 
 	var sPre = new Simplex({
@@ -46,7 +46,7 @@ define([
 	var sTem = new Simplex({
 		octaves: 20,
 		persistence: 0.4,
-		level: 0.0075
+		level: 0.0045
 	});
 
 	return function world(opt) {
@@ -57,9 +57,10 @@ define([
 		var _start = null;
 		var _end = null;
 		var gAltRadial = _rollingParticles();
+		var gTemAxial = _axialParticles();
 		var gAlt = _chunk(sAlt, ranges.altitude, _height, _width, 0, 0, gAltRadial);
 		var gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0);
-		var gTem = _chunk(sTem, _randomize(ranges.temperature), _height, _width, 0, 0);
+		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, gTemAxial);
 
 		var aa = 0,
 			ap = 0,
@@ -69,7 +70,7 @@ define([
 			_grid[x] = [];
 			for (var y = 0; y < _width; y++) {
 				var c = {
-					temp: gTem[x][y],
+					temp: ~~(gTem[x][y] * 1.4) + 10,
 					prec: ~~(gPre[x][y] - (0.065 * (gAlt[x][y] + 3000))),
 					alt: ~~(gAlt[x][y] + 3000)
 				}
@@ -139,6 +140,18 @@ define([
 				_start = (bank.get(start.tile).walkable === true) ? [sx, sy] : null;
 				_end = (bank.get(end.tile).walkable === true) ? [ex, ey] : null;
 			}
+		}
+
+		function _axialParticles() {
+			var grid = [];
+			for (var x = 0; x < _width; x++) {
+				grid[x] = [];
+				for (var y = 0; y < _height; y++) {
+					var n = 1 - (Math.abs(_height / 2 - x) / (_height));
+					grid[x][y] = n;
+				}
+			}
+			return grid;
 		}
 
 		function _rollingParticles() {
