@@ -51,7 +51,7 @@ define([
 		for (var x = 0; x < grid.length; x++) {
 			world[x] = [];
 			for (var y = 0; y < grid[x].length; y++) {
-				world[x][y] = assets.object(bank.get('tree'), x, y);
+				world[x][y] = assets.object(bank.get('grass'), x, y);
 			}
 		}
 		return world;

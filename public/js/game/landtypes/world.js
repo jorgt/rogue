@@ -33,63 +33,92 @@ define([
 
 	var sAlt = new Simplex({
 		octaves: 20,
-		persistence: 0.4,
+		persistence: 0.2,
 		level: 0.0065
+	});
+
+	var sAlt2 = new Simplex({
+		octaves: 20,
+		persistence: 0.4,
+		level: 0.0095
+	});
+
+	var sAlt3 = new Simplex({
+		octaves: 20,
+		persistence: 0.7,
+		level: 0.0155
 	});
 
 	var sPre = new Simplex({
 		octaves: 20,
 		persistence: 0.2,
-		level: 0.0065
+		level: 0.0085
 	});
 
 	var sTem = new Simplex({
 		octaves: 20,
 		persistence: 0.4,
-		level: 0.0045
+		level: 0.0075
 	});
 
 	return function world(opt) {
 		var _size = opt.size || uneven(random(60, 70));
-		var _width = _size;
-		var _height = _size;
+		var _width = opt.width || _size;
+		var _height = opt.height || _size;
 		var _grid = [];
 		var _start = null;
 		var _end = null;
 		var gAltRadial = _rollingParticles();
 		var gTemAxial = _axialParticles();
-		var gAlt = _chunk(sAlt, ranges.altitude, _height, _width, 0, 0, gAltRadial);
-		var gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0);
+
+		var gAlt = _edges(_chunk(sAlt, ranges.altitude, _height, _width, 0, 0, gAltRadial));
+		log.low('[WORLD]', 'first range of altitude done');
+
+		var gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
+		log.low('[WORLD]', 'second range of altitude done');
+		//var gAlt3 = _edges(_chunk(sAlt3, ranges.altitude, _height, _width, 0, 0));
+		//log.low('[WORLD]', 'first range of altitude done');
 		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, gTemAxial);
+		log.low('[WORLD]', 'temperature done');
+
+		var gDir = _directionalParticles(gAlt, gTem);
+		var gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0, gDir);
+		log.low('[WORLD]', 'precipitation done');
 
 		var aa = 0,
 			ap = 0,
 			at = 0;
 
-		for (var x = 0; x < _height; x++) {
+		for (var x = 0; x < _width; x++) {
 			_grid[x] = [];
-			for (var y = 0; y < _width; y++) {
+			for (var y = 0; y < _height; y++) {
 				var c = {
-					temp: ~~(gTem[x][y] * 1.4) + 10,
-					prec: ~~(gPre[x][y] - (0.065 * (gAlt[x][y] + 3000))),
-					alt: ~~(gAlt[x][y] + 3000)
+					temp: ~~(gTem[x][y] * 1.8) + 5,
+					prec: ~~(Math.pow(gPre[x][y], 1.1)),
+					alt: ~~(2000 + gAlt[x][y] + gAlt2[x][y])
 				}
 				c.climate = climate(c.temp, c.prec, c.alt);
 				var obj = bank.get(c.climate.replace(/\s/g, ''));
 				obj.info.climate = c;
-				_grid[x][y] = opt.assets.object(obj, x, y);
+				_grid[x][y] = obj;
 			}
 		}
 
 		_getStartAndEndTiles();
 
-		return {
-			grid: _grid,
-			start: _start,
-			end: _end,
-			height: _height,
-			width: _width
-		};
+		return new function World() {
+			this.grid = _grid;
+			this.start = _start;
+			this.end = _end;
+			this.height = _height;
+			this.width = _width;
+			this.canWalk = function(x, y) {
+				return this.grid[x][y].walkable;
+			};
+			this.getTile = function(x, y) {
+				return this.grid[x][y];
+			};
+		}
 
 		function _chunk(noise, range, h, w, startx, starty, merge) {
 			var generator = Grids({
@@ -103,8 +132,7 @@ define([
 
 			var grid = generator.grid();
 			var world = [];
-			//var sx = startx * h;
-			//var sy = starty * w;
+
 			for (var x = 0; x < grid.length; x++) {
 				world[x] = [];
 				for (var y = 0; y < grid[x].length; y++) {
@@ -137,8 +165,8 @@ define([
 				var ey = random(0, _grid[0].length - 1)
 				start = _grid[sx][sy];
 				end = _grid[ex][ey];
-				_start = (bank.get(start.tile).walkable === true) ? [sx, sy] : null;
-				_end = (bank.get(end.tile).walkable === true) ? [ex, ey] : null;
+				_start = (start.walkable === true) ? [sx, sy] : null;
+				_end = (end.walkable === true) ? [ex, ey] : null;
 			}
 		}
 
@@ -147,21 +175,49 @@ define([
 			for (var x = 0; x < _width; x++) {
 				grid[x] = [];
 				for (var y = 0; y < _height; y++) {
-					var n = 1 - (Math.abs(_height / 2 - x) / (_height));
+					var n = 1 - (Math.abs(_height / 2 - y) / (_height));
 					grid[x][y] = n;
 				}
 			}
 			return grid;
 		}
 
+		function _directionalParticles(h, t) {
+			var dir = ((2 * Math.PI) / 360 * (Math.random() * 360));
+			h = _normalize(h, true);
+			t = _normalize(t, true);
+			var grid = [];
+			for (var x = 0; x < _width; x++) {
+				grid[x] = [];
+				for (var y = 0; y < _height; y++) {
+					var n1 = point(x, y, 2, dir);
+					var x1 = (n1.x >= 0 && n1.y >= 0 && n1.x < _width && n1.y < _height) ? h[n1.x][n1.y] : 0;
+
+					var x3 = h[x][y];
+
+					grid[x][y] = (x1 <= x3) ? (x3 - x1) + t[x][y] : t[x][y] / 2;
+				}
+			}
+
+			//return h;
+			return _normalize(grid);
+
+			function point(x, y, length, rad) {
+				return {
+					x: ~~(x + (length * Math.sin(rad))),
+					y: ~~(y + (length * Math.cos(rad)))
+				}
+			}
+		}
+
 		function _rollingParticles() {
 			var grid = [];
-			var _its = 2000;
-			var _life = 20;
+			var _its = 10000;
+			var _life = 40;
 			var _edgex = _width * 0.15;
 			var _edgey = _height * 0.15;
-			var _blur1 = 0.85;
-			var _blur2 = 0.77;
+			var _blur1 = 0.35;
+			var _blur2 = 0.20;
 
 			for (var x = 0; x < _width; x++) {
 				grid[x] = [];
@@ -190,7 +246,7 @@ define([
 						}
 					}
 
-					grid[x][y] ++;
+					grid[x][y]++;
 				}
 			}
 
@@ -218,27 +274,46 @@ define([
 				for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
 				return o;
 			};
+		}
 
-			function _normalize(grid) {
-				var max = 0;
-				var min = 10000000;
-				for (var x = 0; x < grid.length; x++) {
-					for (var y = 0; y < grid[0].length; y++) {
-						if (x == 0 || x == _width - 1 || y == 0 || y == _height - 1) grid[x][y] *= 0.77;
-						else if (x == 1 || x == _width - 2 || y == 1 || y == _height - 2) grid[x][y] *= 0.85;
-						var g = grid[x][y];
-						if (g > max) max = g;
-						if (g < min) min = g;
-					}
+
+		function _normalize(grid, copy) {
+			var max = 0;
+			var min = 10000000;
+			for (var x = 0; x < grid.length; x++) {
+				for (var y = 0; y < grid[0].length; y++) {
+					var g = grid[x][y];
+					if (g > max) max = g;
+					if (g < min) min = g;
 				}
+			}
 
-				for (var x = 0; x < grid.length; x++) {
-					for (var y = 0; y < grid[0].length; y++) {
+			var ret = [];
+			for (var x = 0; x < grid.length; x++) {
+				ret[x] = [];
+				for (var y = 0; y < grid[0].length; y++) {
+					if (copy) {
+						ret[x][y] = (grid[x][y] - min) / (max - min);
+					} else {
 						grid[x][y] = (grid[x][y] - min) / (max - min);
 					}
+
 				}
-				return grid;
 			}
+			return (copy) ? ret : grid;
+		}
+
+		function _edges(grid) {
+			for (var x = 0; x < grid.length; x++) {
+				for (var y = 0; y < grid[x].length; y++) {
+					if (x == 0 || x == _width - 1 || y == 0 || y == _height - 1) {
+						grid[x][y] *= (grid[x][y] > 0) ? 0.67 : 1;
+					} else if (x == 1 || x == _width - 2 || y == 1 || y == _height - 2) {
+						grid[x][y] *= (grid[x][y] > 0) ? 0.75 : 1;
+					}
+				}
+			}
+			return grid;
 		}
 	}
 

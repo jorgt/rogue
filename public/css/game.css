@@ -148,7 +148,7 @@ body,
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   border-left: 1px solid #fff;
-  background-color: #0a0a0a;
+  background-color: #0f0f0f;
 }
 .game-screen {
   color: #999;
@@ -180,8 +180,8 @@ body,
   color: #f00;
 }
 #game .game-screen-world .game-object-ice {
-  background-color: #fff;
-  color: #ccc;
+  background-color: #2743c2;
+  color: #fff;
 }
 #game .game-screen-world .game-object-polar {
   background-color: #eee;
@@ -255,9 +255,14 @@ body,
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
-  border-left: 1px solid #f00;
+  border: 1px solid #f00;
 }
-#game .game-screen-land .game-object-tree {
+#game .game-screen-land .game-object-player {
+  background-color: transparent;
+  color: #f00;
+}
+#game .game-screen-land .game-object-tree,
+#game .game-screen-land .game-object-grass {
   background-color: #33b500;
   color: #46f700;
 }

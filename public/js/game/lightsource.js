@@ -1,6 +1,4 @@
-define(["helpers/log", "game/tilebank"], function(
-	log,
-	bank) {
+define(["helpers/log"], function(log) {
 
 	'use strict';
 
@@ -66,7 +64,7 @@ define(["helpers/log", "game/tilebank"], function(
 							}
 
 							if (blocked) {
-								if (bank.get(map.get(X, Y).tile).blocking) {
+								if (map[X][Y].tile).blocking) {
 									new_start = r_slope;
 									continue;
 								} else {
@@ -74,7 +72,7 @@ define(["helpers/log", "game/tilebank"], function(
 									start = new_start;
 								}
 							} else {
-								if (bank.get(map.get(X, Y).tile).blocking && i < radius) {
+								if (map[X][Y].tile).blocking && i < radius) {
 									blocked = true;
 									this.calculateOctant(cx, cy, i + 1, start, l_slope, radius, xx, xy, yx, yy, id + 1);
 

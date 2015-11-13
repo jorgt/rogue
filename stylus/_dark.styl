@@ -25,7 +25,7 @@ html, body, #game
 	-moz-box-sizing:border-box;
 	-webkit-box-sizing:border-box;
 	border-left 1px solid white
-	background-color #0a0a0a	
+	background-color #0f0f0f	
 
 /*
 	All Game Objects
@@ -75,8 +75,8 @@ html, body, #game
 			color red
 			
 		.game-object-ice 
-			background-color #FFFFFF
-			color fg(@background-color, 20%)
+			background-color #2743C2
+			color white
 			
 		.game-object-polar 
 			background-color #EEEEEE
@@ -154,8 +154,13 @@ html, body, #game
 			box-sizing:border-box;
 			-moz-box-sizing:border-box;
 			-webkit-box-sizing:border-box;
-			border-left 1px solid red
-		.game-object-tree
+			border 1px solid red
+			
+		.game-object-player
+			background-color transparent
+			color red
+			
+		.game-object-tree, .game-object-grass
 			background-color #33B500
 			color fg(@background-color, 20%)
 
@@ -165,6 +170,7 @@ html, body, #game
 			visibility visible
 		.notvisited
 			visibility hidden
+			
 		.game-object 
 			color game-object-color
 			background-color game-object-background

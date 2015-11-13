@@ -28,9 +28,9 @@ define([], function() {
                 var sx = speedX || 0
                 var sy = speedY || 0
                 var grid = [];
-                for (var x = 0 - _opt.top; x < _opt.h + _opt.bottom; x++) {
+                for (var x = 0 - _opt.top; x < _opt.w + _opt.bottom; x++) {
                     grid[x + _opt.top] = [];
-                    for (var y = 0 - _opt.left; y < _opt.w + _opt.right; y++) {
+                    for (var y = 0 - _opt.left; y < _opt.h + _opt.right; y++) {
                         grid[x + _opt.top][y + _opt.left] = _calc(x + sx, y + sy);
                     }
                 }
@@ -72,9 +72,9 @@ define([], function() {
 
             this.grid = function() {
                 var grid = [];
-                for (var x = 0; x < _opt.h; x++) {
+                for (var x = 0; x < _opt.w; x++) {
                     grid[x] = [];
-                    for (var y = 0; y < _opt.w; y++) {
+                    for (var y = 0; y < _opt.h; y++) {
                         grid[x][y] = [];
                         for (var z = 0; z < _opt.z; z++) {
                             grid[x][y][z] = _calc(x, y, z);
@@ -98,9 +98,9 @@ define([], function() {
 
             this.grid = function() {
                 var grid = [];
-                for (var x = 0; x < _opt.h; x++) {
+                for (var x = 0; x < _opt.w; x++) {
                     grid[x] = [];
-                    for (var y = 0; y < _opt.w; y++) {
+                    for (var y = 0; y < _opt.h; y++) {
                         grid[x][y] = _calc(x, y);
                     }
                 }
@@ -129,9 +129,9 @@ define([], function() {
 
             this.grid = function() {
                 var grid = [];
-                for (var x = 0; x < _opt.h; x++) {
+                for (var x = 0; x < _opt.w; x++) {
                     grid[x] = [];
-                    for (var y = 0; y < _opt.w; y++) {
+                    for (var y = 0; y < _opt.h; y++) {
                         grid[x][y] = _calc(x, y);
                     }
                 }
