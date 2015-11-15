@@ -28,19 +28,14 @@ define([
 				this.start();
 			}.bind(this));
 		}
-
 	}
 
 	Game.prototype.start = function() {
 		this.player.setLocation(this.world.grid.start[0], this.world.grid.start[1])
-
-		scr.draw(this.world, this.player);
-		//scr.background(this.world, 0, 0);
-		scr.entity(this.player);
 	}
 
 	Game.prototype.draw = function() {
-
+		scr.draw(this.world, this.player);
 	}
 
 	Game.prototype.update = function() {

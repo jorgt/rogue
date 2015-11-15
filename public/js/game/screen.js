@@ -37,30 +37,30 @@ define([], function() {
 		var y = Math.min(background.height - hh / pix, Math.max(0, p.h - (hh / pix / 2)));
 
 		Screen.background(background, x, y);
+		Screen.entity(player, x, y);
 	}
 
 	Screen.background = function(b, offX, offY) {
 		var ctx = Screen().getContext("2d");
+
 		//dont loop over bg, loop over screensize
-		console.log(offX, offY);
 		var poffX = offX * pix;
 		var poffY = offX * pix;
-		for (var x = 0; x < b.width; x++) {
-			for (var y = 0; y < b.height; y++) {
+		for (var x = 0; x < ww / pix; x++) {
+			for (var y = 0; y < hh / pix; y++) {
 				var px = (x + offX) * pix;
 				var py = (y + offY) * pix;
-				console.log( px, py, pix, pix, x * pix, y * pix, pix, pix)
-				if (px >= 0 && px <= hh && py >= 0 && py <= ww)
-					ctx.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
+				ctx.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
 			}
 		}
 	}
 
-	Screen.entity = function(ent) {
+	Screen.entity = function(ent, x, y) {
 		var ctx = Screen().getContext("2d");
-		var x = 
+		var p = ent.getLocation();
+
 		ctx.fillStyle = "rgba(255,255,255,1)";
-		ctx.fillText(ent.sign, ent.position.w * pix + 3, ent.position.h * pix + 12);
+		ctx.fillText(ent.sign, (p.w - x) * pix + 3, (p.h - y) * pix + 12);
 	}
 
 	Screen.backpix = function(b, offx, offy) {
