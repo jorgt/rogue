@@ -36,7 +36,8 @@ define([
 	}
 
 	Game.prototype.draw = function() {
-		scr.background(this.world, 0, 0);
+		scr.draw(this.world, this.player);
+		//scr.background(this.world, 0, 0);
 		scr.entity(this.player);
 	}
 

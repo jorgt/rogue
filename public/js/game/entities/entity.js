@@ -13,8 +13,9 @@ define([], function() {
 		setLocation: function(x, y) {
 			this.position.w = x;
 			this.position.h = y;
-
-			console.log(this.position)
+		},
+		getLocation: function() {
+			return this.position;
 		},
 		move: function(grid, x, y) {
 			var nx = this.position.w + x;
