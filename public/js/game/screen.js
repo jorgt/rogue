@@ -4,8 +4,6 @@ define([], function() {
 	var hh = 600;
 	var ww = 600;
 	var pix = 15;
-	var offX = 0;
-	var offY = 0;
 
 	function Screen() {
 
@@ -38,20 +36,22 @@ define([], function() {
 		var x = Math.min(background.width - ww / pix, Math.max(0, p.w - (ww / pix / 2)));
 		var y = Math.min(background.height - hh / pix, Math.max(0, p.h - (hh / pix / 2)));
 
-		console.log(p, x, y, background.width);
-
-		Screen.background(background);
+		Screen.background(background, x, y);
 	}
 
-	Screen.background = function(b) {
+	Screen.background = function(b, offX, offY) {
 		var ctx = Screen().getContext("2d");
-
+		//dont loop over bg, loop over screensize
+		console.log(offX, offY);
+		var poffX = offX * pix;
+		var poffY = offX * pix;
 		for (var x = 0; x < b.width; x++) {
 			for (var y = 0; y < b.height; y++) {
 				var px = (x + offX) * pix;
 				var py = (y + offY) * pix;
+				console.log( px, py, pix, pix, x * pix, y * pix, pix, pix)
 				if (px >= 0 && px <= hh && py >= 0 && py <= ww)
-					ctx.drawImage(b.image, px, py, pix, pix, px, py, pix, pix);
+					ctx.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
 			}
 		}
 	}
