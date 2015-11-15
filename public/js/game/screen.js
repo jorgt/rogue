@@ -4,23 +4,32 @@ define([], function() {
 	var hh = 600;
 	var ww = 600;
 	var pix = 15;
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+
+	if (!document.getElementById('game')) {
+		var div = document.createElement('div');
+		div.style.width = w + 'px';
+		div.style.height = h + 'px';
+		div.id ='main';
+		var game = document.createElement('div');
+		game.id = 'game';
+
+		div.appendChild(game);
+		document.body.appendChild(div);
+	}
 
 	function Screen() {
 
 		var canvas = document.getElementById('game-screen');
 
 		if (!canvas) {
-			var div = document.createElement('div');
-			var w = window.innerWidth;
-			var h = window.innerHeight;
-			div.style.width = w + 'px';
-			div.style.height = h + 'px';
 			canvas = document.createElement('canvas');
 			canvas.id = 'game-screen';
 			canvas.height = hh;
 			canvas.width = ww;
 			canvas.style.cssText = "position:absolute;left:" + ((w - ww) / 2) + "px;top:" + ((h - hh) / 2) + "px;"
-			div.appendChild(canvas)
+			document.getElementById('game').appendChild(canvas)
 			document.body.appendChild(div);
 			var context = canvas.getContext("2d");
 			context.font = "bold " + pix + "px monospace";
@@ -74,6 +83,10 @@ define([], function() {
 					ctx.drawImage(b.image, px, py, pix, pix, px, py, pix, pix);
 			}
 		}
+	}
+
+	Screen.element = function() {
+		return document.getElementById('game-screen');
 	}
 
 	return Screen;

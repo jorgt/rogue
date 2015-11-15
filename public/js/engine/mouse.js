@@ -32,8 +32,8 @@ define(["helpers/log", "settings"], function(
 		}
 
 		this.setup = function(elem) {
-			_elem = elem;
-
+			_elem = (typeof elem === 'string') ? document.getElementById(elem) : elem;
+		
 			_addEvent('mousemove', function(e) {
 				for (var x = 0; x < _callbacks.mousemove.length; x++) {
 					_gridHelper(e, _callbacks.mousemove[x])
@@ -57,8 +57,8 @@ define(["helpers/log", "settings"], function(
 			var ret = {
 				on: e.srcElement,
 				tile: {
-					height: ~~(parseInt(e.target.dataset.top) / settings.square),
-					width: ~~(parseInt(e.target.dataset.left) / settings.square)
+					height: ~~(parseInt(e.layerY) / settings.square),
+					width: ~~(parseInt(e.layerX) / settings.square)
 				}
 			}
 			func.call(this, ret);

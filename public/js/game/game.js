@@ -46,6 +46,10 @@ define([
 		this.player.move(this.world.grid, x, y);
 	}
 
+	Game.prototype.getTile = function(x, y) {
+		return this.world.grid.getTile(x, y);
+	}
+
 	return function() {
 		if (!game) game = new Game();
 		return game;

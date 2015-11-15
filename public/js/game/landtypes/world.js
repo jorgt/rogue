@@ -106,12 +106,14 @@ define([
 
 		_getStartAndEndTiles();
 
-		return new function World() {
-			this.grid = _grid;
-			this.start = _start;
-			this.end = _end;
-			this.height = _height;
-			this.width = _width;
+		return new WorldObject(_grid, _start, _end, _height, _width);
+
+		function WorldObject(g, s, e, h, w) {
+			this.grid = g;
+			this.start = s;
+			this.end = e;
+			this.height = h;
+			this.width = w;
 			this.canWalk = function(x, y) {
 				return this.grid[x][y].walkable;
 			};
