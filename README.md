@@ -8,7 +8,7 @@ Boo boo bla bla
 - expand world to include roads, towns, cities etc
 - make 'zoomed out' version of world
 - differentiate between different types of maps eg. worlds, lands, dungeons, cities. 
-- expand screens. background draw thingie is basically just to create the images that make up the world. will do the same with dungeons etc. 
+- expand screens. background draw thingie is basically just to create the images that make up the world. will do the same with dungeons etc. need something that will 
 
 ## IDEAS
 

@@ -19,13 +19,13 @@ define([], function() {
 		document.body.appendChild(div);
 	}
 
-	function Screen() {
+	function Screen(name) {
 
-		var canvas = document.getElementById('game-screen');
+		var canvas = document.getElementById('game-screen-' + name);
 
 		if (!canvas) {
 			canvas = document.createElement('canvas');
-			canvas.id = 'game-screen';
+			canvas.id = 'game-screen-' + name;
 			canvas.height = hh;
 			canvas.width = ww;
 			canvas.style.cssText = "position:absolute;left:" + ((w - ww) / 2) + "px;top:" + ((h - hh) / 2) + "px;"
@@ -40,7 +40,6 @@ define([], function() {
 	(function() {
 		Screen.canvas = Screen();
 		Screen.context = Screen.canvas.getContext("2d");
-		Screen.pixels = Screen.context.getImageData(0, 0, Screen.canvas.width, Screen.canvas.height);
 		Screen.width = Screen.canvas.width;
 		Screen.height = Screen.canvas.height;
 	})();
@@ -72,7 +71,7 @@ define([], function() {
 					ctx.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
 				} else if (tile.visited === true) {
 					ctx.drawImage(b.dark, px, py, pix, pix, x * pix, y * pix, pix, pix);
-				} 
+				}
 			}
 		}
 	}

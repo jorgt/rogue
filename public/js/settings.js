@@ -5,6 +5,11 @@ define([], function() {
 	return {
 		font: 12,
 		square: 15,
-		debug: true
+		debug: true,
+		screen: {
+			width: 800,
+			height: 600,
+			block: 15;
+		}
 	};
 });
