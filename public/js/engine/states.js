@@ -1,7 +1,10 @@
-define(["engine/keys", "engine/mouse", "helpers/log"], function(
-	Keys,
-	Mouse,
-	log) {
+define([
+	"engine/keys",
+	"engine/mouse",
+	"helpers/log",
+	"engine/screenmanager",
+	"settings"
+], function(Keys, Mouse, log, ScreenManager, settings) {
 
 	'use strict';
 
@@ -13,6 +16,7 @@ define(["engine/keys", "engine/mouse", "helpers/log"], function(
 
 		this.keys = new Keys(false);
 		this.mouse = new Mouse();
+		this.screen = ScreenManager(obj.name, settings.screen.height, settings.screen.width);
 
 		this.update = function(time) {
 			this.keys.update();
@@ -29,6 +33,7 @@ define(["engine/keys", "engine/mouse", "helpers/log"], function(
 
 		this.init = function() {
 			log.low('[STATE:' + _guid + ']', 'initializing state:', _object.name);
+			this.screen.hide();
 			_running = true;
 			_paused = false;
 			if (_object.init) {
@@ -38,6 +43,7 @@ define(["engine/keys", "engine/mouse", "helpers/log"], function(
 
 		this.start = function() {
 			log.low('[STATE:' + _guid + ']', 'starting state:', _object.name);
+			this.screen.show();
 			if (_object.start) {
 				_object.start.call(this);
 			}
@@ -45,6 +51,7 @@ define(["engine/keys", "engine/mouse", "helpers/log"], function(
 
 		this.stop = function() {
 			log.low('[STATE:' + _guid + ']', 'stopping state:', _object.name);
+			this.screen.hide();
 			if (_object.stop) {
 				_object.stop.call(this);
 			}
@@ -67,6 +74,10 @@ define(["engine/keys", "engine/mouse", "helpers/log"], function(
 		};
 
 		this.name = obj.name;
+
+		for(var name in obj) {
+			this[name] = this[name] || obj[name];
+		}
 	}
 
 	function States() {

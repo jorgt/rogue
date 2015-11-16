@@ -2,9 +2,9 @@ define([
 	'helpers/log',
 	'game/landtypes/world',
 	'game/entities/player',
-	'game/screen',
+	'engine/screenmanager',
 	'game/background',
-], function(log, world, player, scr, background) {
+], function(log, world, player, ScreenManager, background) {
 	'use strict';
 
 	var game;
@@ -12,7 +12,6 @@ define([
 	log.urgent('[GAME]', 'starting to put the game together');
 
 	function Game() {
-		
 
 		var worldPromise = background(world({
 			height: 75,
@@ -29,24 +28,34 @@ define([
 				this.start();
 			}.bind(this));
 		}
+
+		this.offset = {
+			h: 0,
+			w: 0
+		}
+
+		this.screen = ScreenManager('game', 600, 600, 1);
+		this.screen.position(0, 0);
+		this.screen.hide();
 	}
 
 	Game.prototype.start = function() {
+		//debugger;
 		this.player.setLocation(this.world.background.start[0], this.world.background.start[1]);
-		//scr.draw(this.world, this.player);
-		//this.player.update(this.world.background);
-		//scr.draw(this.world, this.player);
+		this.player.update(this.world.background);
+		this.screen.draw(this.world, this.player);
 	}
 
 	Game.prototype.draw = function() {
 		//console.time("draw");
-		scr.draw(this.world, this.player);
+		this.screen.draw(this.world, this.player);
 		//console.timeEnd("draw");
 	}
 
 	Game.prototype.update = function() {
-		//console.time("update");
+		//var p = this.player.getLocation();
 		this.player.update(this.world.background);
+		this.offset = this.screen.offset(this.player, this.world.background);
 		//console.timeEnd("update");
 	}
 

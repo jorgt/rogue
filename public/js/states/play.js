@@ -1,9 +1,8 @@
 define([
 	'helpers/log',
 	"engine/states",
-	"game/game",
-	"game/screen"
-], function(log, states, game, Screen) {
+	"game/game"
+], function(log, states, game) {
 
 	var game = game();
 
@@ -25,6 +24,9 @@ define([
 		},
 		start: function() {
 			this.mouse.setup('game');
+
+			game.start(this.screen);
+			game.screen.show();
 
 			//we need the x and y offset in the game, not just the screen
 			this.mouse.move(function(e) {
