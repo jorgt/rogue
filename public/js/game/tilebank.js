@@ -75,10 +75,18 @@ define(["helpers/log"], function(
 			this.speed = opt.speed;
 			this.walkable = opt.walkable;
 			this.diggable = opt.diggable;
+			this.visited = false;
+			this.visible = false;
 			this.info = {};
 			this.getInfo = function() {
 
 			};
+			this.draw = function() {
+				ret = {
+					f: "rgba(255,255,255,1)",
+					b: "rgba(0,0,0,1)"
+				}
+			}
 		}
 	}
 

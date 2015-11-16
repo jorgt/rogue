@@ -7,6 +7,7 @@ define(["helpers/log"], function(log) {
 		this.tiles = [];
 		this.position = position;
 		this.radius = radius;
+		this.height = false;
 
 		// multipliers for transforming coordinates into other octants.
 		this.mult = [
@@ -22,10 +23,10 @@ define(["helpers/log"], function(log) {
 
 		// calculates an octant. Called by the this.calculate when calculating lighting
 		this.calculateOctant = function(cx, cy, row, start, end, radius, xx, xy, yx, yy, id) {
-			map.get(cx, cy).visible(true);
-			map.get(cx, cy).visited(true);
-			map.get(cx, cy).draw();
-			this.tiles.push(map.get(cx, cy));
+			var tile = map.getTile(cx, cy)
+			tile.visible = true;
+			tile.visited = true;
+			this.tiles.push(tile);
 
 			var new_start = 0;
 
@@ -46,7 +47,7 @@ define(["helpers/log"], function(log) {
 					var X = cx + dx * xx + dy * xy;
 					var Y = cy + dx * yx + dy * yy;
 
-					if (X < map.size().x && X >= 0 && Y < map.size().y && Y >= 0) {
+					if (X < map.width && X >= 0 && Y < map.height && Y >= 0) {
 
 						var l_slope = (dx - 0.5) / (dy + 0.5);
 						var r_slope = (dx + 0.5) / (dy - 0.5);
@@ -57,14 +58,13 @@ define(["helpers/log"], function(log) {
 							break;
 						} else {
 							if (dx * dx + dy * dy < radius_squared) {
-								map.get(X, Y).visible(true);
-								map.get(X, Y).visited(true);
-								map.get(X, Y).draw();
-								this.tiles.push(map.get(X, Y));
+								map.getTile(X, Y).visible = true;
+								map.getTile(X, Y).visited = true;
+								this.tiles.push(map.getTile(X, Y));
 							}
 
 							if (blocked) {
-								if (map[X][Y].tile).blocking) {
+								if (map.getTile(X, Y).blocking || (this.height && tile.info.climate.alt <= map.getTile(X, Y).info.climate.alt)) {
 									new_start = r_slope;
 									continue;
 								} else {
@@ -72,7 +72,7 @@ define(["helpers/log"], function(log) {
 									start = new_start;
 								}
 							} else {
-								if (map[X][Y].tile).blocking && i < radius) {
+								if (((this.height && tile.info.climate.alt <= map.getTile(X, Y).info.climate.alt) || map.getTile(X, Y).blocking) && i < radius) {
 									blocked = true;
 									this.calculateOctant(cx, cy, i + 1, start, l_slope, radius, xx, xy, yx, yy, id + 1);
 
@@ -89,34 +89,31 @@ define(["helpers/log"], function(log) {
 
 		// sets flag lit to false on all tiles within radius of position specified
 		this.clear = function() {
-			for (var i = 0; i < this.tiles.length; i++) {
-				this.tiles[i].visible(false);
-				this.tiles[i].draw();
+			for (var x in this.tiles) {
+				this.tiles[x].visible = false;
 			}
-
 			this.tiles = [];
 		}
 
 		// sets flag lit to true on all tiles within radius of position specified
 		this.calculate = function() {
 			this.clear();
-
-			for (var i = 0; i < 8; i++) {
-				this.calculateOctant(this.position[0], this.position[1], 1, 1.0, 0.0, this.radius,
-					this.mult[0][i], this.mult[1][i], this.mult[2][i], this.mult[3][i], 0);
+			try {
+				for (var i = 0; i < 8; i++) {
+					this.calculateOctant(this.position.w, this.position.h, 1, 1.0, 0.0, this.radius,
+						this.mult[0][i], this.mult[1][i], this.mult[2][i], this.mult[3][i], 0);
+				}
+			} catch (e) {
+				console.log('calculating light failed')
 			}
-
-			map.get(this.position).visible(true);
-			map.get(this.position).visited(true);
-			map.get(this.position).draw();
-			this.tiles.push(map.get(this.position));
 		}
 
 		// update the position of the light source
-		this.update = function(position, map) {
-			if(typeof map !== 'undefined') {
+		this.update = function(position, map, height) {
+			if (typeof map !== 'undefined') {
 				this.setMap(map);
 			}
+			this.height = height;
 			this.position = position;
 			this.clear();
 			this.calculate();

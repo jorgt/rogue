@@ -118,6 +118,11 @@ define([
 				return this.grid[x][y].walkable;
 			};
 			this.getTile = function(x, y) {
+				if(typeof x === 'object') {
+					y = x.y || x.w;
+					x = x.x || x.h;
+				}	
+				
 				return this.grid[x][y];
 			};
 		}

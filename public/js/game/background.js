@@ -7,25 +7,29 @@ define([], function() {
 
 		var promise = new Promise(function(resolve, reject) {
 			var ret = {};
-			ret.grid = background;
-			ret.canvas = document.createElement('canvas');
+			var loaded = 0;
+			ret.background = background;
 			ret.width = background.grid.length;
 			ret.height = background.grid[0].length;
-			ret.canvas.width = background.grid.length * size;
-			ret.canvas.height = background.grid[0].length * size;
-			ret.context = ret.canvas.getContext("2d");
-			ret.context.font = "bold " + size + "px monospace";
-			ret.context.rect(0, 0, ret.canvas.width, ret.canvas.height);
-			ret.context.fillStyle = "black";
-			ret.context.fill();
 
-			draw(ret.context, background.grid);
+			var light = draw(ret, 1);
+
 
 			ret.image = new Image();
+			ret.dark = new Image();
+
 			ret.image.onload = function() {
+				var dark = draw(ret, 0.3);
+				ret.dark.src = dark.toDataURL('image/png');
+
+			}.bind(this);
+
+			ret.dark.onload = function() {
 				resolve(ret);
-			}
-			ret.image.src = ret.canvas.toDataURL('image/png');
+			}.bind(this);
+
+			ret.image.src = light.toDataURL('image/png');
+
 		});
 
 		return promise;
@@ -150,27 +154,38 @@ define([], function() {
 		},
 	}
 
-	function draw(ctx, w) {
-		var sizeWidth = ctx.canvas.clientWidth;
-		var sizeHeight = ctx.canvas.clientHeight;
-		ctx.fillStile = 'black';
-		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
-		for (var x in w) {
-			for (var y in w[x]) {
+	function draw(w, opac) {
+		var canvas, sizeWidth, sizeHeight, ctx;
 
-				draw.tile(ctx, x, y, w[x][y]);
+		canvas = document.createElement('canvas');
+
+		canvas.width = w.background.grid.length * size;
+		canvas.height = w.background.grid[0].length * size;
+		ctx = canvas.getContext("2d");
+		sizeWidth = ctx.canvas.clientWidth;
+		sizeHeight = ctx.canvas.clientHeight;
+		ctx.font = "bold " + size + "px monospace";
+		ctx.rect(0, 0, sizeWidth, sizeHeight);
+		ctx.fillStyle = "black";
+		ctx.fill();
+
+		for (var x in w.background.grid) {
+			for (var y in w.background.grid[x]) {
+				draw.tile(ctx, x, y, w.background.grid[x][y], opac);
 			}
 		}
+
+		return canvas;
 	}
-	
-	draw.tile = function(ctx, x, y, tile) {
+
+	draw.tile = function(ctx, x, y, tile, opac) {
 		var color = drawer[tile.name](tile);
-		var opac = (tile.walkable === true) ? 0.5 : 0.3;
+		var opacb = ((tile.walkable === true) ? 0.5 : 0.3) * opac;
 
 		if (color) {
-			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", 1)";
-			ctx.fillText(tile.sign, x * 15 + 3, y * 15 + 12);
 			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", " + opac + ")";
+			ctx.fillText(tile.sign, x * 15 + 3, y * 15 + 12);
+			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", " + opacb + ")";
 			ctx.fillRect(x * 15, y * 15, 15, 15);
 		}
 	}
