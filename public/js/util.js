@@ -128,7 +128,7 @@ define(["helpers/log"], function(
 						this.height *= ratio;
 					}
 				}
-
+				window.ratio = ratio;
 				return context;
 			};
 		})(prototype.getContext);

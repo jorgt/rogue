@@ -1,7 +1,7 @@
 define([], function() {
 	'use strict';
 
-	var size = 15;
+	var size = 15; // * window.ratio;
 
 	function canvas(background) {
 

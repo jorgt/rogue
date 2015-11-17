@@ -47,6 +47,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			context.rect(0, 0, width, height);
 			context.fillStyle = "black";
 			context.fill();
+			//context.scale(window.devicePixelRatio, window.devicePixelRatio);
 
 			this.canvas = canvas;
 			this.context = context;
@@ -120,7 +121,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var px = xx * pix;
 					var py = yy * pix;
 					var tile = b.background.getTile(xx, yy);
-
+					
 					if (tile.visible === true) {
 						this.context.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
 					} else if (tile.visited === true) {
