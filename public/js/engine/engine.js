@@ -18,7 +18,9 @@ define(["engine/states", "helpers/log", "states/all"], function(
 				if (states.active.isPaused() === false) {
 					engine.update(time);
 				}
+
 				engine.draw(time);
+
 				if (states.active.isRunning() === true) {
 					window.requestAnimFrame(function(time) {
 						engine.loop(time);
@@ -35,6 +37,9 @@ define(["engine/states", "helpers/log", "states/all"], function(
 			},
 			pause: function() {
 				states.active.pause();
+			},
+			switch: function(name) {
+				states.switch(name);
 			}
 		};
 

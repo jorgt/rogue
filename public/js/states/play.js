@@ -4,8 +4,8 @@ define([
 	"game/game"
 ], function(log, states, game) {
 
-	var game = game();
-
+	var game;
+	
 	states.add({
 		name: 'play',
 		init: function() {
@@ -23,6 +23,7 @@ define([
 			});
 		},
 		start: function() {
+			game = game();
 			this.mouse.setup('game');
 
 			game.start(this.screen);

@@ -11,10 +11,11 @@ define(['settings', 'helpers/log'], function(settings, log) {
 	//implement the main divs if not existing upon first 
 	//calling the Screen Manager
 	if (!document.getElementById('game')) {
+		//do the rest of the shizzle
 		var div = document.createElement('div');
 		div.style.width = mainW + 'px';
 		div.style.height = mainH + 'px';
-		div.style.cssText = "height:" + mainH + "px;width:" + mainW + "px;display:block;position:absolute;left:" + ((w - mainW) / 2) + "px;top:" + ((h - mainH) / 2) + "px;";
+		div.style.cssText = "border:1px solid #111;height:" + mainH + "px;width:" + mainW + "px;display:block;position:absolute;left:" + ((w - mainW) / 2) + "px;top:" + ((h - mainH) / 2) + "px;";
 		div.id = 'main';
 		var game = document.createElement('div');
 		game.id = 'game';
@@ -24,7 +25,9 @@ define(['settings', 'helpers/log'], function(settings, log) {
 	}
 
 	function Factory(name, height, width, index) {
-		if (!screens[name]) screens[name] = new Screen(name, height, width, index);
+		if (!screens[name]) {
+			screens[name] = new Screen(name, height, width, index);
+		}
 
 		return screens[name];
 	}
@@ -36,8 +39,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			canvas.id = 'game-screen-' + name;
 			canvas.height = height;
 			canvas.width = width;
-			canvas.style.cssText = "display:none;position:absolute;z-index:" + index + ";"
-			document.getElementById('game').appendChild(canvas)
+			canvas.style.cssText = "display:none;position:absolute;z-index:" + index + ";";
+			document.getElementById('game').appendChild(canvas);
 
 			var context = canvas.getContext("2d");
 			context.font = "bold " + pix + "px monospace";
@@ -52,6 +55,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this.heightBlocks = height / pix;
 			this.widthBlocks = width / pix;
 			this.name = name;
+			this.color = "rgba(0,0,0,1)"
 		},
 		position: function(left, top) {
 			this.canvas.style.left = left + 'px';
@@ -67,7 +71,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		},
 		clear: function() {
 			this.context.rect(0, 0, this.width, this.height);
-			this.context.fillStyle = "black";
+			this.context.fillStyle = this.color;
 			this.context.fill();
 		},
 		draw: function(background, player, entities) {
@@ -77,6 +81,9 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this._background(background, offset.w, offset.h);
 			this._entity(player, offset.w, offset.h);
 		},
+		setBackgroundColor: function(color) {
+			this.color = color;
+		},
 		offset: function(player, background) {
 			var p = player.getLocation();
 			var w = Math.min(background.width - this.width / pix, Math.max(0, p.w - (this.width / pix / 2)));
@@ -84,9 +91,11 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			return {
 				h: h,
 				w: w
-			}
+			};
 		},
 		write: function(text, x, y, color) {
+			var oldfont = this.context.font;
+			this.context.font = "15px minecraftmedium"
 			x = x || 0;
 			y = y || 0;
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
@@ -95,6 +104,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			for (var t = 0; t < array.length; t++) {
 				this.context.fillText(array[t], (x + t * pix), y);
 			}
+			this.context.font = oldfont;
 		},
 		_entity: function(ent, offX, offY) {
 			var p = ent.getLocation();

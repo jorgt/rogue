@@ -94,7 +94,7 @@ define(["helpers/log"], function(
 	*/
 	function Keys(rt) {
 		var _guid = guid();
-		log.med('[KEYS:' + _guid + ']', 'getting a new key object');
+		log.low('[KEYS:' + _guid + ']', 'getting a new key object');
 		var _realtime = rt || false;
 
 		this.keys = new Array(222);

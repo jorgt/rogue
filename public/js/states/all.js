@@ -1,10 +1,11 @@
-define(['states/play', 'states/menu', 'states/exit', 'states/help'], function(
-	play,
-	menu,
-	exit,
-	help) {
-
+define([
+	'states/loading',
+	'states/play',
+	'states/menu',
+	'states/exit',
+	'states/help'
+], function(loading, play, menu, exit, help) {
 	'use strict';
 
-	return [menu, play, exit, help];
+	return [loading, menu, play, help, exit];
 });

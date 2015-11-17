@@ -16,20 +16,20 @@ define(["helpers/log"], function(
 	_bank.add('sea', '≈', 1, false, false, false);
 	_bank.add('deepsea', '≈', 1, false, false, false);
 	_bank.add('shallowsea', '≈', 1, false, false, false);
-	_bank.add('ice', '.', 1, true, false, false);
-	_bank.add('polar', '·', 1, true, false, false);
-	_bank.add('tundra', '·', 1, true, false, false);
-	_bank.add('taiga', '*', 1, true, false, false);
-	_bank.add('savannah', '·', 1, true, false, false);
-	_bank.add('shrubland', '·', 1, true, false, false);
-	_bank.add('forest', '♣', 1, true, false, false);
-	_bank.add('swamp', '·', 1, true, false, false);
-	_bank.add('desert', ' ', 1, true, false, false);
-	_bank.add('plains', '*', 1, true, false, false);
-	_bank.add('seasonalforest', '♣', 1, true, false, false);
-	_bank.add('rainforest', '♣', 1, true, false, false);
-	_bank.add('mountain', 'Δ', 1, true, false, false);
-	_bank.add('snowymountain', 'Δ', 1, true, false, false);
+	_bank.add('ice', '·', 10, true, false, false);
+	_bank.add('polar', '·', 10, true, false, false);
+	_bank.add('tundra', '·', 50, true, false, false);
+	_bank.add('taiga', '*', 50, true, false, false);
+	_bank.add('savannah', '·', 50, true, false, false);
+	_bank.add('shrubland', '·', 40, true, false, false);
+	_bank.add('forest', '♣', 50, true, false, false);
+	_bank.add('swamp', '·', 20, true, false, false);
+	_bank.add('desert', '·', 40, true, false, false);
+	_bank.add('plains', '*', 70, true, false, false);
+	_bank.add('seasonalforest', '♣', 70, true, false, false);
+	_bank.add('rainforest', '♣', 40, true, false, false);
+	_bank.add('mountain', 'Δ', 10, true, false, false);
+	_bank.add('snowymountain', 'Δ', 5, true, false, false);
 
 	/*
 		dungeons and caves
@@ -50,7 +50,7 @@ define(["helpers/log"], function(
 
 	function TileBank() {
 		var _guid = guid();
-		log.med('[TILEBANK:' + _guid + ']:', 'Creating a tile repository');
+		log.low('[TILEBANK:' + _guid + ']:', 'Creating a tile repository');
 		var _bank = {};
 
 		this.add = function(name, sign, speed, walkable, diggable, blocking) {
@@ -73,6 +73,7 @@ define(["helpers/log"], function(
 			this.sign = opt.sign;
 			this.blocking = opt.blocking;
 			this.speed = opt.speed;
+			this.cost = 100 - opt.speed;
 			this.walkable = opt.walkable;
 			this.diggable = opt.diggable;
 			this.visited = false;

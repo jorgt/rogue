@@ -8,7 +8,7 @@ define(["helpers/log", "settings"], function(
 
 	function Mouse() {
 		var _guid = guid();
-		log.med('[MOUSE:' + _guid + ']', 'getting a new mouse object');
+		log.low('[MOUSE:' + _guid + ']', 'getting a new mouse object');
 		var _elem = null;
 		var _callbacks = {
 			mouseup: [],
@@ -19,39 +19,39 @@ define(["helpers/log", "settings"], function(
 		};
 
 		this.up = function(func) {
-			_register('mouseup', func)
-		}
+			_register('mouseup', func);
+		};
 
 		this.down = function(func) {
 			_register('mousedown', func);
-		}
+		};
 
 
 		this.move = function(func) {
 			_register('mousemove', func);
-		}
+		};
 
 		this.setup = function(elem) {
 			_elem = (typeof elem === 'string') ? document.getElementById(elem) : elem;
 		
 			_addEvent('mousemove', function(e) {
 				for (var x = 0; x < _callbacks.mousemove.length; x++) {
-					_gridHelper(e, _callbacks.mousemove[x])
+					_gridHelper(e, _callbacks.mousemove[x]);
 				}
 			}.bind(this));
 
 			_addEvent('mouseup', function(e) {
 				for (var x = 0; x < _callbacks.mouseup.length; x++) {
-					_gridHelper(e, _callbacks.mouseup[x])
+					_gridHelper(e, _callbacks.mouseup[x]);
 				}
 			}.bind(this));
 
 			_addEvent('mousedown', function(e) {
 				for (var x = 0; x < _callbacks.mousedown.length; x++) {
-					_gridHelper(e, _callbacks.mousedown[x])
+					_gridHelper(e, _callbacks.mousedown[x]);
 				}
 			}.bind(this));
-		}
+		};
 
 		function _gridHelper(e, func) {
 			var ret = {
@@ -65,7 +65,7 @@ define(["helpers/log", "settings"], function(
 		}
 
 		function _register(type, func) {
-			_callbacks[type].push(func)
+			_callbacks[type].push(func);
 		}
 
 

@@ -9,7 +9,7 @@ define([
 	land,
 	dungeon) {
 
-	'use strict';
+	'use strict'; 
 
 	var _active;
 	var _planes = {};

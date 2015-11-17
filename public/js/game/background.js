@@ -5,9 +5,8 @@ define([], function() {
 
 	function canvas(background) {
 
-		var promise = new Promise(function(resolve, reject) {
+		var promise = new Promise(function(resolve) {
 			var ret = {};
-			var loaded = 0;
 			ret.background = background;
 			ret.width = background.grid.length;
 			ret.height = background.grid[0].length;
@@ -151,8 +150,8 @@ define([], function() {
 			var r, g, b;
 			r = g = b = _color(255, tile.info.climate.alt, 15000);
 			return [r, g, b];
-		},
-	}
+		}
+	};
 
 	function draw(w, opac) {
 		var canvas, sizeWidth, sizeHeight, ctx;
@@ -198,9 +197,11 @@ define([], function() {
 		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
 		for (var x in w) {
 			for (var y in w[x]) {
-				if (w[x][y].info.climate.alt > 0) ctx.fillStyle = "rgba(0, " + ~~h[x][y] + ", 0, 1)";
-				else ctx.fillStyle = "rgba(0, 0, " + ~~h[x][y] + ", 1)";
-
+				if (w[x][y].info.climate.alt > 0) {
+					ctx.fillStyle = "rgba(0, " + ~~h[x][y] + ", 0, 1)";	
+				} else {
+					ctx.fillStyle = "rgba(0, 0, " + ~~h[x][y] + ", 1)";	
+				} 
 				ctx.fillRect(x * 15, y * 15, 15, 15);
 			}
 		}
@@ -237,17 +238,18 @@ define([], function() {
 		var max = 0;
 		var min = 10000000;
 		var normalized = [];
-		for (var x = 0; x < grid.length; x++) {
-			for (var y = 0; y < grid[x].length; y++) {
+		var x, y;
+		for (x = 0; x < grid.length; x++) {
+			for (y = 0; y < grid[x].length; y++) {
 				var g = grid[x][y].info.climate[attr];
 				if (g > max) max = g;
 				if (g < min) min = g;
 			}
 		}
 
-		for (var x = 0; x < grid.length; x++) {
+		for (x = 0; x < grid.length; x++) {
 			normalized[x] = [];
-			for (var y = 0; y < grid[0].length; y++) {
+			for (y = 0; y < grid[0].length; y++) {
 				normalized[x][y] = 255 * ((grid[x][y].info.climate[attr] - min) / (max - min));
 			}
 		}

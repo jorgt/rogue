@@ -1,4 +1,7 @@
-define(['game/entities/entity', 'game/lightsource'], function(Entity, Light) {
+define([
+	'game/entities/entity',
+	'game/lightsource'
+], function(Entity, Light) {
 	'use strict';
 
 	var player;
@@ -9,17 +12,20 @@ define(['game/entities/entity', 'game/lightsource'], function(Entity, Light) {
 			this._super.apply(this, arguments);
 			this.sign = '@';
 			this.radius = 10;
-			this.light = new Light(grid, this.getLocation(), this.radius);
+			this.light = this._changeLight(grid);
 		},
 		update: function(grid) {
 			var light = this.light.update(this.getLocation(), grid, true);
+		},
+		_changeLight: function(grid) {
+			return new Light(grid, this.getLocation(), this.radius)
 		}
-	})
+	});
 
 	return function() {
-		if(!player) {
+		if (!player) {
 			player = new Player();
 		}
 		return player;
-	}
+	};
 });

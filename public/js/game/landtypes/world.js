@@ -62,6 +62,7 @@ define([
 	});
 
 	return function world(opt) {
+		log.med('[WORLD]', 'start building the overworld');
 		var _size = opt.size || uneven(random(60, 70));
 		var _width = opt.width || _size;
 		var _height = opt.height || _size;
@@ -114,15 +115,12 @@ define([
 			this.end = e;
 			this.height = h;
 			this.width = w;
-			this.canWalk = function(x, y) {
-				return this.grid[x][y].walkable;
-			};
 			this.getTile = function(x, y) {
-				if(typeof x === 'object') {
+				if (typeof x === 'object') {
 					y = x.y || x.w;
 					x = x.x || x.h;
-				}	
-				
+				}
+
 				return this.grid[x][y];
 			};
 		}
