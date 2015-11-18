@@ -2,7 +2,7 @@ define([
 	'helpers/log',
 	"engine/states",
 	"game/game"
-], function(log, states, game) {
+], function(log, states, Game) {
 
 	var game;
 	
@@ -21,12 +21,19 @@ define([
 			this.keys.press('down', function(e) {
 				game.move(0, 1);
 			});
+
+			this.keys.press('p', function(e) {
+				game.pause();
+			}.bind(this));
+
+			this.keys.press('m', function(e) {
+				game.screen.hide();
+				states.switch('map');
+			}.bind(this));
 		},
 		start: function() {
-			game = game();
+			game = Game();
 			this.mouse.setup('game');
-
-			game.start(this.screen);
 			game.screen.show();
 
 			//we need the x and y offset in the game, not just the screen

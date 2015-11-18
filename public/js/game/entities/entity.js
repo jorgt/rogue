@@ -51,7 +51,7 @@ define([], function() {
 					this.position.w += x;
 					this.position.h += y;
 					this.moves++;
-					this.cost += grid.cost;
+					this.cost += tile.cost;
 				}
 			}
 		},

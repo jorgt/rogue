@@ -1,7 +1,8 @@
 define([], function() {
 	'use strict';
 
-	var size = 15; // * window.ratio;
+	//pixelratio, see util.js && https://github.com/jondavidjohn/hidpi-canvas-polyfill
+	var size = 15 * window.pixelRatio || 1;
 
 	function canvas(background) {
 
@@ -18,7 +19,7 @@ define([], function() {
 			ret.dark = new Image();
 
 			ret.image.onload = function() {
-				var dark = draw(ret, 0.3);
+				var dark = draw(ret, 0.2);
 				ret.dark.src = dark.toDataURL('image/png');
 
 			}.bind(this);

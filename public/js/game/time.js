@@ -23,6 +23,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 				current = movement * secondsPerMovement;
 			}
 
+			//console.log(movement, current, secondsPerMovement)
+
 			minutes = Math.floor(current / 60);
 			hours = Math.floor(minutes / 60);
 			minutes = minutes % 60;
@@ -31,7 +33,11 @@ define(['settings', 'helpers/log'], function(settings, log) {
 
 		};
 		this.getTime = function() {
-			return [minutes, hours, days];
+			return {
+				m: minutes,
+				h: hours,
+				d: days
+			}
 		}
 	}
 

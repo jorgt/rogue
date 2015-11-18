@@ -4,14 +4,16 @@ define([
 	"game/landtypes/worlds/climate",
 	"libs/simplex",
 	"game/tilebank",
-	"helpers/grids"
+	"helpers/grids",
+	"game/landtypes/base",
 ], function(
 	log,
 	settings,
 	climate,
 	Simplex,
 	bank,
-	Grids) {
+	Grids,
+	Base) {
 
 	'use strict';
 
@@ -107,23 +109,7 @@ define([
 
 		_getStartAndEndTiles();
 
-		return new WorldObject(_grid, _start, _end, _height, _width);
-
-		function WorldObject(g, s, e, h, w) {
-			this.grid = g;
-			this.start = s;
-			this.end = e;
-			this.height = h;
-			this.width = w;
-			this.getTile = function(x, y) {
-				if (typeof x === 'object') {
-					y = x.y || x.w;
-					x = x.x || x.h;
-				}
-
-				return this.grid[x][y];
-			};
-		}
+		return new Base(_grid, _start, _end, _height, _width);
 
 		function _chunk(noise, range, h, w, startx, starty, merge) {
 			var generator = Grids({

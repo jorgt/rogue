@@ -42,7 +42,7 @@ define([
 		};
 
 		this.start = function() {
-			log.low('[STATE:' + _guid + ']', 'starting state:', _object.name);
+			log.med('[STATE:' + _guid + ']', 'starting state:', _object.name);
 			this.screen.show();
 			if (_object.start) {
 				_object.start.call(this);
@@ -52,6 +52,7 @@ define([
 		this.stop = function() {
 			log.low('[STATE:' + _guid + ']', 'stopping state:', _object.name);
 			this.screen.hide();
+			this.keys.pause();
 			if (_object.stop) {
 				_object.stop.call(this);
 			}

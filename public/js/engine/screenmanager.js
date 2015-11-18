@@ -6,7 +6,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		w = window.innerWidth,
 		mainW = settings.screen.width,
 		mainH = settings.screen.height,
-		pix = settings.screen.block;
+		pix = settings.screen.block,
+		font = settings.screen.font;
 
 	//implement the main divs if not existing upon first 
 	//calling the Screen Manager
@@ -70,10 +71,54 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			log.low('[SCREEN]', 'hiding screen', this.name);
 			this.canvas.style.display = "none";
 		},
+		background: function(color) {
+			this.context.fillStyle = color || this.color;
+			this.context.fillRect(0, 0, this.width, this.height);
+		},
 		clear: function() {
-			this.context.rect(0, 0, this.width, this.height);
-			this.context.fillStyle = this.color;
-			this.context.fill();
+			this.context.save();
+
+			// Use the identity matrix while clearing the canvas
+			this.context.setTransform(1, 0, 0, 1, 0, 0);
+			this.context.clearRect(0, 0, this.width, this.height);
+
+			// Restore the transform
+			this.context.restore();
+		},
+		map: function(b, player) {
+			this.clear();
+			var edges = 50;
+			var p = ~~Math.min((this.height - edges) / b.height, (this.width - edges) / b.width) - 1;
+			var eh = (this.height - b.height * p) / 2;
+			var ew = (this.width - b.width * p) / 2;
+			var pos = player.getLocation();
+			var color;
+
+			for (var x = 0; x < b.width; x++) {
+				for (var y = 0; y < b.height; y++) {
+					var px = ew + x * p;
+					var py = eh + y * p;
+
+					if (x === pos.w && y === pos.h) {
+						color = 'red';
+					} else {
+						var tile = b.getTile(x, y);
+						if (tile.visible === true) {
+							color = (tile.info.climate.alt >= 0) ? 'rgba(50,255,0,1)' : 'rgba(0,0,200,1)';
+						} else if (tile.visited === true) {
+							color = (tile.info.climate.alt >= 0) ? 'rgba(50,255,0,0.2)' : 'rgba(0,0,200,0.2)';
+						}
+					}
+
+
+					if (!color) {
+						color = 'black';
+					}
+					this.context.fillStyle = color;
+					this.context.fillRect(px, py, p, p);
+					color = null;
+				}
+			}
 		},
 		draw: function(background, player, entities) {
 			var offset = this.offset(player, background);
@@ -81,6 +126,14 @@ define(['settings', 'helpers/log'], function(settings, log) {
 
 			this._background(background, offset.w, offset.h);
 			this._entity(player, offset.w, offset.h);
+		},
+		center: function(input) {
+			var x = (this.width / 2) - String(input || '').length / 2;
+			var y = (this.height / 2);
+			return {
+				x: x,
+				y: y
+			};
 		},
 		setBackgroundColor: function(color) {
 			this.color = color;
@@ -96,7 +149,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		},
 		write: function(text, x, y, color) {
 			var oldfont = this.context.font;
-			this.context.font = "15px minecraftmedium"
+			this.context.font = "15px " + font
 			x = x || 0;
 			y = y || 0;
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
@@ -107,13 +160,14 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			}
 			this.context.font = oldfont;
 		},
-		_entity: function(ent, offX, offY) {
+		_entity: function(ent, offX, offY, color) {
 			var p = ent.getLocation();
 
-			this.context.fillStyle = "rgba(255,255,255,1)";
+			this.context.fillStyle = color || "rgba(255,255,255,1)";
 			this.context.fillText(ent.sign, (p.w - offX) * pix + 3, (p.h - offY) * pix + 12);
 		},
 		_background: function(b, offX, offY) {
+			//console.time("background")
 			for (var x = 0; x < this.width / pix; x++) {
 				for (var y = 0; y < this.height / pix; y++) {
 					var xx = x + offX;
@@ -121,7 +175,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var px = xx * pix;
 					var py = yy * pix;
 					var tile = b.background.getTile(xx, yy);
-					
+
 					if (tile.visible === true) {
 						this.context.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
 					} else if (tile.visited === true) {
@@ -129,6 +183,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					}
 				}
 			}
+			//console.timeEnd("background")
 		}
 	});
 

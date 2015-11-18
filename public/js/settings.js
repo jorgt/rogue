@@ -9,7 +9,8 @@ define([], function() {
 		screen: {
 			width: 800,
 			height: 600,
-			block: 15
+			block: 15,
+			font: 'minecraftiaregular' //minecraftiaregular or minecraftmedium
 		}
 	};
 });

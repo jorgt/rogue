@@ -96,6 +96,7 @@ define(["helpers/log"], function(
 		var _guid = guid();
 		log.low('[KEYS:' + _guid + ']', 'getting a new key object');
 		var _realtime = rt || false;
+		var _paused = false;
 
 		this.keys = new Array(222);
 		this.callbacks = {
@@ -112,9 +113,10 @@ define(["helpers/log"], function(
 		}
 
 		this.activate = function() {
-			log.med('[KEYS:' + _guid + ']', 'activating key set');
+			log.low('[KEYS:' + _guid + ']', 'activating key set');
 			document.onkeyup = this.__keyup.bind(this);
 			document.onkeydown = this.__keydown.bind(this);
+			_paused = false;
 			this.__loop();
 		};
 
@@ -142,32 +144,37 @@ define(["helpers/log"], function(
 			this.__loop();
 		};
 
+		this.pause = function() {
+			_paused = !_paused;
+		}
+
 		this.update = function() {
-			for (var ns in this.callbacks) {
-				if (this.callbacks.hasOwnProperty(ns)) {
-					for (var c in this.callbacks[ns]) {
-						if (this.callbacks[ns].hasOwnProperty(c)) {
-							var ok = true;
-							var keys = c.split('+');
-							for (var key in keys) {
-								if (keys.hasOwnProperty(key)) {
-									ok = ok && this.keys[MAP_INVERSE[keys[key]]][ns];
-									//press is ONCE, so disable after first detection. 
-									//only need to do this for registered callbacks, 
-									//the others are irrelevant because unused
-									if (ns === 'press') {
-										this.keys[MAP_INVERSE[keys[key]]][ns] = false;
+			if (_paused === false) {
+				for (var ns in this.callbacks) {
+					if (this.callbacks.hasOwnProperty(ns)) {
+						for (var c in this.callbacks[ns]) {
+							if (this.callbacks[ns].hasOwnProperty(c)) {
+								var ok = true;
+								var keys = c.split('+');
+								for (var key in keys) {
+									if (keys.hasOwnProperty(key)) {
+										ok = ok && this.keys[MAP_INVERSE[keys[key]]][ns];
+										//press is ONCE, so disable after first detection. 
+										//only need to do this for registered callbacks, 
+										//the others are irrelevant because unused
+										if (ns === 'press') {
+											this.keys[MAP_INVERSE[keys[key]]][ns] = false;
+										}
 									}
 								}
-							}
-							if (ok) {
-								this.callbacks[ns][c](keys);
+								if (ok) {
+									this.callbacks[ns][c](keys);
+								}
 							}
 						}
 					}
 				}
 			}
-
 			this.__loop();
 		};
 

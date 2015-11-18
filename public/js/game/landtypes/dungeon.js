@@ -1,11 +1,13 @@
 define([
 	"helpers/log",
 	"game/tilebank",
-	"game/pathfinding/astar"
+	"game/pathfinding/astar",
+	"game/landtypes/base"
 ], function(
 	log,
 	bank,
-	AStar) {
+	AStar,
+	Base) {
 
 	'use strict';
 
@@ -21,20 +23,13 @@ define([
 		var _totalfloorspace = uneven(random(_surface * 0.3, _surface * 0.4));
 		var _doors = [];
 
-		log.high('[DUNGEON:' + _guid + ']',
-			'dimensions', _height, 'x', _width, 'blocks');
+		log.high('[DUNGEON:' + _guid + ']', 'dimensions', _height, 'x', _width, 'blocks');
 
 		_initializeRooms();
 		_connectDoors();
 		_getStartAndEndTiles();
 
-		return {
-			grid: _grid,
-			start: _start,
-			end: _end,
-			height: _height,
-			width: _width
-		};
+		return new Base(_grid, _start, _end, _height, _width);
 
 		function _fill(tile) {
 			for (var x = 0; x < _height; x++) {
