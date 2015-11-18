@@ -6,7 +6,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		w = window.innerWidth,
 		mainW = settings.screen.width,
 		mainH = settings.screen.height,
-		pix = settings.screen.block,
+		pix = settings.screen.block * window.pixelRatio || 1,
+		ratio = window.pixelRatio || 1,
 		font = settings.screen.font;
 
 	//implement the main divs if not existing upon first 
@@ -44,7 +45,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			document.getElementById('game').appendChild(canvas);
 
 			var context = canvas.getContext("2d");
-			context.font = "bold " + pix + "px monospace";
+			context.font = "bold " + settings.screen.block + "px monospace";
 			context.rect(0, 0, width, height);
 			context.fillStyle = "black";
 			context.fill();
@@ -149,14 +150,14 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		},
 		write: function(text, x, y, color) {
 			var oldfont = this.context.font;
-			this.context.font = "15px " + font
+			this.context.font = settings.screen.block + "px " + font
 			x = x || 0;
 			y = y || 0;
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
 			var array = text.split('');
 
 			for (var t = 0; t < array.length; t++) {
-				this.context.fillText(array[t], (x + t * pix), y);
+				this.context.fillText(array[t], (x + t * settings.screen.block), y);
 			}
 			this.context.font = oldfont;
 		},
@@ -164,22 +165,22 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			var p = ent.getLocation();
 
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
-			this.context.fillText(ent.sign, (p.w - offX) * pix + 3, (p.h - offY) * pix + 12);
+			this.context.fillText(ent.sign, (p.w - offX) * pix + 3 * window.devicePixelRatio, (p.h - offY) * pix + 12 * window.devicePixelRatio);
 		},
 		_background: function(b, offX, offY) {
-			//console.time("background")
+			var bl = settings.screen.block;
 			for (var x = 0; x < this.width / pix; x++) {
 				for (var y = 0; y < this.height / pix; y++) {
 					var xx = x + offX;
 					var yy = y + offY;
-					var px = xx * pix;
-					var py = yy * pix;
+					var px = xx * bl;
+					var py = yy * bl;
 					var tile = b.background.getTile(xx, yy);
 
 					if (tile.visible === true) {
-						this.context.drawImage(b.image, px, py, pix, pix, x * pix, y * pix, pix, pix);
+						this.context.drawImage(b.image, px, py, bl, bl, x * bl, y * bl, bl, bl);
 					} else if (tile.visited === true) {
-						this.context.drawImage(b.dark, px, py, pix, pix, x * pix, y * pix, pix, pix);
+						this.context.drawImage(b.dark, px, py, bl, bl, x * bl, y * bl, bl, bl);
 					}
 				}
 			}

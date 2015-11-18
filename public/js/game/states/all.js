@@ -1,10 +1,10 @@
 define([
-	'states/loading',
-	'states/play',
-	'states/menu',
-	'states/map',
-	'states/exit',
-	'states/help'
+	'game/states/loading',
+	'game/states/play',
+	'game/states/menu',
+	'game/states/map',
+	'game/states/exit',
+	'game/states/help'
 ], function(loading, play, menu, map, exit, help) {
 	'use strict';
 

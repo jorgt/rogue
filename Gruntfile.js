@@ -18,6 +18,7 @@ module.exports = function(grunt) {
 					define: false,
 					require: false,
 					requirejs: true,
+					Class: false,
 					module: true,
 					guid: false,
 					random: false,
@@ -25,6 +26,16 @@ module.exports = function(grunt) {
 					console: false
 				},
 				reporter: require('jshint-stylish')
+			}
+		},
+		connect: {
+			dev: {
+				options: {
+					port: 8080,
+					base: 'public',
+					keepalive: true,
+					open: 'http://localhost:8080/'
+				}
 			}
 		},
 		shell: {
@@ -48,20 +59,9 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-shell');
+	grunt.loadNpmTasks('grunt-contrib-connect');
 
 	grunt.registerTask('default', [
 		'jshint'
-	]);
-
-	grunt.registerTask('stylus', [
-		'shell:styluswatch'
-	]);
-
-	grunt.registerTask('serve', [
-		'shell:server'
-	]);
-
-	grunt.registerTask('build', [
-		'shell:cpcss', 'shell:cpjs'
 	]);
 };

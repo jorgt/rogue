@@ -2,7 +2,7 @@ define([
 	"engine/states",
 	"helpers/log",
 	"settings",
-	"states/all"
+	"game/states/all"
 ], function(states, log, settings) {
 
 	'use strict';

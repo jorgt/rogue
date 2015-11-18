@@ -1,8 +1,8 @@
-define([], function() {
+define(['settings'], function(settings) {
 	'use strict';
 
 	//pixelratio, see util.js && https://github.com/jondavidjohn/hidpi-canvas-polyfill
-	var size = 15 * window.pixelRatio || 1;
+	var size = settings.screen.block * window.pixelRatio || 1;
 
 	function canvas(background) {
 
@@ -26,6 +26,7 @@ define([], function() {
 
 			ret.dark.onload = function() {
 				resolve(ret);
+				//document.body.appendChild(ret.image)
 			}.bind(this);
 
 			ret.image.src = light.toDataURL('image/png');
@@ -184,9 +185,9 @@ define([], function() {
 
 		if (color) {
 			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", " + opac + ")";
-			ctx.fillText(tile.sign, x * 15 + 3, y * 15 + 12);
+			ctx.fillText(tile.sign, x * size + 3 * window.devicePixelRatio, y * size + 12 * window.devicePixelRatio);
 			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", " + opacb + ")";
-			ctx.fillRect(x * 15, y * 15, 15, 15);
+			ctx.fillRect(x * size, y * size, size, size);
 		}
 	}
 
@@ -199,11 +200,11 @@ define([], function() {
 		for (var x in w) {
 			for (var y in w[x]) {
 				if (w[x][y].info.climate.alt > 0) {
-					ctx.fillStyle = "rgba(0, " + ~~h[x][y] + ", 0, 1)";	
+					ctx.fillStyle = "rgba(0, " + ~~h[x][y] + ", 0, 1)";
 				} else {
-					ctx.fillStyle = "rgba(0, 0, " + ~~h[x][y] + ", 1)";	
-				} 
-				ctx.fillRect(x * 15, y * 15, 15, 15);
+					ctx.fillStyle = "rgba(0, 0, " + ~~h[x][y] + ", 1)";
+				}
+				ctx.fillRect(x * size, y * size, size, size);
 			}
 		}
 	}
@@ -231,7 +232,7 @@ define([], function() {
 		for (var x in w) {
 			for (var y in w[x]) {
 				ctx.fillStyle = "rgba(" + ~~h[x][y] + ", 0, " + (200 - ~~h[x][y]) + ", 1)";
-				ctx.fillRect(x * 15, y * 15, 15, 15);
+				ctx.fillRect(x * size, y * size, size, size);
 			}
 		}
 	}

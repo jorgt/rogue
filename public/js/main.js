@@ -1,9 +1,12 @@
 requirejs.config({
 	baseUrl: 'js',
-	urlArgs: "bust=" + (new Date()).getTime()
+	urlArgs: "bust=" + (new Date()).getTime(),
+	shim: {
+		'game/game': ['util']
+	}
 });
 
-require(['helpers/log', 'settings', 'game/game', 'util'], function(log, settings, game) {
+require(['helpers/log', 'settings', 'game/game'], function(log, settings, game) {
 	'use strict';
 
 	log.urgent('[MAIN]', 'START!');

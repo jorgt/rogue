@@ -3,7 +3,7 @@ define([
 	'game/landtypes/world',
 	'game/landtypes/all',
 	'game/entities/player',
-	'engine/screenmanager',
+	'game/screenmanager',
 	'game/background',
 	'game/time',
 ], function(log, world, Lands, player, ScreenManager, background, time) {
