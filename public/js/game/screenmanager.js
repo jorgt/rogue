@@ -6,8 +6,9 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		w = window.innerWidth,
 		mainW = settings.screen.width,
 		mainH = settings.screen.height,
-		pix = settings.screen.block * window.pixelRatio || 1,
-		ratio = window.pixelRatio || 1,
+		pix = settings.screen.block,// * window.pixelRatio || 1,
+		bl = settings.screen.block,
+		ratio = 1,//window.pixelRatio || 1,
 		font = settings.screen.font;
 
 	//implement the main divs if not existing upon first 
@@ -166,12 +167,12 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		},
 		_entity: function(ent, offX, offY, color) {
 			var p = ent.getLocation();
-
+			var nx = (p.w - offX) * bl + 3;
+			var ny = (p.h - offY) * bl + 12;
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
-			this.context.fillText(ent.sign, (p.w - offX) * pix + 3 * window.devicePixelRatio, (p.h - offY) * pix + 12 * window.devicePixelRatio);
+			this.context.fillText(ent.sign, nx, ny);
 		},
 		_background: function(b, offX, offY) {
-			var bl = settings.screen.block;
 			for (var x = 0; x < this.width / pix; x++) {
 				for (var y = 0; y < this.height / pix; y++) {
 					var xx = x + offX;

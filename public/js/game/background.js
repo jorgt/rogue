@@ -2,7 +2,7 @@ define(['settings'], function(settings) {
 	'use strict';
 
 	//pixelratio, see util.js && https://github.com/jondavidjohn/hidpi-canvas-polyfill
-	var size = settings.screen.block * window.pixelRatio || 1;
+	var size = settings.screen.block// * window.pixelRatio || 1;
 
 	function canvas(background) {
 
@@ -26,7 +26,7 @@ define(['settings'], function(settings) {
 
 			ret.dark.onload = function() {
 				resolve(ret);
-				//document.body.appendChild(ret.image)
+				//document.body.appendChild(ret.image);
 			}.bind(this);
 
 			ret.image.src = light.toDataURL('image/png');
