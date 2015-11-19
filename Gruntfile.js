@@ -37,28 +37,10 @@ module.exports = function(grunt) {
 					open: 'http://localhost:8080/'
 				}
 			}
-		},
-		shell: {
-			styluswatch: {
-				command: 'stylus -w -u nib stylus/game.styl -o public/css'
-			},
-			stylusgenerate: {
-				command: 'stylus -u nib stylus/game.styl -o public/css'
-			},
-			server: {
-				command: 'http-server -s ./public/'
-			},
-			cpcss: {
-				command: 'cp ./public/css/* ../rogue_build/css/'
-			},
-			cpjs: {
-				command: 'r.js.cmd -o ./build.js'
-			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 
 	grunt.registerTask('default', [

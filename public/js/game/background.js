@@ -36,125 +36,6 @@ define(['settings'], function(settings) {
 		return promise;
 	}
 
-	var drawer = {
-		deepsea: function(tile) {
-			var r, g, b;
-			r = g = _color(0, tile.info.climate.alt, 9000);
-			b = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		sea: function(tile) {
-			var r, g, b;
-			r = g = _color(50, tile.info.climate.alt, 9000);
-			b = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		shallowsea: function(tile) {
-			var r, g, b;
-			r = g = _color(100, tile.info.climate.alt, 9000);
-			b = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		ice: function(tile) {
-			var r, g, b;
-			r = g = b = _color(255, tile.info.climate.alt, 15000);
-			return [r, g, b];
-		},
-		polar: function(tile) {
-			var r, g, b;
-
-			r = g = _color(200, tile.info.climate.alt, 9000);
-			b = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		tundra: function(tile) {
-			var r, g, b;
-
-			r = _color(50, tile.info.climate.alt, 9000);
-			g = _color(100, tile.info.climate.alt, 9000);
-			b = _color(150, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		taiga: function(tile) {
-			var r, g, b;
-			r = g = _color(200, tile.info.climate.alt, 9000);
-			g = _color(200, tile.info.climate.alt, 9000);
-			b = _color(50, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		savannah: function(tile) {
-			var r, g, b;
-			r = _color(200, tile.info.climate.alt, 9000);
-			g = _color(200, tile.info.climate.alt, 9000);
-			b = _color(100, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		shrubland: function(tile) {
-			var r, g, b;
-
-			r = _color(50, tile.info.climate.alt, 9000);
-			g = _color(255, tile.info.climate.alt, 9000);
-			b = _color(50, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		swamp: function(tile) {
-			var r, g, b;
-
-			r = _color(20, tile.info.climate.alt, 9000);
-			g = _color(255, tile.info.climate.alt, 9000);
-			b = _color(150, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		desert: function(tile) {
-			var r, g, b;
-
-			r = _color(250, tile.info.climate.alt, 9000);
-			g = _color(220, tile.info.climate.alt, 9000);
-			b = 0;
-			return [r, g, b];
-		},
-		plains: function(tile) {
-			var r, g, b;
-
-			r = _color(250, tile.info.climate.alt, 9000);
-			g = _color(220, tile.info.climate.alt, 9000);
-			b = _color(100, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		forest: function(tile) {
-			var r, g, b;
-
-			b = r = 20; //_color(20, tile.info.climate.alt, 9000);
-			g = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		seasonalforest: function(tile) {
-			var r, g, b;
-
-			r = b = 75; //_color(50, tile.info.climate.alt, 9000);
-			g = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		rainforest: function(tile) {
-			var r, g, b;
-
-			r = b = 110; //_color(100, tile.info.climate.alt, 9000);
-			g = _color(255, tile.info.climate.alt, 9000);
-			return [r, g, b];
-		},
-		mountain: function(tile) {
-			var r, g, b;
-
-			r = g = b = _color(100, tile.info.climate.alt, 15000);
-			return [r, g, b];
-		},
-		snowymountain: function(tile) {
-			var r, g, b;
-			r = g = b = _color(255, tile.info.climate.alt, 15000);
-			return [r, g, b];
-		}
-	};
-
 	function draw(w, opac) {
 		var canvas, sizeWidth, sizeHeight, ctx;
 
@@ -166,29 +47,16 @@ define(['settings'], function(settings) {
 		sizeWidth = ctx.canvas.clientWidth;
 		sizeHeight = ctx.canvas.clientHeight;
 		ctx.font = "bold " + size + "px monospace";
-		ctx.rect(0, 0, sizeWidth, sizeHeight);
 		ctx.fillStyle = "black";
-		ctx.fill();
+		ctx.fillRect(0, 0, sizeWidth, sizeHeight);;
 
 		for (var x in w.background.grid) {
 			for (var y in w.background.grid[x]) {
-				draw.tile(ctx, x, y, w.background.grid[x][y], opac);
+				w.background.grid[x][y].draw(ctx, x, y, size, opac);
 			}
 		}
 
 		return canvas;
-	}
-
-	draw.tile = function(ctx, x, y, tile, opac) {
-		var color = drawer[tile.name](tile);
-		var opacb = ((tile.walkable === true) ? 0.5 : 0.3) * opac;
-
-		if (color) {
-			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", " + opac + ")";
-			ctx.fillText(tile.sign, x * size + 3 * window.devicePixelRatio, y * size + 12 * window.devicePixelRatio);
-			ctx.fillStyle = "rgba(" + color[0] + ", " + color[1] + ", " + color[2] + ", " + opacb + ")";
-			ctx.fillRect(x * size, y * size, size, size);
-		}
 	}
 
 	draw.alt = function(ctx, w) {
@@ -218,7 +86,7 @@ define(['settings'], function(settings) {
 		for (var x in w) {
 			for (var y in w[x]) {
 				ctx.fillStyle = "rgba(0, 0, " + ~~h[x][y] + ", 1)";
-				ctx.fillRect(x * 15, y * 15, 15, 15);
+				ctx.fillRect(x * size, y * size, size, size);
 			}
 		}
 	}
@@ -236,6 +104,7 @@ define(['settings'], function(settings) {
 			}
 		}
 	}
+
 	draw.normalize = function(grid, attr) {
 		var max = 0;
 		var min = 10000000;

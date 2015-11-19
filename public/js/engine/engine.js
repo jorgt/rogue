@@ -17,7 +17,7 @@ define([
 		fps = 0,
 		div = 0;
 
-	if(settings.debug === true) {
+	if (settings.debug === true) {
 		div = document.createElement('div');
 		div.style.cssText = 'background-color:black;color:white;position:fixed;top:0,left:0;font-family:"Courier New", Courier, monospace;';
 		document.body.appendChild(div);
@@ -42,13 +42,13 @@ define([
 					engine.update(time);
 					//console.timeEnd("update");
 				}
-				
+
 				//console.time("draw");
 				engine.draw(time);
 				//console.timeEnd("draw");
 				//console.log(time - t);
 				t = time;
-				
+
 				if (states.active.isRunning() === true) {
 					window.requestAnimFrame(engine.loop);
 				} else {
@@ -64,8 +64,8 @@ define([
 					fps = ticks;
 					ticks = 0;
 					timeSecond = 0;
-					if(settings.debug === true) {
-						div.innerHTML = fps;
+					if (settings.debug === true) {
+						div.innerHTML = (fps < 10) ? "0" + fps : fps;
 					}
 				}
 			},

@@ -104,10 +104,13 @@ define(['settings', 'helpers/log'], function(settings, log) {
 						color = 'red';
 					} else {
 						var tile = b.getTile(x, y);
+						var o1 = (!tile.name.match(/sea/)) ? (tile.info.tot - 0.5) * 1.5 + 0.25 : 1 - ((0.5 - tile.info.tot) * 1.5 + 0.25);
+						var o2 = (o1 * 0.3 + 0.1);
+
 						if (tile.visible === true) {
-							color = (tile.info.climate.alt >= 0) ? 'rgba(50,255,0,1)' : 'rgba(0,0,200,1)';
+							color = (!tile.name.match(/sea/)) ? 'rgba(0,170,0,' + o1 + ')' : 'rgba(0,0,170,' + o1 + ')';
 						} else if (tile.visited === true) {
-							color = (tile.info.climate.alt >= 0) ? 'rgba(50,255,0,0.2)' : 'rgba(0,0,200,0.2)';
+							color = (!tile.name.match(/sea/)) ? 'rgba(170,170,170,' + o2 + ')' : 'rgba(60,60,60,' + o2 + ')';
 						}
 					}
 

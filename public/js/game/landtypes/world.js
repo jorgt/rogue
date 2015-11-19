@@ -90,11 +90,13 @@ define([
 
 		var aa = 0,
 			ap = 0,
-			at = 0;
+			at = 0,
+			x = 0,
+			y = 0;
 
-		for (var x = 0; x < _width; x++) {
+		for (x = 0; x < _width; x++) {
 			_grid[x] = [];
-			for (var y = 0; y < _height; y++) {
+			for (y = 0; y < _height; y++) {
 				var c = {
 					temp: ~~(gTem[x][y] * 1.8) + 5,
 					prec: ~~(Math.pow(gPre[x][y], 1.1)),
@@ -104,6 +106,38 @@ define([
 				var obj = bank.get(c.climate.replace(/\s/g, ''));
 				obj.info.climate = c;
 				_grid[x][y] = obj;
+			}
+		}
+		//normalize the colors
+		var cols = {
+			total: {
+				min: 999999,
+				max: -999999
+			}
+		};
+
+		for (x = 0; x < _width; x++) {
+			for (y = 0; y < _height; y++) {
+				var t = _grid[x][y];
+				if (!cols[t.name]) {
+					cols[t.name] = {
+						min: 999999,
+						max: -999999
+					}
+				}
+				if (t.info.climate.alt < cols[t.name].min) cols[t.name].min = t.info.climate.alt;
+				if (t.info.climate.alt > cols[t.name].max) cols[t.name].max = t.info.climate.alt;
+				if (t.info.climate.alt < cols.total.min) cols.total.min = t.info.climate.alt;
+				if (t.info.climate.alt > cols.total.max) cols.total.max = t.info.climate.alt;
+			}
+		}
+
+		for (x = 0; x < _width; x++) {
+			for (y = 0; y < _height; y++) {
+				var t = _grid[x][y];
+				var c = cols[t.name];
+				t.info.alt = (t.info.climate.alt - c.min) / (c.max - c.min);
+				t.info.tot = (t.info.climate.alt - cols.total.min) / (cols.total.max - cols.total.min);
 			}
 		}
 
