@@ -2,7 +2,7 @@ define(['settings'], function(settings) {
 	'use strict';
 
 	//pixelratio, see util.js && https://github.com/jondavidjohn/hidpi-canvas-polyfill
-	var size = settings.screen.block// * window.pixelRatio || 1;
+	var size = settings.screen.block; // * window.pixelRatio || 1;
 
 	function canvas(background) {
 
@@ -12,21 +12,21 @@ define(['settings'], function(settings) {
 			ret.width = background.grid.length;
 			ret.height = background.grid[0].length;
 
-			var light = draw(ret, 1);
+			var light = draw(ret, true);
 
 
 			ret.image = new Image();
 			ret.dark = new Image();
 
 			ret.image.onload = function() {
-				var dark = draw(ret, 0.2);
+				var dark = draw(ret, false);
 				ret.dark.src = dark.toDataURL('image/png');
 
 			}.bind(this);
 
 			ret.dark.onload = function() {
 				resolve(ret);
-				//document.body.appendChild(ret.image);
+				//document.body.appendChild(ret.dark);
 			}.bind(this);
 
 			ret.image.src = light.toDataURL('image/png');
@@ -37,21 +37,21 @@ define(['settings'], function(settings) {
 	}
 
 	function draw(w, opac) {
-		var canvas, sizeWidth, sizeHeight, ctx;
+		var canvas, sizeWidth, sizeHeight, ctx, x, y;
 
 		canvas = document.createElement('canvas');
-
 		canvas.width = w.background.grid.length * size;
 		canvas.height = w.background.grid[0].length * size;
+
 		ctx = canvas.getContext("2d");
 		sizeWidth = ctx.canvas.clientWidth;
 		sizeHeight = ctx.canvas.clientHeight;
 		ctx.font = "bold " + size + "px monospace";
 		ctx.fillStyle = "black";
-		ctx.fillRect(0, 0, sizeWidth, sizeHeight);;
+		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
 
-		for (var x in w.background.grid) {
-			for (var y in w.background.grid[x]) {
+		for (x = 0; x < w.background.grid.length; x++) {
+			for (y = 0; y < w.background.grid[x].length; y++) {
 				w.background.grid[x][y].draw(ctx, x, y, size, opac);
 			}
 		}
@@ -60,13 +60,14 @@ define(['settings'], function(settings) {
 	}
 
 	draw.alt = function(ctx, w) {
-		var h = draw.normalize(w, 'alt');
-		var sizeWidth = ctx.canvas.clientWidth;
-		var sizeHeight = ctx.canvas.clientHeight;
+		var x, y, h = draw.normalize(w, 'alt'),
+			sizeWidth = ctx.canvas.clientWidth,
+			sizeHeight = ctx.canvas.clientHeight;
+
 		ctx.fillStile = 'black';
 		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
-		for (var x in w) {
-			for (var y in w[x]) {
+		for (x = 0; x < w.length; x++) {
+			for (y = 0; y < w[x].length; y++) {
 				if (w[x][y].info.climate.alt > 0) {
 					ctx.fillStyle = "rgba(0, " + ~~h[x][y] + ", 0, 1)";
 				} else {
@@ -75,46 +76,49 @@ define(['settings'], function(settings) {
 				ctx.fillRect(x * size, y * size, size, size);
 			}
 		}
-	}
+	};
 
 	draw.prec = function(ctx, w) {
-		var h = draw.normalize(w, 'prec');
-		var sizeWidth = ctx.canvas.clientWidth;
-		var sizeHeight = ctx.canvas.clientHeight;
+		var x, y, h = draw.normalize(w, 'prec'),
+			sizeWidth = ctx.canvas.clientWidth,
+			sizeHeight = ctx.canvas.clientHeight;
+
 		ctx.fillStile = 'black';
 		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
-		for (var x in w) {
-			for (var y in w[x]) {
+		for (x = 0; x < w.length; x++) {
+			for (y = 0; y < w[x].length; y++) {
 				ctx.fillStyle = "rgba(0, 0, " + ~~h[x][y] + ", 1)";
 				ctx.fillRect(x * size, y * size, size, size);
 			}
 		}
-	}
+	};
 
 	draw.temp = function(ctx, w) {
-		var h = draw.normalize(w, 'temp');
-		var sizeWidth = ctx.canvas.clientWidth;
-		var sizeHeight = ctx.canvas.clientHeight;
+		var x, y, h = draw.normalize(w, 'temp'),
+			sizeWidth = ctx.canvas.clientWidth,
+			sizeHeight = ctx.canvas.clientHeight;
+
 		ctx.fillStile = 'black';
 		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
-		for (var x in w) {
-			for (var y in w[x]) {
+		for (x = 0; x < w.length; x++) {
+			for (y = 0; y < w[x].length; y++) {
 				ctx.fillStyle = "rgba(" + ~~h[x][y] + ", 0, " + (200 - ~~h[x][y]) + ", 1)";
 				ctx.fillRect(x * size, y * size, size, size);
 			}
 		}
-	}
+	};
 
 	draw.normalize = function(grid, attr) {
-		var max = 0;
-		var min = 10000000;
-		var normalized = [];
-		var x, y;
+		var x, y, max = Number.MIN_VALUE,
+			min = Number.MAX_VALUE,
+			normalized = [];
+
 		for (x = 0; x < grid.length; x++) {
 			for (y = 0; y < grid[x].length; y++) {
 				var g = grid[x][y].info.climate[attr];
-				if (g > max) max = g;
-				if (g < min) min = g;
+			
+				max = (g > max) ? g : max;
+				min = (g > min) ? g : min;
 			}
 		}
 
@@ -125,11 +129,7 @@ define(['settings'], function(settings) {
 			}
 		}
 		return normalized;
-	}
-
-	function _color(min, factor, divider) {
-		return Math.abs(~~Math.min(min, (1 - (Math.abs(factor) / divider)) * min));
-	}
+	};
 
 	return canvas;
 });

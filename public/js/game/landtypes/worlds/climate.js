@@ -17,6 +17,8 @@ define([
 			p = t[1];
 			t = t[0];
 		}
+
+		var r;
 		// water
 		if (a < -2500) return 0; //deep sea
 		if (a < -500 && t < -5) return 3; //ice

@@ -14,6 +14,7 @@ module.exports = function(grunt) {
 				forin: true,
 				undef: true,
 				unused: true,
+				validthis: true,
 				globals: {
 					define: false,
 					require: false,

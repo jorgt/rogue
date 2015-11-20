@@ -1,7 +1,7 @@
 define(["helpers/log"], function(
 	log) {
 
-	log.setDebug(3);
+	log.setDebug(4);
 
 	window.guid = function() {
 		return ~~(Math.random() * 100000);

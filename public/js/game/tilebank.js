@@ -34,17 +34,15 @@ define(["helpers/log"], function(
 	/*
 		dungeons and caves
 	*/
-	_bank.add('floor', '·', 1, true, false, false);
-	_bank.add('door', '·', 1, true, true, false);
-	_bank.add('road', '·', 50, true, true, false);
-	_bank.add('rock', ' ', 99, false, true, true);
-	_bank.add('wall', '#', 0, false, false, true);
+	_bank.add('floor', '·', 80, true, false, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
+	_bank.add('door', '·', 50, true, true, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
+	_bank.add('road', '·', 20, true, true, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
+	_bank.add('rock', ' ', 0, false, true, true, [0, 0, 0], [0, 0, 0]);
+	_bank.add('wall', '#', 0, false, false, true, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
 
 	/*
 		objects
 	*/
-	_bank.add('tree', '^', 0, false, false, true);
-	_bank.add('grass', '.', 1, true, false, false);
 
 	return _bank;
 
@@ -54,7 +52,13 @@ define(["helpers/log"], function(
 		var _bank = {};
 		var _classes = {};
 
-		this.add = function(name, sign, speed, walkable, diggable, blocking, color, background) {
+		this.add = function(name, sign, speed, walkable, diggable, blocking, color, background, dcolor, dbackground) {
+
+			color = color || [255, 255, 255];
+			background = background;
+			dcolor = dcolor;
+
+
 			_bank[name] = {
 				name: name,
 				sign: sign,
@@ -62,17 +66,23 @@ define(["helpers/log"], function(
 				speed: speed,
 				walkable: walkable,
 				diggable: diggable,
-				color: color || [255, 255, 255],
-				background: background || color || [0, 0, 0]
+				color: color,
+				background: background,
+				dcolor: dcolor,
+				dbackground: dbackground
 			};
 		};
 
 		this.get = function(name) {
+			if (!_bank[name]) {
+				throw new Error("Tile type " + name + " is not defined");
+			}
 			return new Tile(_bank[name]);
 		};
 
 		var Tile = Class.extend({
 			init: function(opt) {
+				this.guid = guid();
 				this.name = opt.name;
 				this.sign = opt.sign;
 				this.blocking = opt.blocking;
@@ -83,26 +93,50 @@ define(["helpers/log"], function(
 				this.visited = false;
 				this.visible = false;
 				this.color = opt.color;
-				this.background = opt.background
-				this.info = {};
-			},
-			draw: function(ctx, posx, posy, size, opac) {
-				var opacb = ((this.info.tot + this.info.alt / 5) / 1.8) * opac;
-				if(this.name === 'ice') opacb += 0.3;
-				var cf = this.color.map(function(a) {
-					return ~~(a * opac);
-				});
-				var cb = (this.background || this.color).map(function(a) {
-					return ~~(a * opacb);
-				});
+				this.background = opt.background;
 
-				if (cf) {
-					ctx.fillStyle = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
-					ctx.fillRect(posx * size, posy * size, size, size);
-					ctx.fillStyle = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
-					ctx.fillText(this.sign, posx * size + 3, posy * size + 12);
+				this.dcolor = opt.dcolor;
+				this.dbackground = opt.dbackground;
+				this.info = {
+					climate: {
+						alt: 0,
+						prec: 0,
+						temp: 0
+					},
+					alt: 1,
+					tot: 1
+				};
+			},
+			draw: function(ctx, posx, posy, size, light) {
+				var cb, cf;
+				var opac = (light === true) ? 1 : 0.2;
+				var opacb = ((this.info.tot + this.info.alt / 5) / 1.8) * opac;
+				var fcol, bcol;
+
+				if (this.name === 'ice') opacb += 0.3;
+
+				//lightmap
+				if (light === true) {
+					cf = this.color;
+					cb = this.background || this.color.map(function(a) {
+						return ~~(a * opacb);
+					});
+				} else {
+					cf = this.dcolor || this.color.map(function(a) {
+						return ~~(a * opac);
+					});
+					cb = this.dbackground || this.color.map(function(a) {
+						return ~~(a * opacb);
+					});
 				}
 
+				bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
+				fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
+
+				ctx.fillStyle = bcol;
+				ctx.fillRect(posx * size, posy * size, size, size);
+				ctx.fillStyle = fcol;
+				ctx.fillText(this.sign, posx * size + 3, posy * size + 12);
 			}
 		});
 	}

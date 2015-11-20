@@ -3,7 +3,6 @@ define([
 	"settings",
 	"game/landtypes/worlds/climate",
 	"libs/simplex",
-	"game/tilebank",
 	"helpers/grids",
 	"game/landtypes/base",
 ], function(
@@ -11,7 +10,6 @@ define([
 	settings,
 	climate,
 	Simplex,
-	bank,
 	Grids,
 	Base) {
 
@@ -103,7 +101,7 @@ define([
 					alt: ~~(2000 + gAlt[x][y] + gAlt2[x][y])
 				}
 				c.climate = climate(c.temp, c.prec, c.alt);
-				var obj = bank.get(c.climate.replace(/\s/g, ''));
+				var obj = opt.bank.get(c.climate.replace(/\s/g, ''));
 				obj.info.climate = c;
 				_grid[x][y] = obj;
 			}

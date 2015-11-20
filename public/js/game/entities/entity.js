@@ -25,7 +25,7 @@ define([], function() {
 				thirst: 0, //how thirsty you are
 				cold: 0, //hypothermia!
 				drowning: 0 //if you're drowing
-			}
+			};
 			this.skills = {
 				melee: {
 
@@ -33,7 +33,7 @@ define([], function() {
 				magic: {
 
 				}
-			}
+			};
 		},
 		setLocation: function(x, y) {
 			this.position.w = x;
@@ -55,7 +55,7 @@ define([], function() {
 				}
 			}
 		},
-		draw: function(ctx, offx, offw) {
+		draw: function(/* ctx, offx, offw */) {
 			//draw
 		}
 	});

@@ -4,7 +4,7 @@ define([
 	"helpers/log",
 	"game/screenmanager",
 	"settings"
-], function(Keys, Mouse, log, ScreenManager, settings) {
+], function(Keys, Mouse, log, screenManager, settings) {
 
 	'use strict';
 
@@ -16,7 +16,7 @@ define([
 
 		this.keys = new Keys(false);
 		this.mouse = new Mouse();
-		this.screen = ScreenManager(obj.name, settings.screen.height, settings.screen.width);
+		this.screen = screenManager(obj.name, settings.screen.height, settings.screen.width);
 
 		this.update = function(time) {
 			this.keys.update();
@@ -77,7 +77,9 @@ define([
 		this.name = obj.name;
 
 		for(var name in obj) {
-			this[name] = this[name] || obj[name];
+			if(obj.hasOwnProperty(name)){
+				this[name] = this[name] || obj[name];
+			}
 		}
 	}
 

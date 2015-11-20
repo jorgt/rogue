@@ -1,12 +1,14 @@
 define([
+	'settings',
 	'helpers/log',
 	'game/landtypes/world',
-	'game/landtypes/all',
+	'game/landtypes/landmanager',
 	'game/entities/player',
 	'game/screenmanager',
 	'game/background',
 	'game/time',
-], function(log, world, Lands, player, ScreenManager, background, time) {
+	'game/tilebank',
+], function(settings, log, world, Lands, player, screenManager, background, time, tilebank) {
 	'use strict';
 
 	var game,
@@ -16,13 +18,14 @@ define([
 
 		log.urgent('[GAME]', 'starting to put the game together');
 
-		var worldPromise = background(Lands.createPlane({
-			type: 'world',
+		var worldPromise = Lands.createPlane({
+			type: 'dungeon',
 			options: {
 				height: 75,
-				width: 100
+				width: 100,
+				bank: tilebank
 			}
-		})).then(function(ret) {
+		}).then(function(ret) {
 			this.world = ret;
 			this.player = player(this.world.background);
 		}.bind(this));
@@ -43,7 +46,8 @@ define([
 			w: 0
 		};
 
-		this.screen = ScreenManager('game', 600, 600, 1);
+		//screen is square, so height twice!
+		this.screen = screenManager('game', settings.screen.height, settings.screen.height, 1);
 		this.screen.position(0, 0);
 		this.screen.canvas.style.borderRight = "1px solid #111";
 		this.screen.hide();
@@ -58,6 +62,7 @@ define([
 		// player position. after that, draw the screen!
 		this.player.setLocation(this.world.background.start[0], this.world.background.start[1]);
 		this.player.update(this.world.background);
+		this.offset = this.screen.offset(this.player, this.world.background);
 		this.draw();
 	};
 
@@ -103,7 +108,7 @@ define([
 
 	Game.prototype.pause = function() {
 		this.paused = !this.paused;
-	}
+	};
 
 	return function() {
 		if (!game) {

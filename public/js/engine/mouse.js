@@ -60,7 +60,7 @@ define(["helpers/log", "settings"], function(
 					height: ~~(parseInt(e.layerY) / settings.square),
 					width: ~~(parseInt(e.layerX) / settings.square)
 				}
-			}
+			};
 			func.call(this, ret);
 		}
 

@@ -146,7 +146,7 @@ define(["helpers/log"], function(
 
 		this.pause = function() {
 			_paused = !_paused;
-		}
+		};
 
 		this.update = function() {
 			if (_paused === false) {

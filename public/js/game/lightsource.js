@@ -4,10 +4,12 @@ define(["helpers/log"], function(log) {
 
 	function LightSource(m, position, radius) {
 		var map = m;
+		var current = {};
 		this.tiles = [];
 		this.position = position;
 		this.radius = radius;
 		this.height = false;
+		this.current = [];
 
 		// multipliers for transforming coordinates into other octants.
 		this.mult = [
@@ -23,7 +25,7 @@ define(["helpers/log"], function(log) {
 
 		// calculates an octant. Called by the this.calculate when calculating lighting
 		this.calculateOctant = function(cx, cy, row, start, end, radius, xx, xy, yx, yy, id) {
-			var tile = map.getTile(cx, cy)
+			var tile = map.getTile(cx, cy);
 			tile.visible = true;
 			tile.visited = true;
 			this.tiles.push(tile);
@@ -60,6 +62,7 @@ define(["helpers/log"], function(log) {
 							if (dx * dx + dy * dy < radius_squared) {
 								map.getTile(X, Y).visible = true;
 								map.getTile(X, Y).visited = true;
+								current[X + ',' + Y] = [X, Y];
 								this.tiles.push(map.getTile(X, Y));
 							}
 
@@ -93,19 +96,23 @@ define(["helpers/log"], function(log) {
 				this.tiles[x].visible = false;
 			}
 			this.tiles = [];
+			this.current = [];
+			current = {};
 		}
 
 		// sets flag lit to true on all tiles within radius of position specified
 		this.calculate = function() {
 			this.clear();
-			try {
-				for (var i = 0; i < 8; i++) {
-					this.calculateOctant(this.position.w, this.position.h, 1, 1.0, 0.0, this.radius,
-						this.mult[0][i], this.mult[1][i], this.mult[2][i], this.mult[3][i], 0);
-				}
-			} catch (e) {
-				console.log('calculating light failed')
+
+			for (var i = 0; i < 8; i++) {
+				this.calculateOctant(this.position.w, this.position.h, 1, 1.0, 0.0, this.radius,
+					this.mult[0][i], this.mult[1][i], this.mult[2][i], this.mult[3][i], 0);
 			}
+
+		}
+
+		this.changeRadius = function(rad) {
+			this.radius = rad;
 		}
 
 		// update the position of the light source
@@ -117,6 +124,12 @@ define(["helpers/log"], function(log) {
 			this.position = position;
 			this.clear();
 			this.calculate();
+			for(var x in current) {
+				if(current.hasOwnProperty(x)) {
+					this.current.push(current[x]);
+				}
+			}
+			return this.current;
 		}
 	}
 

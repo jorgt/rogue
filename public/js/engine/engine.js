@@ -7,11 +7,7 @@ define([
 
 	'use strict';
 
-	var stats = {
-			fps: 0,
-			start: new Date()
-		},
-		ticks = 0,
+	var ticks = 0,
 		timePassed = 0,
 		timeSecond = 0,
 		fps = 0,
@@ -22,8 +18,6 @@ define([
 		div.style.cssText = 'background-color:black;color:white;position:fixed;top:0,left:0;font-family:"Courier New", Courier, monospace;';
 		document.body.appendChild(div);
 	}
-
-	var t = 0;
 
 	return (function Engine() {
 		var engine = {
@@ -43,11 +37,7 @@ define([
 					//console.timeEnd("update");
 				}
 
-				//console.time("draw");
 				engine.draw(time);
-				//console.timeEnd("draw");
-				//console.log(time - t);
-				t = time;
 
 				if (states.active.isRunning() === true) {
 					window.requestAnimFrame(engine.loop);
@@ -56,10 +46,10 @@ define([
 				}
 
 				var now = new Date().getTime();
-				timeSecond += (now - timePassed)
+				timeSecond += (now - timePassed);
 				timePassed = now;
 				ticks++;
-				//console.log(now, timePassed, timeSecond);
+
 				if (timeSecond >= 1000) {
 					fps = ticks;
 					ticks = 0;

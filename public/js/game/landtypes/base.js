@@ -10,10 +10,13 @@ define([], function() {
 			this.width = w;
 		},
 		getTile: function(x, y) {
-			if (typeof x === 'object') {
+			if(x instanceof Array) {
+				y = x[1];
+				x = x[0];
+			} else if (typeof x === 'object') {
 				y = x.y || x.w;
 				x = x.x || x.h;
-			}
+			} 
 
 			return this.grid[x][y];
 		}
