@@ -96,6 +96,7 @@ define([
 				}
 				c.climate = climate(c.temp, c.prec, c.alt);
 				var obj = opt.bank.get(c.climate.replace(/\s/g, ''));
+
 				obj.info.climate = c;
 				_grid[x][y] = obj;
 			}
@@ -178,9 +179,9 @@ define([
 			var end = null;
 			while (_start === null || _end === null) {
 				var sx = random(0, _grid.length - 1);
-				var sy = random(0, _grid[0].length - 1)
+				var sy = random(0, _grid[0].length - 1);
 				var ex = random(0, _grid.length - 1);
-				var ey = random(0, _grid[0].length - 1)
+				var ey = random(0, _grid[0].length - 1);
 				start = _grid[sx][sy];
 				end = _grid[ex][ey];
 				_start = (start.walkable === true) ? [sx, sy] : null;
@@ -194,32 +195,47 @@ define([
 			var city = Math.random() > 0.7; // ratio towns/cities 7:3
 			var totalCities = 0;
 			var totalTowns = 0;
-			if (city === true) {
-				totalCities += (_createCity()) ? 1 : 0;
-			} else {
-				totalTowns += (_createTown()) ? 1 : 0;
+			while (_cities.length < 5) {
+				_createCity((city) ? 1 : random(5, 9));
 			}
 
 		}
 
-		function _createTown() {
+		function _createCity(n) {
+			var x, y, r, g = [],
+				r = [-1, 0, 1];
 
-		}
-
-		function _createCity() {
-			var x, y, r, g = [];
-			r = [-1, 0, 1];
 			x = random(0, _grid.length - 1);
 			y = random(0, _grid[0].length - 1);
 			for (var a = 0; a < r.length; a++) {
 				for (var b = 0; b < r.length; b++) {
-					if ((x + a >= _grid.length || x + a < 0) || (y + b >= _grid.length || y + b < 0)) {
-						if(_grid[x + r[a]][grid][y + r[b]].info.climate.alt >= 0) return false;
-						g.push([x, y]);
+					if (x + r[a] < _grid.length && x + r[a] >= 0 && y + r[b] < _grid[0].length && y + r[b] >= 0) {
+						if (_grid[x + r[a]][y + r[b]].info.climate.alt < 0) return 0;
+						g.push([x + r[a], y + r[b]]);
+					} else {
+						return 0;
 					}
 				}
 			}
 
+			g = shuffle(g).slice(0, n);
+
+			for (var c = 0; c < g.length; c++) {
+				var tile = _grid[g[c][0]][g[c][1]];
+				var climate = tile.info.climate;
+				var color = tile.color;
+				var background = tile.background;
+				_grid[g[c][0]][g[c][1]] = opt.bank.get('city');
+				_grid[g[c][0]][g[c][1]].info.climate = climate;
+				_grid[g[c][0]][g[c][1]].background = background;
+				_grid[g[c][0]][g[c][1]].color = color;
+			}
+
+			_cities.push([x, y]);
+
+			log.low('[WORLD]', 'created a city at', x, y);
+
+			return 1;
 		}
 
 		function _axialParticles() {
@@ -319,12 +335,7 @@ define([
 					}
 				}
 
-				return _shuffle(result);
-			};
-
-			function _shuffle(o) { //v1.0
-				for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-				return o;
+				return shuffle(result);
 			};
 		}
 

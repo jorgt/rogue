@@ -24,7 +24,7 @@ define(['settings'], function(settings) {
 
 			ret.dark.onload = function() {
 				resolve(ret);
-				document.body.appendChild(ret.image);
+				//document.body.appendChild(ret.image);
 			}.bind(this);
 
 			ret.image.src = light.toDataURL('image/png');
@@ -58,13 +58,10 @@ define(['settings'], function(settings) {
 	}
 
 	function _drawTile(ctx, grid, posx, posy, size, light) {
-		var cb, cf, color, background, dcolor, dbackground, sign;
+		var cb, cf, color, background, dcolor, dbackground, sign, fcol, bcol;
 		var tile = grid[posx][posy];
-
 		var opac = (light === true) ? 1 : 0.2;
-
 		var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
-		var fcol, bcol;
 
 		sign = tile.subtile.sign || tile.sign
 
@@ -80,6 +77,7 @@ define(['settings'], function(settings) {
 		if (tile.name === 'ice' && light === true) opacb += 0.3;
 		if (tile.name === 'ice' && light === false) opacb += 0.05;
 
+		//console.log(tile, color);
 		//lightmap
 		if (light === true) {
 			cf = color;
@@ -95,13 +93,16 @@ define(['settings'], function(settings) {
 			});
 		}
 
+		tile.color = cf;
+		tile.background = background;
+
 		bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
 		fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
 
 		ctx.fillStyle = bcol;
 		ctx.fillRect(posx * size, posy * size, size, size);
 		ctx.fillStyle = fcol;
-		ctx.fillText(sign, posx * size + 3, posy * size + 12);
+		ctx.fillText(sign, posx * size + 3, posy * size + 13);
 	}
 
 	//LEGACY. Some functions for analysis

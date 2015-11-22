@@ -15,6 +15,26 @@ define(["helpers/log"], function(
 		return ~~(Math.random() * (high - low + 1) + low);
 	};
 
+	window.shuffle = function(array) {
+		var currentIndex = array.length,
+			temporaryValue, randomIndex;
+
+		// While there remain elements to shuffle...
+		while (0 !== currentIndex) {
+
+			// Pick a remaining element...
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
+
+			// And swap it with the current element.
+			temporaryValue = array[currentIndex];
+			array[currentIndex] = array[randomIndex];
+			array[randomIndex] = temporaryValue;
+		}
+
+		return array;
+	}
+
 	//animationframe polyfill
 	window.requestAnimFrame = (function() {
 		return window.requestAnimationFrame ||
@@ -104,7 +124,7 @@ define(["helpers/log"], function(
 
 	//hdpi canvas polyfill 
 	//https://github.com/jondavidjohn/hidpi-canvas-polyfill
-	
+
 	(function(prototype) {
 		prototype.getContext = (function(_super) {
 			return function(type) {
@@ -173,8 +193,8 @@ define(["helpers/log"], function(
 				'translate': 'all',
 				'createRadialGradient': 'all',
 				'createLinearGradient': 'all',
-				'drawImage': [1,2,3,4,5,6,7,8]
-				//'drawImage': [1,2,3,4]
+				'drawImage': [1, 2, 3, 4, 5, 6, 7, 8]
+					//'drawImage': [1,2,3,4]
 			};
 
 		if (pixelRatio === 1) return;
@@ -268,7 +288,7 @@ define(["helpers/log"], function(
 			};
 		})(prototype.strokeText);
 	})(CanvasRenderingContext2D.prototype);
-	
+
 
 	(function(win, doc) {
 		"use strict";

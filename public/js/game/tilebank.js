@@ -33,7 +33,7 @@ define(["helpers/log"], function(
 
 	_bank.add('city', function(grid, x, y) {
 			return 'C';
-		}, 0, null, null, null, [255, 255, 255], [0, 0, 0])
+		}, 0, null, null, null, [255, 255, 255], [0,0,0]);
 		/*
 			dungeons and caves
 		*/
@@ -65,22 +65,6 @@ define(["helpers/log"], function(
 				diggable: diggable,
 				object: null,
 				color: color || [255, 255, 255],
-				background: background,
-				dcolor: dcolor,
-				dbackground: dbackground
-			};
-		};
-
-		this.object = function(name, sign, speed, walkable, diggable, blocking, color, background, dcolor, dbackground) {
-
-			_bank[name] = {
-				name: name,
-				sign: sign,
-				blocking: blocking,
-				speed: speed,
-				walkable: walkable,
-				diggable: diggable,
-				color: color,
 				background: background,
 				dcolor: dcolor,
 				dbackground: dbackground
@@ -123,8 +107,11 @@ define(["helpers/log"], function(
 					tot: 1
 				};
 			},
-			subtile: function(tile) {
+			setSubtile: function(tile) {
 				this.subtile = tile;
+			},
+			change: function(tile) {
+
 			}
 		});
 	}
