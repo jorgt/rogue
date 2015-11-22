@@ -14,8 +14,9 @@ define([
 			this.light = this._changeLight(grid);
 		},
 		update: function(grid) {
-			if(grid.type === 'dungeon') this.radius = 5;
-			if(grid.type === 'world') this.radius = 10;
+			if (grid.type === 'dungeon') this.radius = 5;
+			if (grid.type === 'world') this.radius = 10;
+			
 			this.light.changeRadius(this.radius);
 			this.light.update(this.getLocation(), grid, grid.type !== 'dungeon');
 		},

@@ -19,7 +19,7 @@ define([
 		log.urgent('[GAME]', 'starting to put the game together');
 
 		var worldPromise = Lands.createPlane({
-			type: 'dungeon',
+			type: 'world',
 			options: {
 				height: 75,
 				width: 100,

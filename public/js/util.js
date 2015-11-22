@@ -104,7 +104,7 @@ define(["helpers/log"], function(
 
 	//hdpi canvas polyfill 
 	//https://github.com/jondavidjohn/hidpi-canvas-polyfill
-	/*
+	
 	(function(prototype) {
 		prototype.getContext = (function(_super) {
 			return function(type) {
@@ -173,7 +173,7 @@ define(["helpers/log"], function(
 				'translate': 'all',
 				'createRadialGradient': 'all',
 				'createLinearGradient': 'all',
-				'drawImage': [5,6,7,8]
+				'drawImage': [1,2,3,4,5,6,7,8]
 				//'drawImage': [1,2,3,4]
 			};
 
@@ -268,7 +268,7 @@ define(["helpers/log"], function(
 			};
 		})(prototype.strokeText);
 	})(CanvasRenderingContext2D.prototype);
-	*/
+	
 
 	(function(win, doc) {
 		"use strict";

@@ -2,7 +2,7 @@ define(['settings'], function(settings) {
 	'use strict';
 
 	//pixelratio, see util.js && https://github.com/jondavidjohn/hidpi-canvas-polyfill
-	var size = settings.screen.block; // * window.pixelRatio || 1;
+	var size = settings.screen.block;
 
 	function canvas(background) {
 
@@ -13,7 +13,6 @@ define(['settings'], function(settings) {
 			ret.height = background.grid[0].length;
 
 			var light = draw(ret, true);
-
 
 			ret.image = new Image();
 			ret.dark = new Image();
@@ -58,7 +57,8 @@ define(['settings'], function(settings) {
 
 		return canvas;
 	}
-
+	
+	//some functions for analysis
 	draw.alt = function(ctx, w) {
 		var x, y, h = draw.normalize(w, 'alt'),
 			sizeWidth = ctx.canvas.clientWidth,

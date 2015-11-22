@@ -6,9 +6,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		w = window.innerWidth,
 		mainW = settings.screen.width,
 		mainH = settings.screen.height,
-		pix = settings.screen.block, // * window.pixelRatio || 1,
 		bl = settings.screen.block,
-		ratio = 1, //window.pixelRatio || 1,
+		ratio = 1, //window.blelRatio || 1,
 		font = settings.screen.font;
 
 	//implement the main divs if not existing upon first 
@@ -50,14 +49,14 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			context.rect(0, 0, width, height);
 			context.fillStyle = "black";
 			context.fill();
-			//context.scale(window.devicePixelRatio, window.devicePixelRatio);
+			//context.scale(window.deviceblelRatio, window.deviceblelRatio);
 
 			this.canvas = canvas;
 			this.context = context;
 			this.height = height;
 			this.width = width;
-			this.heightBlocks = height / pix;
-			this.widthBlocks = width / pix;
+			this.heightBlocks = height / bl;
+			this.widthBlocks = width / bl;
 			this.name = name;
 			this.color = "rgba(0,0,0,1)"
 		},
@@ -102,28 +101,23 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var px = ew + x * p;
 					var py = eh + y * p;
 
-					if (x === pos.w && y === pos.h) {
-						color = 'red';
-					} else {
-						var tile = b.getTile(x, y);
-						var o1 = (!tile.name.match(/sea/)) ? (tile.info.tot - 0.5) * 1.5 + 0.25 : 1 - ((0.5 - tile.info.tot) * 1.5 + 0.25);
-						var o2 = (o1 * 0.3 + 0.1);
+					var tile = b.getTile(x, y);
+					var o1 = (!tile.name.match(/sea/)) ? (tile.info.tot - 0.5) * 1.5 + 0.25 : 1 - ((0.5 - tile.info.tot) * 1.5 + 0.25);
+					var o2 = (o1 * 0.3 + 0.1);
 
-						if (b.type === 'world') {
-							if (tile.visible === true) {
-								color = (!tile.name.match(/sea/)) ? 'rgba(0,170,0,' + o1 + ')' : 'rgba(0,0,170,' + o1 + ')';
-							} else if (tile.visited === true) {
-								color = (!tile.name.match(/sea/)) ? 'rgba(170,170,170,' + o2 + ')' : 'rgba(60,60,60,' + o2 + ')';
-							}
-						} else if (b.type === 'dungeon' && tile.name !== 'rock') {
-							if (tile.visible === true) {
-								color = (tile.name === 'wall') ? 'rgba(160, 160, 160, 1)' : 'rgba(120, 120, 120, 1)';
-							} else if (tile.visited === true) {
-								color = (tile.name === 'wall') ? 'rgba(50, 50, 50, 1)' : 'rgba(30, 30, 30, 1)';
-							}
+					if (b.type === 'world') {
+						if (tile.visible === true) {
+							color = (!tile.name.match(/sea/)) ? 'rgba(0,190,0,' + o1 + ')' : 'rgba(0,0,190,' + o1 + ')';
+						} else if (tile.visited === true) {
+							color = (!tile.name.match(/sea/)) ? 'rgba(190,190,190,' + o2 + ')' : 'rgba(70,70,70,' + o2 + ')';
+						}
+					} else if (b.type === 'dungeon' && tile.name !== 'rock') {
+						if (tile.visible === true) {
+							color = (tile.name === 'wall') ? 'rgba(160, 160, 160, 1)' : 'rgba(120, 120, 120, 1)';
+						} else if (tile.visited === true) {
+							color = (tile.name === 'wall') ? 'rgba(50, 50, 50, 1)' : 'rgba(30, 30, 30, 1)';
 						}
 					}
-
 
 					if (!color) {
 						color = 'black';
@@ -135,7 +129,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 						this.context.beginPath();
 						this.context.arc(px + p / 2, py + p / 2, p / 3, 0, Math.PI * 2, true);
 						this.context.closePath();
-						this.context.fill()
+						this.context.fill();
 					} else {
 						this.context.fillRect(px, py, p, p);
 					}
@@ -143,6 +137,12 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					color = null;
 				}
 			}
+
+			this.context.fillStyle = 'red';
+			this.context.beginPath();
+			this.context.arc(ew + pos.w * p + p / 2, eh + pos.h * p + p / 3, p / 2, 0, Math.PI * 2, true);
+			this.context.closePath();
+			this.context.fill();
 		},
 		draw: function(background, player, entities) {
 			var offset = this.offset(player, background);
@@ -165,8 +165,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		offset: function(player, background) {
 			var p = player.getLocation();
 
-			var w = Math.min(background.width - this.width / pix, Math.max(0, p.w - (this.width / pix / 2)));
-			var h = Math.min(background.height - this.height / pix, Math.max(0, p.h - (this.height / pix / 2)));
+			var w = Math.min(background.width - this.width / bl, Math.max(0, p.w - (this.width / bl / 2)));
+			var h = Math.min(background.height - this.height / bl, Math.max(0, p.h - (this.height / bl / 2)));
 			return {
 				h: h,
 				w: w
@@ -198,9 +198,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this.context.fillText(ent.sign, nx, ny);
 		},
 		_background: function(b, offX, offY) {
-
-			for (var x = 0; x < this.width / pix; x++) {
-				for (var y = 0; y < this.height / pix; y++) {
+			for (var x = 0; x < this.width / bl; x++) {
+				for (var y = 0; y < this.height / bl; y++) {
 					var xx = x + offX;
 					var yy = y + offY;
 					var px = xx * bl;
@@ -215,7 +214,6 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					}
 				}
 			}
-			//console.timeEnd("background")
 		}
 	});
 

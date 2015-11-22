@@ -43,7 +43,6 @@ define(["helpers/log"], function(
 	/*
 		objects
 	*/
-
 	return _bank;
 
 	function TileBank() {
@@ -54,11 +53,6 @@ define(["helpers/log"], function(
 
 		this.add = function(name, sign, speed, walkable, diggable, blocking, color, background, dcolor, dbackground) {
 
-			color = color || [255, 255, 255];
-			background = background;
-			dcolor = dcolor;
-
-
 			_bank[name] = {
 				name: name,
 				sign: sign,
@@ -66,7 +60,7 @@ define(["helpers/log"], function(
 				speed: speed,
 				walkable: walkable,
 				diggable: diggable,
-				color: color,
+				color: color || [255, 255, 255],
 				background: background,
 				dcolor: dcolor,
 				dbackground: dbackground
@@ -92,6 +86,7 @@ define(["helpers/log"], function(
 				this.diggable = opt.diggable;
 				this.visited = false;
 				this.visible = false;
+				this.child = null;
 				this.color = opt.color;
 				this.background = opt.background;
 
@@ -113,7 +108,8 @@ define(["helpers/log"], function(
 				var opacb = ((this.info.tot + this.info.alt / 5) / 1.8) * opac;
 				var fcol, bcol;
 
-				if (this.name === 'ice') opacb += 0.3;
+				if (this.name === 'ice' && light === true) opacb += 0.3;
+				if (this.name === 'ice' && light === false) opacb += 0.05;
 
 				//lightmap
 				if (light === true) {

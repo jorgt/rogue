@@ -77,8 +77,7 @@ define([
 
 		var gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
 		log.low('[WORLD]', 'second range of altitude done');
-		//var gAlt3 = _edges(_chunk(sAlt3, ranges.altitude, _height, _width, 0, 0));
-		//log.low('[WORLD]', 'first range of altitude done');
+
 		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, gTemAxial);
 		log.low('[WORLD]', 'temperature done');
 
@@ -109,8 +108,8 @@ define([
 		//normalize the colors
 		var cols = {
 			total: {
-				min: 999999,
-				max: -999999
+				min: Number.MIN_VALUE,
+				max: Number.MAX_VALUE
 			}
 		};
 
@@ -119,8 +118,8 @@ define([
 				var t = _grid[x][y];
 				if (!cols[t.name]) {
 					cols[t.name] = {
-						min: 999999,
-						max: -999999
+						min: Number.MIN_VALUE,
+						max: Number.MAX_VALUE
 					}
 				}
 				if (t.info.climate.alt < cols[t.name].min) cols[t.name].min = t.info.climate.alt;
@@ -301,8 +300,8 @@ define([
 
 
 		function _normalize(grid, copy) {
-			var max = 0;
-			var min = 10000000;
+			var max = Number.MIN_VALUE;
+			var min = Number.MAX_VALUE;
 			for (var x = 0; x < grid.length; x++) {
 				for (var y = 0; y < grid[0].length; y++) {
 					var g = grid[x][y];
