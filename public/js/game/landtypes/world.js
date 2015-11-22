@@ -43,12 +43,6 @@ define([
 		level: 0.0095
 	});
 
-	var sAlt3 = new Simplex({
-		octaves: 20,
-		persistence: 0.7,
-		level: 0.0155
-	});
-
 	var sPre = new Simplex({
 		octaves: 20,
 		persistence: 0.2,
@@ -69,20 +63,21 @@ define([
 		var _grid = [];
 		var _start = null;
 		var _end = null;
-		var gAltRadial = _rollingParticles();
-		var gTemAxial = _axialParticles();
+		var _cities = [];
+		var _gAltRadial = _rollingParticles();
+		var _gTemAxial = _axialParticles();
 
-		var gAlt = _edges(_chunk(sAlt, ranges.altitude, _height, _width, 0, 0, gAltRadial));
+		var _gAlt = _edges(_chunk(sAlt, ranges.altitude, _height, _width, 0, 0, _gAltRadial));
 		log.low('[WORLD]', 'first range of altitude done');
 
-		var gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
+		var _gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
 		log.low('[WORLD]', 'second range of altitude done');
 
-		var gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, gTemAxial);
+		var _gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, _gTemAxial);
 		log.low('[WORLD]', 'temperature done');
 
-		var gDir = _directionalParticles(gAlt, gTem);
-		var gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0, gDir);
+		var _gDir = _directionalParticles(_gAlt, _gTem);
+		var _gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0, _gDir);
 		log.low('[WORLD]', 'precipitation done');
 
 		var aa = 0,
@@ -95,9 +90,9 @@ define([
 			_grid[x] = [];
 			for (y = 0; y < _height; y++) {
 				var c = {
-					temp: ~~(gTem[x][y] * 1.8) + 5,
-					prec: ~~(Math.pow(gPre[x][y], 1.1)),
-					alt: ~~(2000 + gAlt[x][y] + gAlt2[x][y])
+					temp: ~~(_gTem[x][y] * 1.8) + 5,
+					prec: ~~(Math.pow(_gPre[x][y], 1.1)),
+					alt: ~~(2000 + _gAlt[x][y] + _gAlt2[x][y])
 				}
 				c.climate = climate(c.temp, c.prec, c.alt);
 				var obj = opt.bank.get(c.climate.replace(/\s/g, ''));
@@ -108,8 +103,8 @@ define([
 		//normalize the colors
 		var cols = {
 			total: {
-				min: Number.MIN_VALUE,
-				max: Number.MAX_VALUE
+				min: Number.MAX_VALUE,
+				max: Number.MIN_VALUE
 			}
 		};
 
@@ -118,8 +113,8 @@ define([
 				var t = _grid[x][y];
 				if (!cols[t.name]) {
 					cols[t.name] = {
-						min: Number.MIN_VALUE,
-						max: Number.MAX_VALUE
+						min: Number.MAX_VALUE,
+						max: Number.MIN_VALUE
 					}
 				}
 				if (t.info.climate.alt < cols[t.name].min) cols[t.name].min = t.info.climate.alt;
@@ -139,6 +134,7 @@ define([
 		}
 
 		_getStartAndEndTiles();
+		_getCitiesAndTowns();
 
 		return new Base(_grid, _start, _end, _height, _width);
 
@@ -190,6 +186,40 @@ define([
 				_start = (start.walkable === true) ? [sx, sy] : null;
 				_end = (end.walkable === true) ? [ex, ey] : null;
 			}
+		}
+
+		function _getCitiesAndTowns() {
+			log.med('[WORLD]', 'creating cities and towns');
+			var x, y;
+			var city = Math.random() > 0.7; // ratio towns/cities 7:3
+			var totalCities = 0;
+			var totalTowns = 0;
+			if (city === true) {
+				totalCities += (_createCity()) ? 1 : 0;
+			} else {
+				totalTowns += (_createTown()) ? 1 : 0;
+			}
+
+		}
+
+		function _createTown() {
+
+		}
+
+		function _createCity() {
+			var x, y, r, g = [];
+			r = [-1, 0, 1];
+			x = random(0, _grid.length - 1);
+			y = random(0, _grid[0].length - 1);
+			for (var a = 0; a < r.length; a++) {
+				for (var b = 0; b < r.length; b++) {
+					if ((x + a >= _grid.length || x + a < 0) || (y + b >= _grid.length || y + b < 0)) {
+						if(_grid[x + r[a]][grid][y + r[b]].info.climate.alt >= 0) return false;
+						g.push([x, y]);
+					}
+				}
+			}
+
 		}
 
 		function _axialParticles() {

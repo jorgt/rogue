@@ -31,9 +31,12 @@ define(["helpers/log"], function(
 	_bank.add('mountain', 'Δ', 10, true, false, false, [51, 51, 51]);
 	_bank.add('snowymountain', 'Δ', 5, true, false, false, [170, 170, 170]);
 
-	/*
-		dungeons and caves
-	*/
+	_bank.add('city', function(grid, x, y) {
+			return 'C';
+		}, 0, null, null, null, [255, 255, 255], [0, 0, 0])
+		/*
+			dungeons and caves
+		*/
 	_bank.add('floor', '·', 80, true, false, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
 	_bank.add('door', '·', 50, true, true, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
 	_bank.add('road', '·', 20, true, true, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
@@ -60,7 +63,24 @@ define(["helpers/log"], function(
 				speed: speed,
 				walkable: walkable,
 				diggable: diggable,
+				object: null,
 				color: color || [255, 255, 255],
+				background: background,
+				dcolor: dcolor,
+				dbackground: dbackground
+			};
+		};
+
+		this.object = function(name, sign, speed, walkable, diggable, blocking, color, background, dcolor, dbackground) {
+
+			_bank[name] = {
+				name: name,
+				sign: sign,
+				blocking: blocking,
+				speed: speed,
+				walkable: walkable,
+				diggable: diggable,
+				color: color,
 				background: background,
 				dcolor: dcolor,
 				dbackground: dbackground
@@ -89,9 +109,10 @@ define(["helpers/log"], function(
 				this.child = null;
 				this.color = opt.color;
 				this.background = opt.background;
-
 				this.dcolor = opt.dcolor;
 				this.dbackground = opt.dbackground;
+				this.subtile = {};
+
 				this.info = {
 					climate: {
 						alt: 0,
@@ -102,37 +123,8 @@ define(["helpers/log"], function(
 					tot: 1
 				};
 			},
-			draw: function(ctx, posx, posy, size, light) {
-				var cb, cf;
-				var opac = (light === true) ? 1 : 0.2;
-				var opacb = ((this.info.tot + this.info.alt / 5) / 1.8) * opac;
-				var fcol, bcol;
-
-				if (this.name === 'ice' && light === true) opacb += 0.3;
-				if (this.name === 'ice' && light === false) opacb += 0.05;
-
-				//lightmap
-				if (light === true) {
-					cf = this.color;
-					cb = this.background || this.color.map(function(a) {
-						return ~~(a * opacb);
-					});
-				} else {
-					cf = this.dcolor || this.color.map(function(a) {
-						return ~~(a * opac);
-					});
-					cb = this.dbackground || this.color.map(function(a) {
-						return ~~(a * opacb);
-					});
-				}
-
-				bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
-				fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
-
-				ctx.fillStyle = bcol;
-				ctx.fillRect(posx * size, posy * size, size, size);
-				ctx.fillStyle = fcol;
-				ctx.fillText(this.sign, posx * size + 3, posy * size + 12);
+			subtile: function(tile) {
+				this.subtile = tile;
 			}
 		});
 	}

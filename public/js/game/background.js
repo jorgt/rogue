@@ -20,12 +20,11 @@ define(['settings'], function(settings) {
 			ret.image.onload = function() {
 				var dark = draw(ret, false);
 				ret.dark.src = dark.toDataURL('image/png');
-
 			}.bind(this);
 
 			ret.dark.onload = function() {
 				resolve(ret);
-				//document.body.appendChild(ret.dark);
+				document.body.appendChild(ret.image);
 			}.bind(this);
 
 			ret.image.src = light.toDataURL('image/png');
@@ -51,14 +50,61 @@ define(['settings'], function(settings) {
 
 		for (x = 0; x < w.background.grid.length; x++) {
 			for (y = 0; y < w.background.grid[x].length; y++) {
-				w.background.grid[x][y].draw(ctx, x, y, size, opac);
+				_drawTile(ctx, w.background.grid, x, y, size, opac);
 			}
 		}
 
 		return canvas;
 	}
-	
-	//some functions for analysis
+
+	function _drawTile(ctx, grid, posx, posy, size, light) {
+		var cb, cf, color, background, dcolor, dbackground, sign;
+		var tile = grid[posx][posy];
+
+		var opac = (light === true) ? 1 : 0.2;
+
+		var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
+		var fcol, bcol;
+
+		sign = tile.subtile.sign || tile.sign
+
+		if (typeof sign === 'function') {
+			sign = sign(grid, posx, posy);
+		}
+
+		color = tile.subtile.color || tile.color;
+		background = tile.subtile.background || tile.background;
+		dcolor = tile.subtile.dcolor || tile.dcolor;
+		dbackground = tile.subtile.dbackground || tile.dbackground;
+
+		if (tile.name === 'ice' && light === true) opacb += 0.3;
+		if (tile.name === 'ice' && light === false) opacb += 0.05;
+
+		//lightmap
+		if (light === true) {
+			cf = color;
+			cb = background || color.map(function(a) {
+				return ~~(a * opacb);
+			});
+		} else {
+			cf = dcolor || color.map(function(a) {
+				return ~~(a * opac);
+			});
+			cb = dbackground || color.map(function(a) {
+				return ~~(a * opacb);
+			});
+		}
+
+		bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
+		fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
+
+		ctx.fillStyle = bcol;
+		ctx.fillRect(posx * size, posy * size, size, size);
+		ctx.fillStyle = fcol;
+		ctx.fillText(sign, posx * size + 3, posy * size + 12);
+	}
+
+	//LEGACY. Some functions for analysis
 	draw.alt = function(ctx, w) {
 		var x, y, h = draw.normalize(w, 'alt'),
 			sizeWidth = ctx.canvas.clientWidth,
@@ -116,7 +162,7 @@ define(['settings'], function(settings) {
 		for (x = 0; x < grid.length; x++) {
 			for (y = 0; y < grid[x].length; y++) {
 				var g = grid[x][y].info.climate[attr];
-			
+
 				max = (g > max) ? g : max;
 				min = (g > min) ? g : min;
 			}
