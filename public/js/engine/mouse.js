@@ -17,7 +17,7 @@ define(["helpers/log", "settings"], function(
 			mouseover: [],
 			mouseout: []
 		};
-
+		
 		this.up = function(func) {
 			_register('mouseup', func);
 		};
@@ -58,7 +58,9 @@ define(["helpers/log", "settings"], function(
 				on: e.srcElement,
 				tile: {
 					height: ~~(parseInt(e.layerY) / settings.square),
-					width: ~~(parseInt(e.layerX) / settings.square)
+					width: ~~(parseInt(e.layerX) / settings.square),
+					pixHeight: e.layerY,
+					pixWidth: e.layerX
 				}
 			};
 			func.call(this, ret);

@@ -4,7 +4,7 @@ define(["helpers/log"], function(
 	log.setDebug(4);
 
 	window.guid = function() {
-		return ~~(Math.random() * 100000);
+		return ~~(Math.random() * 100000000);
 	};
 
 	window.uneven = function(n) {
@@ -33,6 +33,27 @@ define(["helpers/log"], function(
 		}
 
 		return array;
+	}
+
+	window.toUTF16 = function(codePoint) {
+		var TEN_BITS = parseInt('1111111111', 2);
+
+		function u(codeUnit) {
+			return '\\u' + codeUnit.toString(16).toUpperCase();
+		}
+
+		if (codePoint <= 0xFFFF) {
+			return u(codePoint);
+		}
+		codePoint -= 0x10000;
+
+		// Shift right to get to most significant 10 bits
+		var leadSurrogate = 0xD800 + (codePoint >> 10);
+
+		// Mask to get least significant 10 bits
+		var tailSurrogate = 0xDC00 + (codePoint & TEN_BITS);
+
+		return u(leadSurrogate) + u(tailSurrogate);
 	}
 
 	//animationframe polyfill
@@ -124,7 +145,6 @@ define(["helpers/log"], function(
 
 	//hdpi canvas polyfill 
 	//https://github.com/jondavidjohn/hidpi-canvas-polyfill
-
 	(function(prototype) {
 		prototype.getContext = (function(_super) {
 			return function(type) {
@@ -194,7 +214,6 @@ define(["helpers/log"], function(
 				'createRadialGradient': 'all',
 				'createLinearGradient': 'all',
 				'drawImage': [1, 2, 3, 4, 5, 6, 7, 8]
-					//'drawImage': [1,2,3,4]
 			};
 
 		if (pixelRatio === 1) return;

@@ -25,7 +25,7 @@ require(['helpers/log', 'settings', 'game/game'], function(log, settings, game) 
 					engine.start('loading');
 
 					window.setTimeout(function() {
-						game().create().then(function() {
+						game().then(function() {
 							log.urgent('[MAIN]', 'Game creation done, now starting engine');
 							engine.switch('menu');
 						});

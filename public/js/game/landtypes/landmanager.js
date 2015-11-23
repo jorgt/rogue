@@ -40,7 +40,7 @@ define([
 			o._guid = guid();
 			o.type = opt.type;
 			_planes[o.name] = o;
-			return background(o);
+			return o;
 		}
 	};
 

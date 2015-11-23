@@ -36,7 +36,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 
 	var Screen = Class.extend({
 		init: function(name, height, width, index) {
-			index = index || 0;
+			index = index || 10;
 			var canvas = document.createElement('canvas');
 			canvas.id = 'game-screen-' + name;
 			canvas.height = height;
@@ -86,32 +86,32 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			// Restore the transform
 			this.context.restore();
 		},
-		map: function(b, player) {
+		map: function(world, player) {
 			this.clear();
 
 			var edges = 50;
-			var p = Math.min(8, ~~Math.min((this.height - edges) / b.height, (this.width - edges) / b.width) - 1);
-			var eh = ~~((this.height - b.height * p) / 2);
-			var ew = ~~((this.width - b.width * p) / 2);
+			var p = Math.min(8, ~~Math.min((this.height - edges) / world.height, (this.width - edges) / world.width) - 1);
+			var eh = ~~((this.height - world.height * p) / 2);
+			var ew = ~~((this.width - world.width * p) / 2);
 			var pos = player.getLocation();
 			var color;
 
-			for (var x = 0; x < b.width; x++) {
-				for (var y = 0; y < b.height; y++) {
+			for (var x = 0; x < world.width; x++) {
+				for (var y = 0; y < world.height; y++) {
 					var px = ew + x * p;
 					var py = eh + y * p;
 
-					var tile = b.getTile(x, y);
+					var tile = world.getTile(x, y);
 					var o1 = (!tile.name.match(/sea/)) ? (tile.info.tot - 0.5) * 1.5 + 0.25 : 1 - ((0.5 - tile.info.tot) * 1.5 + 0.25);
 					var o2 = (o1 * 0.3 + 0.1);
 
-					if (b.type === 'world') {
+					if (world.type === 'world') {
 						if (tile.visible === true) {
 							color = (!tile.name.match(/sea/)) ? 'rgba(0,190,0,' + o1 + ')' : 'rgba(0,0,190,' + o1 + ')';
 						} else if (tile.visited === true) {
 							color = (!tile.name.match(/sea/)) ? 'rgba(190,190,190,' + o2 + ')' : 'rgba(70,70,70,' + o2 + ')';
 						}
-					} else if (b.type === 'dungeon' && tile.name !== 'rock') {
+					} else if (world.type === 'dungeon' && tile.name !== 'rock') {
 						if (tile.visible === true) {
 							color = (tile.name === 'wall') ? 'rgba(160, 160, 160, 1)' : 'rgba(120, 120, 120, 1)';
 						} else if (tile.visited === true) {
@@ -123,26 +123,18 @@ define(['settings', 'helpers/log'], function(settings, log) {
 						color = 'black';
 					}
 
-					this.context.fillStyle = color;
-
-					if (tile.name === 'road') {
-						this.context.beginPath();
-						this.context.arc(px + p / 2, py + p / 2, p / 3, 0, Math.PI * 2, true);
-						this.context.closePath();
-						this.context.fill();
+					if (tile.name === 'road' || tile.name === 'city') {
+						this.circle(color, px + p / 2, py + p / 2, p / ((tile.name === 'road') ? 3 : 2));
 					} else {
-						this.context.fillRect(px, py, p, p);
+						this.rectangle(color, px, py, p);
 					}
 
 					color = null;
 				}
 			}
 
-			this.context.fillStyle = 'red';
-			this.context.beginPath();
-			this.context.arc(ew + pos.w * p + p / 2, eh + pos.h * p + p / 3, p / 2, 0, Math.PI * 2, true);
-			this.context.closePath();
-			this.context.fill();
+			this.circle('red', ew + pos.w * p + p / 2, eh + pos.h * p + p / 2, p / 2)
+
 		},
 		draw: function(background, player, entities) {
 			var offset = this.offset(player, background);
@@ -150,6 +142,9 @@ define(['settings', 'helpers/log'], function(settings, log) {
 
 			this._background(background, offset.w, offset.h);
 			this._entity(player, offset.w, offset.h);
+		},
+		drawMouse: function(x, y, tile) {
+			this.box('white', x - 10, y - 10, 5, 15);
 		},
 		center: function(input) {
 			var x = (this.width / 2) - String(input || '').length / 2;
@@ -197,7 +192,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
 			this.context.fillText(ent.sign, nx, ny);
 		},
-		_background: function(b, offX, offY) {
+		_background: function(world, offX, offY) {
 			for (var x = 0; x < this.width / bl; x++) {
 				for (var y = 0; y < this.height / bl; y++) {
 					var xx = x + offX;
@@ -205,15 +200,76 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var px = xx * bl;
 					var py = yy * bl;
 
-					var tile = b.background.getTile(xx, yy);
+					var tile = world.getTile(xx, yy);
 
 					if (tile.visible === true) {
-						this.context.drawImage(b.image, px, py, bl, bl, x * bl, y * bl, bl, bl);
+						this._drawTile(tile, x, y, xx, yy, bl, true);
 					} else if (tile.visited === true) {
-						this.context.drawImage(b.dark, px, py, bl, bl, x * bl, y * bl, bl, bl);
+						this._drawTile(tile, x, y, xx, yy, bl, false);
 					}
 				}
 			}
+		},
+		_drawTile: function(tile, x, y, posx, posy, size, light) {
+			var cb, cf, color, background, dcolor, dbackground, sign, fcol, bcol;
+
+			var opac = (light === true) ? 1 : 0.3;
+			var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
+
+			sign = tile.subtile.sign || tile.sign;
+
+			color = tile.subtile.color || tile.color;
+			background = tile.subtile.background || tile.background;
+			dcolor = tile.subtile.dcolor || tile.dcolor;
+			dbackground = tile.subtile.dbackground || tile.dbackground;
+
+			if (tile.name === 'ice' && light === true) opacb += 0.3;
+			if (tile.name === 'ice' && light === false) opacb += 0.05;
+
+			//lightmap
+			if (light === true) {
+				cf = color;
+				cb = background || color.map(function(a) {
+					return ~~(a * opacb);
+				});
+			} else {
+				cf = dcolor || color.map(function(a) {
+					return ~~(a * opac);
+				});
+				cb = dbackground || color.map(function(a) {
+					return ~~(a * opacb);
+				});
+			}
+
+			bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
+			fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
+
+			this.rectangle(bcol, x * size, y * size, size);
+			this.character(fcol, x * size + 3, y * size + 13, sign);
+
+		},
+		circle: function(color, x, y, rad) {
+			this.context.fillStyle = color;
+			this.context.beginPath();
+			this.context.arc(x, y, rad, 0, Math.PI * 2, true);
+			this.context.closePath();
+			this.context.fill();
+		},
+		rectangle: function(color, x, y, sides) {
+			this.context.fillStyle = color;
+			this.context.fillRect(x, y, sides, sides);
+		},
+		character: function(color, x, y, sign) {
+			this.context.fillStyle = color;
+			this.context.fillText(sign, x, y);
+		},
+		box: function(color, x, y, height, width) {
+			height = height || bl;
+			width = width || bl;
+			color = color || 'rgba(255,255,255,1)';
+			console.log(color, x, y, height, width);
+			this.context.fillStyle = color;
+			this.context.strokeRect(x, y, height, width);
 		}
 	});
 
