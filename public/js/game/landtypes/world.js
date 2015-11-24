@@ -223,12 +223,10 @@ define([
 			for (var c = 0; c < g.length; c++) {
 				var tile = _grid[g[c][0]][g[c][1]];
 				var climate = tile.info.climate;
-				var color = tile.color;
-				var background = tile.background;
-				_grid[g[c][0]][g[c][1]] = opt.bank.get('city');
-				_grid[g[c][0]][g[c][1]].info.climate = climate;
-				_grid[g[c][0]][g[c][1]].background = background;
-				_grid[g[c][0]][g[c][1]].color = color;
+				tile.subtile = opt.bank.get('city');
+				tile.subtile.info.climate = climate;
+				tile.sign = tile.subtile.sign;
+				tile.name = tile.subtile.name;
 			}
 
 			_cities.push([x, y]);

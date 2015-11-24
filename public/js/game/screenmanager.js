@@ -17,13 +17,21 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		var div = document.createElement('div');
 		div.style.width = mainW + 'px';
 		div.style.height = mainH + 'px';
-		div.style.cssText = "border:1px solid #111;height:" + mainH + "px;width:" + mainW + "px;display:block;position:absolute;left:" + ((w - mainW) / 2) + "px;top:" + ((h - mainH) / 2) + "px;";
+		div.style.cssText = "border:1px solid #111;height:" + mainH + "px;width:" + mainW + "px;display:block;position:fixed;left:" + ((w - mainW) / 2) + "px;top:" + ((h - mainH) / 2) + "px;";
 		div.id = 'main';
+
 		var game = document.createElement('div');
 		game.id = 'game';
 		game.style.cssText = "position:absolute;height:" + mainH + "px;width:" + mainW + "px;display:block";
 		div.appendChild(game);
 		document.body.appendChild(div);
+
+		var canvas = document.createElement('canvas');
+		canvas.id = 'game-screen';
+		canvas.height = h;
+		canvas.width = w;
+		canvas.style.cssText = "position:fixed;top:0px;left:0px;z-index:99";
+		document.body.appendChild(canvas);
 	}
 
 	function Factory(name, height, width, index) {
@@ -136,6 +144,14 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this.circle('red', ew + pos.w * p + p / 2, eh + pos.h * p + p / 2, p / 2)
 
 		},
+		prepareBackground: function(world) {
+			for (var x = 0; x < world.grid.length; x++) {
+				for (var y = 0; y < world.grid[x].length; y++) {
+					var t = world.grid[x][y];
+					this._prepareTile(t);
+				}
+			}
+		},
 		draw: function(background, player, entities) {
 			var offset = this.offset(player, background);
 			this.clear();
@@ -143,7 +159,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this._background(background, offset.w, offset.h);
 			this._entity(player, offset.w, offset.h);
 		},
-		drawMouse: function(x, y, tile) {
+		drawSelectedTile: function(x, y, tile) {
 			this.box('white', x - 10, y - 10, 5, 15);
 		},
 		center: function(input) {
@@ -169,7 +185,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		},
 		write: function(text, x, y, color) {
 			var oldfont = this.context.font;
-			this.context.font = settings.screen.block + "px " + font
+			this.context.font = "bold " + settings.screen.block + "px " + font
 			x = x || 0;
 			y = y || 0;
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
@@ -203,50 +219,12 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var tile = world.getTile(xx, yy);
 
 					if (tile.visible === true) {
-						this._drawTile(tile, x, y, xx, yy, bl, true);
+						this.context.drawImage(world.light, px, py, bl, bl, x * bl, y * bl, bl, bl);
 					} else if (tile.visited === true) {
-						this._drawTile(tile, x, y, xx, yy, bl, false);
+						this.context.drawImage(world.dark, px, py, bl, bl, x * bl, y * bl, bl, bl);
 					}
 				}
 			}
-		},
-		_drawTile: function(tile, x, y, posx, posy, size, light) {
-			var cb, cf, color, background, dcolor, dbackground, sign, fcol, bcol;
-
-			var opac = (light === true) ? 1 : 0.3;
-			var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
-
-			sign = tile.subtile.sign || tile.sign;
-
-			color = tile.subtile.color || tile.color;
-			background = tile.subtile.background || tile.background;
-			dcolor = tile.subtile.dcolor || tile.dcolor;
-			dbackground = tile.subtile.dbackground || tile.dbackground;
-
-			if (tile.name === 'ice' && light === true) opacb += 0.3;
-			if (tile.name === 'ice' && light === false) opacb += 0.05;
-
-			//lightmap
-			if (light === true) {
-				cf = color;
-				cb = background || color.map(function(a) {
-					return ~~(a * opacb);
-				});
-			} else {
-				cf = dcolor || color.map(function(a) {
-					return ~~(a * opac);
-				});
-				cb = dbackground || color.map(function(a) {
-					return ~~(a * opacb);
-				});
-			}
-
-			bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", 1)";
-			fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", 1)";
-
-			this.rectangle(bcol, x * size, y * size, size);
-			this.character(fcol, x * size + 3, y * size + 13, sign);
-
 		},
 		circle: function(color, x, y, rad) {
 			this.context.fillStyle = color;
@@ -267,8 +245,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			height = height || bl;
 			width = width || bl;
 			color = color || 'rgba(255,255,255,1)';
-			console.log(color, x, y, height, width);
-			this.context.fillStyle = color;
+			this.context.strokeStyle = color;
 			this.context.strokeRect(x, y, height, width);
 		}
 	});

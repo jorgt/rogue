@@ -31,7 +31,7 @@ define(["helpers/log"], function(
 	_bank.add('mountain', 'Δ', 10, true, false, false, [51, 51, 51]);
 	_bank.add('snowymountain', 'Δ', 5, true, false, false, [170, 170, 170]);
 
-	_bank.add('city', 'C', 0, null, null, null, [255, 255, 255], [0,0,0]);
+	_bank.add('city', 'C', 0, null, null, null, [255, 255, 255], [0,0,0, 0.4]);
 		/*
 			dungeons and caves
 		*/
