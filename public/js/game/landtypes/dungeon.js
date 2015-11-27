@@ -1,7 +1,8 @@
 define([
 	"helpers/log",
 	"game/pathfinding/astar",
-	"game/landtypes/base"
+	"game/landtypes/base",
+	"helpers/maths"
 ], function(
 	log,
 	AStar,
@@ -12,14 +13,14 @@ define([
 	return function dungeon(opt) {
 
 		var _guid = guid();
-		var _height = uneven(random(40, 50));
-		var _width = uneven(random(60, 80));
+		var _height = Math.uneven(Math.between(40, 50));
+		var _width = Math.uneven(Math.between(60, 80));
 		var _grid = [];
 		var _start = null;
 		var _end = null;
 		var _surface = _height * _width;
 		var _floorspace = 0;
-		var _totalfloorspace = uneven(random(_surface * 0.3, _surface * 0.4));
+		var _totalfloorspace = Math.uneven(Math.between(_surface * 0.3, _surface * 0.4));
 		var _doors = [];
 
 		log.high('[DUNGEON:' + _guid + ']', 'dimensions', _height, 'x', _width, 'blocks');
@@ -65,7 +66,7 @@ define([
 				var d2 = _doors[x + 1][1];
 				_grid[d1[0]][d1[1]] = opt.bank.get('door');
 				_grid[d2[0]][d2[1]] = opt.bank.get('door');
-				var result = AStar.search(clone(_grid), d1, d2);
+				var result = AStar.search(window.clone(_grid), d1, d2);
 				for (var r in result) {
 					if (result.hasOwnProperty(r)) {
 						_grid[result[r].x][result[r].y] = opt.bank.get('road');
@@ -79,10 +80,10 @@ define([
 			var start = null;
 			var end = null;
 			while (_start === null || _end === null) {
-				var sx = random(0, _grid.length - 1);
-				var sy = random(0, _grid[0].length - 1);
-				var ex = random(0, _grid.length - 1);
-				var ey = random(0, _grid[0].length - 1);
+				var sx = Math.between(0, _grid.length - 1);
+				var sy = Math.between(0, _grid[0].length - 1);
+				var ex = Math.between(0, _grid.length - 1);
+				var ey = Math.between(0, _grid[0].length - 1);
 				start = _grid[sx][sy];
 				end = _grid[ex][ey];
 				_start = (start.walkable === true) ? [sx, sy] : null;
@@ -91,11 +92,11 @@ define([
 		}
 
 		function _makeRoom() {
-			var grid = clone(_grid);
-			var w = uneven(random(5, 20));
-			var h = uneven(random(3, 20));
-			var sw = uneven(random(1, _width));
-			var sh = uneven(random(1, _height));
+			var grid = window.clone(_grid);
+			var w = Math.uneven(Math.between(5, 20));
+			var h = Math.uneven(Math.between(3, 20));
+			var sw = Math.uneven(Math.between(1, _width));
+			var sh = Math.uneven(Math.between(1, _height));
 			var walls = [];
 			var doors = [];
 			// out of bounds
@@ -125,20 +126,12 @@ define([
 				}
 			}
 
-			doors.push(walls[random(0, walls.length - 1)]);
-			doors.push(walls[random(0, walls.length - 1)]);
+			doors.push(walls[Math.between(0, walls.length - 1)]);
+			doors.push(walls[Math.between(0, walls.length - 1)]);
 
 			_doors.push(doors);
 			_grid = grid;
 			return w * h;
 		}
 	};
-
-	function clone(array) {
-		var newObj = (array instanceof Array) ? [] : {};
-		for (var x = 0; x < array.length; x++) {
-			newObj[x] = array[x].slice(0);
-		}
-		return newObj;
-	}
 });

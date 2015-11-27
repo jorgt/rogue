@@ -31,7 +31,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		canvas.height = h;
 		canvas.width = w;
 		canvas.style.cssText = "position:fixed;top:0px;left:0px;z-index:99";
-		document.body.appendChild(canvas);
+		//document.body.appendChild(canvas);
 	}
 
 	function Factory(name, height, width, index) {
@@ -57,7 +57,6 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			context.rect(0, 0, width, height);
 			context.fillStyle = "black";
 			context.fill();
-			//context.scale(window.deviceblelRatio, window.deviceblelRatio);
 
 			this.canvas = canvas;
 			this.context = context;
@@ -94,7 +93,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			// Restore the transform
 			this.context.restore();
 		},
-		map: function(world, player) {
+		map: function(world, player, all) {
 			this.clear();
 
 			var edges = 50;
@@ -110,47 +109,50 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var py = eh + y * p;
 
 					var tile = world.getTile(x, y);
-					var o1 = (!tile.name.match(/sea/)) ? (tile.info.tot - 0.5) * 1.5 + 0.25 : 1 - ((0.5 - tile.info.tot) * 1.5 + 0.25);
-					var o2 = (o1 * 0.3 + 0.1);
+					//don't bother if invisible
+					if (tile.visited === true || all === true) {
+						var o1 = (!tile.name.match(/sea$/)) ? (tile.info.tot - 0.5) * 3 + 0.25 : 1 - ((0.5 - tile.info.tot) * 2 + 0.25);
+						var o2 = (o1 * 0.3 + 0.1);
 
-					if (world.type === 'world') {
-						if (tile.visible === true) {
-							color = (!tile.name.match(/sea/)) ? 'rgba(0,190,0,' + o1 + ')' : 'rgba(0,0,190,' + o1 + ')';
-						} else if (tile.visited === true) {
-							color = (!tile.name.match(/sea/)) ? 'rgba(190,190,190,' + o2 + ')' : 'rgba(70,70,70,' + o2 + ')';
+						if (world.type === 'world') {
+							if (tile.visible === true) {
+								color = (!tile.name.match(/sea$/)) ? 'rgba(0,190,0,' + o1 + ')' : 'rgba(0,0,190,' + o1 + ')';
+							} else if (tile.visited === true || all === true) {
+								color = (!tile.name.match(/sea$/)) ? 'rgba(0,120,0,' + o2 + ')' : 'rgba(0,0,90,' + o2 + ')';
+							}
+						} else if (world.type === 'dungeon' && tile.name !== 'rock') {
+							if (tile.visible === true) {
+								color = (tile.name === 'wall') ? 'rgba(160, 160, 160, 1)' : 'rgba(120, 120, 120, 1)';
+							} else if (tile.visited === true || all === true) {
+								color = (tile.name === 'wall') ? 'rgba(50, 50, 50, 1)' : 'rgba(30, 30, 30, 1)';
+							}
 						}
-					} else if (world.type === 'dungeon' && tile.name !== 'rock') {
-						if (tile.visible === true) {
-							color = (tile.name === 'wall') ? 'rgba(160, 160, 160, 1)' : 'rgba(120, 120, 120, 1)';
-						} else if (tile.visited === true) {
-							color = (tile.name === 'wall') ? 'rgba(50, 50, 50, 1)' : 'rgba(30, 30, 30, 1)';
+
+						if (tile.name === 'road') {
+							this.circle(color, px + p / 2, py + p / 2, p / 3);
+						} else {
+							this.rectangle(color, px, py, p);
 						}
-					}
 
-					if (!color) {
-						color = 'black';
-					}
+						if (tile.name === 'city') {
+							this.circle((tile.visible) ? 'rgba(255,255,255,1)' : 'rgba(190,190,190,1)', px + p / 2, py + p / 2, p / 3);
+						}
 
-					if (tile.name === 'road' || tile.name === 'city') {
-						this.circle(color, px + p / 2, py + p / 2, p / ((tile.name === 'road') ? 3 : 2));
-					} else {
-						this.rectangle(color, px, py, p);
-					}
+						if (tile.name === 'river') {
+							this.circle((tile.visible) ? 'rgba(100,100,255,1)' : 'rgba(50,50,190,0.5)', px + p / 2, py + p / 2, p / 3);
+						}
 
-					color = null;
+						if (tile.name.match(/ferry|highway/)) {
+							this.circle((tile.visible) ? 'rgba(255,255,255,0.4)' : 'rgba(190,190,190,0.4)', px + p / 2, py + p / 2, p / 3);
+						}
+
+						color = null;
+					}
 				}
 			}
 
 			this.circle('red', ew + pos.w * p + p / 2, eh + pos.h * p + p / 2, p / 2)
 
-		},
-		prepareBackground: function(world) {
-			for (var x = 0; x < world.grid.length; x++) {
-				for (var y = 0; y < world.grid[x].length; y++) {
-					var t = world.grid[x][y];
-					this._prepareTile(t);
-				}
-			}
 		},
 		draw: function(background, player, entities) {
 			var offset = this.offset(player, background);
@@ -249,6 +251,53 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this.context.strokeRect(x, y, height, width);
 		}
 	});
+
+	//bit hacky I guess but I wanted the tile image generating logic in the screen
+	//as well because this is where all the other visuals are
+	function tileToImage(ctx, tile, posx, posy, size, light) {
+		var cb, cf, color, background, dcolor, dbackground, sign, fcol, bcol;
+		var opac = (light === true) ? 1 : 0.2;
+		var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
+
+		sign = tile.sign
+		color = tile.color;
+		background = tile.background;
+		dcolor = tile.dcolor;
+		dbackground = tile.dbackground;
+
+		//lightmap
+		if (light === true) {
+			cf = color;
+			cb = background || color.map(function(a) {
+				return ~~(a * opacb);
+			});
+		} else {
+			cf = dcolor || color.map(function(a) {
+				return ~~(a * opac);
+			});
+			cb = dbackground || color.map(function(a) {
+				return ~~(a * opacb);
+			});
+		}
+
+		tile.color = cf;
+		tile.background = background;
+
+		bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", " + (cb[3] || 1) + ")";
+		fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", " + (cf[3] || 1) + ")";
+
+		ctx.fillStyle = bcol;
+		ctx.fillRect(posx * size, posy * size, size, size);
+		//if (light === true) {
+		ctx.fillStyle = fcol;
+		ctx.fillText(sign, posx * size + 3, posy * size + 13);
+		//}
+		if (tile.subtile.guid) {
+			tileToImage(ctx, tile.subtile, posx, posy, size, light);
+		}
+	}
+
+	Factory.tileToImage = tileToImage;
 
 	return Factory;
 });

@@ -7,14 +7,6 @@ define(["helpers/log"], function(
 		return ~~(Math.random() * 100000000);
 	};
 
-	window.uneven = function(n) {
-		return (n % 2 === 0) ? n + 1 : n;
-	};
-
-	window.random = function(low, high) {
-		return ~~(Math.random() * (high - low + 1) + low);
-	};
-
 	window.shuffle = function(array) {
 		var currentIndex = array.length,
 			temporaryValue, randomIndex;
@@ -35,25 +27,12 @@ define(["helpers/log"], function(
 		return array;
 	}
 
-	window.toUTF16 = function(codePoint) {
-		var TEN_BITS = parseInt('1111111111', 2);
-
-		function u(codeUnit) {
-			return '\\u' + codeUnit.toString(16).toUpperCase();
+	window.clone = function(array) {
+		var newObj = (array instanceof Array) ? [] : {};
+		for (var x = 0; x < array.length; x++) {
+			newObj[x] = array[x].slice(0);
 		}
-
-		if (codePoint <= 0xFFFF) {
-			return u(codePoint);
-		}
-		codePoint -= 0x10000;
-
-		// Shift right to get to most significant 10 bits
-		var leadSurrogate = 0xD800 + (codePoint >> 10);
-
-		// Mask to get least significant 10 bits
-		var tailSurrogate = 0xDC00 + (codePoint & TEN_BITS);
-
-		return u(leadSurrogate) + u(tailSurrogate);
+		return newObj;
 	}
 
 	//animationframe polyfill

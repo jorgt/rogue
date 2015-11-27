@@ -92,9 +92,50 @@ define([
 				var center = this.screen.center();
 				this.screen.background("rgba(0,0,0,0.8)");
 				this.screen.write('Paused', center.x, center.y, 'rgba(255,0,0,1)');
+			} else {
+				this._selectedTile();
 			}
+		},
+		drawSidebar: function(src) {
+			var sidex = this.screen.width + 10;
+			var sidey = 30;
+			var secondcol = 20;
+			var no = 1;
+			var mx = this._mouseLocation.x;
+			var my = this._mouseLocation.y;
+			var t = this.time.getTime();
+			var tile;
 
-			this._selectedTile();
+			src.write('Player', sidex, sidey + 20 * no++);
+
+			src.write('health:', sidex + settings.screen.block, sidey + 20 * no);
+			src.write(String(this.player.stats.health), sidex + settings.screen.block * secondcol, sidey + 20 * no++);
+
+			src.write('hunger:', sidex + settings.screen.block, sidey + 20 * no);
+			src.write(String(this.player.status.hunger), sidex + settings.screen.block * secondcol, sidey + 20 * no++);
+
+			no++;
+
+			src.write('Time', sidex, sidey + 20 * no++);
+			src.write(t.d + ' days,', sidex + settings.screen.block, sidey + 20 * no++);
+			src.write(t.h + ' hours,', sidex + settings.screen.block, sidey + 20 * no++);
+			src.write(t.m + ' minutes', sidex + settings.screen.block, sidey + 20 * no++);
+
+			no++
+
+			if (mx > -1) {
+				tile = this.getTile(mx, my);
+				src.write('Tile at ' + mx + ',' + my + ': ' + tile.name, sidex, sidey + 20 * no++);
+
+				src.write('altitude:', sidex + settings.screen.block, sidey + 20 * no);
+				src.write(String(tile.info.climate.alt), sidex + settings.screen.block * secondcol, sidey + 20 * no++);
+
+				src.write('temperature:', sidex + settings.screen.block, sidey + 20 * no);
+				src.write(String(tile.info.climate.temp), sidex + settings.screen.block * secondcol, sidey + 20 * no++);
+
+				src.write('precipitation:', sidex + settings.screen.block, sidey + 20 * no);
+				src.write(String(tile.info.climate.prec), sidex + settings.screen.block * secondcol, sidey + 20 * no++);
+			}
 		},
 		update: function() {
 			//the game paused thing is not very relevant after moving the key updates to their own loops.

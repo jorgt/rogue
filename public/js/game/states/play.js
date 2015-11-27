@@ -33,6 +33,7 @@ define([
 			this.screen.clear();
 			if (this.game) {
 				this.game.draw();
+				this.game.drawSidebar(this.screen);
 			}
 		}
 	});

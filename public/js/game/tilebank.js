@@ -9,32 +9,40 @@ define(["helpers/log"], function(
 		actors
 	*/
 	_bank.add('player', '@', 1, true, true, true);
+	_bank.add('monster', '@', 1, true, true, true, [255, 0, 0]);
 
 	/*
-		worlds
+		climate tiles
 	*/
-	_bank.add('shallowsea', '~', 1, false, false, false, [41, 72, 210]);
-	_bank.add('sea', '≈', 1, false, false, false, [20, 46, 166]);
-	_bank.add('deepsea', '≈', 1, false, false, false, [0, 25, 128]);
-	_bank.add('ice', '·', 10, true, false, false, [255, 255, 255]);
-	_bank.add('polar', '·', 10, true, false, false, [238, 238, 238]);
-	_bank.add('tundra', '·', 50, true, false, false, [204, 219, 195]);
-	_bank.add('taiga', '*', 50, true, false, false, [195, 218, 219]);
-	_bank.add('savannah', '·', 50, true, false, false, [211, 222, 0]);
-	_bank.add('shrubland', '·', 40, true, false, false, [142, 230, 0]);
-	_bank.add('forest', '♣', 50, true, false, false, [51, 181, 0]);
-	_bank.add('swamp', '·', 20, true, false, false, [0, 90, 30]);
-	_bank.add('desert', '·', 40, true, false, false, [255, 191, 0]);
-	_bank.add('plains', '*', 70, true, false, false, [212, 255, 0]);
-	_bank.add('seasonalforest', '♣', 70, true, false, false, [0, 163, 0]);
-	_bank.add('rainforest', '♣', 40, true, false, false, [0, 105, 0]);
-	_bank.add('mountain', 'Δ', 10, true, false, false, [51, 51, 51]);
-	_bank.add('snowymountain', 'Δ', 5, true, false, false, [170, 170, 170]);
+	_bank.add('shallowsea', '~', 1, false, true, false, [41, 72, 210]);
+	_bank.add('sea', '≈', 1, false, true, false, [20, 46, 166]);
+	_bank.add('deepsea', '≈', 1, false, true, false, [0, 25, 128]);
+	_bank.add('ice', '·', 10, true, true, false, [255, 255, 255], [200,200,255], [100, 100, 100], [70,70,100]);
+	_bank.add('polar', '·', 10, true, true, false, [238, 238, 238]);
+	_bank.add('tundra', '·', 50, true, true, false, [204, 219, 195]);
+	_bank.add('taiga', '*', 50, true, true, false, [195, 218, 219]);
+	_bank.add('savannah', '·', 50, true, true, false, [211, 222, 0]);
+	_bank.add('shrubland', '·', 40, true, true, false, [142, 230, 0]);
+	_bank.add('forest', '♣', 50, true, true, false, [51, 181, 0]);
+	_bank.add('swamp', '·', 20, true, true, false, [0, 90, 30]);
+	_bank.add('desert', '·', 40, true, true, false, [255, 191, 0]);
+	_bank.add('plains', '*', 70, true, true, false, [212, 255, 0]);
+	_bank.add('seasonalforest', '♣', 70, true, true, false, [0, 163, 0]);
+	_bank.add('rainforest', '♣', 40, true, true, false, [0, 105, 0]);
+	_bank.add('mountain', 'Δ', 10, true, true, false, [51, 51, 51]);
+	_bank.add('snowymountain', 'Δ', 5, true, true, false, [170, 170, 170]);
 
-	_bank.add('city', 'C', 0, null, null, null, [255, 255, 255], [0,0,0, 0.4]);
-		/*
-			dungeons and caves
-		*/
+	/*
+		world objects
+	 */
+	_bank.add('city', "C", 90, null, null, null, [255, 255, 255], [0, 0, 0, 0.4], [0, 0, 0, 0.4], [0, 0, 0, 0.4]);
+	_bank.add('highway', 'x', 90, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], null, [0, 0, 0, 0.2]);
+	_bank.add('ferry', '*', 40, true, true, false, [200, 200, 200], [0, 0, 0, 0.2], null, [0, 0, 0, 0.2]);
+	_bank.add('river', '*', 40, true, true, false, [0, , 0, 255], [0, 0, 255, 0.4], null, [0, 0, 0, 0.2]);
+
+	/*
+		dungeons and caves
+	*/
 	_bank.add('floor', '·', 80, true, false, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
 	_bank.add('door', '·', 50, true, true, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
 	_bank.add('road', '·', 20, true, true, false, [170, 170, 170], [75, 60, 0], [33, 33, 33], [0, 0, 0]);
@@ -105,11 +113,24 @@ define(["helpers/log"], function(
 					tot: 1
 				};
 			},
-			setSubtile: function(tile) {
+			sub: function(tile, stats) {
+				stats = stats || [];
 				this.subtile = tile;
+				this.subtile.info = tile.info;
+				for (var s = 0; s < stats.length; s++) {
+					this[stats[s]] = tile[stats[s]] || this[stats[s]]
+				}
 			},
 			change: function(tile) {
-
+				this.name = tile.name || this.name;
+				this.sign = tile.sign || this.sign;
+				this.blocking = tile.blocking || this.blocking;
+				this.speed = tile.speed || this.speed;
+				this.cost = tile.cost || this.cost;
+				this.color = tile.color || this.color;
+				this.background = tile.background || this.background;
+				this.dcolor = tile.dcolor || this.dcolor;
+				this.dbackground = tile.dbackground || this.dbackground;
 			}
 		});
 	}

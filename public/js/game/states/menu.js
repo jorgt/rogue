@@ -33,8 +33,8 @@ define([
 
 		},
 		_newOffset: function() {
-			this.textx = random(this.screen.width / 2 - 10, this.screen.width / 2 + 10);
-			this.texty = random(this.screen.height / 2 - 10, this.screen.height / 2 + 10);
+			this.textx = Math.between(this.screen.width / 2 - 10, this.screen.width / 2 + 10);
+			this.texty = Math.between(this.screen.height / 2 - 10, this.screen.height / 2 + 10);
 		}
 	});
 });

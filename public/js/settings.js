@@ -7,7 +7,7 @@ define([], function() {
 		square: 15,
 		debug: true,
 		screen: {
-			width: 800,
+			width: 1000,
 			height: 600,
 			block: 15,
 			font: 'minecraftiaregular' //minecraftiaregular or minecraftmedium

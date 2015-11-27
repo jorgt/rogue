@@ -3,8 +3,10 @@ requirejs.config({
 	urlArgs: "bust=" + (new Date()).getTime()
 });
 
-require(['helpers/log', 'settings', 'util'], function(log, settings) {
+require(['helpers/log', 'settings', 'util', 'helpers/maths'], function(log, settings) {
 	'use strict';
+
+	Math.seedrandom();
 
 	log.urgent('[MAIN]', 'START!');
 

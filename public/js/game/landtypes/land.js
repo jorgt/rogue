@@ -2,7 +2,8 @@ define([
 	"helpers/log",
 	"libs/simplex",
 	"game/tilebank",
-	"helpers/grids"
+	"helpers/grids",
+	"helpers/maths"
 ], function(
 	log,
 	Simplex,
@@ -19,7 +20,7 @@ define([
 	});
 
 	return function land(opt) {
-		var _size = opt.size || uneven(random(60, 70));
+		var _size = opt.size || Math.uneven(Math.between(60, 70));
 		var _width = _size;
 		var _height = _size;
 		var _grid = [];

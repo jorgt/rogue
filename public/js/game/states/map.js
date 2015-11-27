@@ -17,7 +17,7 @@ define([
 		start: function() {
 			Game().then(function(obj) {
 				this.game = obj;
-				this.screen.map(this.game.world, this.game.player);
+				this.screen.map(this.game.world, this.game.player, true);
 			}.bind(this));
 			
 			//don't need to do this in the 'draw' function at the moment 

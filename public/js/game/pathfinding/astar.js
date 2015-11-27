@@ -8,8 +8,15 @@ define([
 	'use strict';
 
 	var astar = {
-		init: function(grid) {
+		init: function(grid, costfunction) {
+			costfunction = costfunction || function(tile) {
+				return tile.cost;
+			}
+
+			var g = [];
+
 			for (var x = 0, xl = grid.length; x < xl; x++) {
+				g[x] = [];
 				for (var y = 0, yl = grid[x].length; y < yl; y++) {
 					var node = {};
 					node.x = x;
@@ -17,22 +24,23 @@ define([
 					node.f = 0;
 					node.g = 0;
 					node.h = 0;
-					node.speed = grid[x][y].cost;
+					node.speed = costfunction(grid[x][y]);
 					node.blocking = !grid[x][y].diggable;
 					node.visited = false;
 					node.closed = false;
 					node.parent = null;
-					grid[x][y] = node;
+					g[x][y] = node;
 				}
 			}
+			return g;
 		},
 		heap: function() {
 			return new BinaryHeap(function(node) {
 				return node.f;
 			});
 		},
-		search: function(grid, start, end, diagonal, heuristic) {
-			astar.init(grid);
+		search: function(grid, start, end, diagonal, heuristic, costfunction) {
+			grid = astar.init(grid, costfunction);
 			heuristic = heuristic || astar.tiebreaking;
 			diagonal = !!diagonal;
 
@@ -63,7 +71,7 @@ define([
 
 				// Find all neighbors for the current node. Optionally find diagonal neighbors as well (false by default).
 				var neighbors = astar.neighbors(grid, currentNode, diagonal);
-
+				
 				for (var i = 0, il = neighbors.length; i < il; i++) {
 					var neighbor = neighbors[i];
 					if (neighbor.closed || neighbor.blocking) {

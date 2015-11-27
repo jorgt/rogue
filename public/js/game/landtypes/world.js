@@ -5,13 +5,16 @@ define([
 	"libs/simplex",
 	"helpers/grids",
 	"game/landtypes/base",
+	"game/pathfinding/astar",
+	"helpers/maths"
 ], function(
 	log,
 	settings,
 	climate,
 	Simplex,
 	Grids,
-	Base) {
+	Base,
+	AStar) {
 
 	'use strict';
 
@@ -57,87 +60,103 @@ define([
 
 	return function world(opt) {
 		log.med('[WORLD]', 'start building the overworld');
-		var _size = opt.size || uneven(random(60, 70));
+		var _size = opt.size || Math.uneven(Math.between(60, 70));
 		var _width = opt.width || _size;
 		var _height = opt.height || _size;
 		var _grid = [];
 		var _start = null;
 		var _end = null;
 		var _cities = [];
-		var _gAltRadial = _rollingParticles();
-		var _gTemAxial = _axialParticles();
+		var _rivers = [];
 
-		var _gAlt = _edges(_chunk(sAlt, ranges.altitude, _height, _width, 0, 0, _gAltRadial));
-		log.low('[WORLD]', 'first range of altitude done');
-
-		var _gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
-		log.low('[WORLD]', 'second range of altitude done');
-
-		var _gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, _gTemAxial);
-		log.low('[WORLD]', 'temperature done');
-
-		var _gDir = _directionalParticles(_gAlt, _gTem);
-		var _gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0, _gDir);
-		log.low('[WORLD]', 'precipitation done');
-
-		var aa = 0,
-			ap = 0,
-			at = 0,
-			x = 0,
-			y = 0;
-
-		for (x = 0; x < _width; x++) {
-			_grid[x] = [];
-			for (y = 0; y < _height; y++) {
-				var c = {
-					temp: ~~(_gTem[x][y] * 1.8) + 5,
-					prec: ~~(Math.pow(_gPre[x][y], 1.1)),
-					alt: ~~(2000 + _gAlt[x][y] + _gAlt2[x][y])
-				}
-				c.climate = climate(c.temp, c.prec, c.alt);
-				var obj = opt.bank.get(c.climate.replace(/\s/g, ''));
-
-				obj.info.climate = c;
-				_grid[x][y] = obj;
-			}
-		}
-		//normalize the colors
-		var cols = {
-			total: {
-				min: Number.MAX_VALUE,
-				max: Number.MIN_VALUE
-			}
-		};
-
-		for (x = 0; x < _width; x++) {
-			for (y = 0; y < _height; y++) {
-				var t = _grid[x][y];
-				if (!cols[t.name]) {
-					cols[t.name] = {
-						min: Number.MAX_VALUE,
-						max: Number.MIN_VALUE
-					}
-				}
-				if (t.info.climate.alt < cols[t.name].min) cols[t.name].min = t.info.climate.alt;
-				if (t.info.climate.alt > cols[t.name].max) cols[t.name].max = t.info.climate.alt;
-				if (t.info.climate.alt < cols.total.min) cols.total.min = t.info.climate.alt;
-				if (t.info.climate.alt > cols.total.max) cols.total.max = t.info.climate.alt;
-			}
-		}
-
-		for (x = 0; x < _width; x++) {
-			for (y = 0; y < _height; y++) {
-				var t = _grid[x][y];
-				var c = cols[t.name];
-				t.info.alt = (t.info.climate.alt - c.min) / (c.max - c.min);
-				t.info.tot = (t.info.climate.alt - cols.total.min) / (cols.total.max - cols.total.min);
-			}
-		}
-
+		_createBase();
+		_normalizeAltitude();
+		_createRivers();
 		_getStartAndEndTiles();
-		_getCitiesAndTowns();
+		_createCities();
+		_connectCities();
+		_reSignRoads();
 
 		return new Base(_grid, _start, _end, _height, _width);
+
+		function _createBase() {
+			var _gAltRadial = _rollingParticles();
+			var _gTemAxial = _axialParticles();
+
+			var _gAlt = _edges(_chunk(sAlt, ranges.altitude, _height, _width, 0, 0, _gAltRadial));
+			log.low('[WORLD]', 'first range of altitude done');
+
+			var _gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
+			log.low('[WORLD]', 'second range of altitude done');
+
+			var _gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, _gTemAxial);
+			log.low('[WORLD]', 'temperature done');
+
+			var _gDir = _directionalParticles(_gAlt, _gTem);
+			var _gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0, _gDir);
+			log.low('[WORLD]', 'precipitation done');
+
+			var aa = 0,
+				ap = 0,
+				at = 0,
+				x = 0,
+				y = 0;
+
+			//combine everything into base
+			for (x = 0; x < _width; x++) {
+				_grid[x] = [];
+				for (y = 0; y < _height; y++) {
+					var c = {
+						temp: ~~(_gTem[x][y] * 1.8) + 5,
+						prec: ~~(Math.pow(_gPre[x][y], 1.1)),
+						alt: ~~(2000 + _gAlt[x][y] + _gAlt2[x][y])
+					}
+					c.climate = climate(c.temp, c.prec, c.alt);
+					var obj = opt.bank.get(c.climate.replace(/\s/g, ''));
+					obj.info.climate = c;
+					if (obj.name === 'ice') obj.info.climate.alt = Math.abs(obj.info.climate.alt);
+					_grid[x][y] = obj;
+				}
+			}
+		}
+
+		function _normalizeAltitude() {
+			var x, y;
+
+			//normalize the colors
+			var cols = {
+				total: {
+					min: Number.MAX_VALUE,
+					max: Number.MIN_VALUE
+				}
+			};
+
+			//first determine minimum and maximum
+			for (x = 0; x < _width; x++) {
+				for (y = 0; y < _height; y++) {
+					var t = _grid[x][y];
+					if (!cols[t.name]) {
+						cols[t.name] = {
+							min: Number.MAX_VALUE,
+							max: Number.MIN_VALUE
+						}
+					}
+					if (t.info.climate.alt < cols[t.name].min) cols[t.name].min = t.info.climate.alt;
+					if (t.info.climate.alt > cols[t.name].max) cols[t.name].max = t.info.climate.alt;
+					if (t.info.climate.alt < cols.total.min) cols.total.min = t.info.climate.alt;
+					if (t.info.climate.alt > cols.total.max) cols.total.max = t.info.climate.alt;
+				}
+			}
+
+			for (x = 0; x < _width; x++) {
+				for (y = 0; y < _height; y++) {
+					var t = _grid[x][y];
+					var c = cols[t.name];
+					t.info.alt = (t.info.climate.alt - c.min) / (c.max - c.min);
+					t.info.tot = (t.info.climate.alt - cols.total.min) / (cols.total.max - cols.total.min);
+				}
+			}
+		}
 
 		function _chunk(noise, range, h, w, startx, starty, merge) {
 			var generator = Grids({
@@ -178,10 +197,10 @@ define([
 			var start = null;
 			var end = null;
 			while (_start === null || _end === null) {
-				var sx = random(0, _grid.length - 1);
-				var sy = random(0, _grid[0].length - 1);
-				var ex = random(0, _grid.length - 1);
-				var ey = random(0, _grid[0].length - 1);
+				var sx = Math.between(0, _grid.length - 1);
+				var sy = Math.between(0, _grid[0].length - 1);
+				var ex = Math.between(0, _grid.length - 1);
+				var ey = Math.between(0, _grid[0].length - 1);
 				start = _grid[sx][sy];
 				end = _grid[ex][ey];
 				_start = (start.walkable === true) ? [sx, sy] : null;
@@ -189,51 +208,214 @@ define([
 			}
 		}
 
-		function _getCitiesAndTowns() {
+		function _createCities() {
 			log.med('[WORLD]', 'creating cities and towns');
 			var x, y;
-			var city = Math.random() > 0.7; // ratio towns/cities 7:3
-			var totalCities = 0;
-			var totalTowns = 0;
-			while (_cities.length < 5) {
-				_createCity((city) ? 1 : random(5, 9));
+			var city = Math.random() > 0.85; // ratio towns/cities 7:3
+			var attempts = 0;
+			while (_cities.length < 15 && attempts++ < 5000) {
+				_createCity((city) ? 1 : Math.between(5, 9));
 			}
-
+			log.med('[WORLD]', 'created', _cities.length, 'cities and towns');
 		}
 
 		function _createCity(n) {
-			var x, y, r, g = [],
-				r = [-1, 0, 1];
+			var c, d, x, y, r, g = [];
 
-			x = random(0, _grid.length - 1);
-			y = random(0, _grid[0].length - 1);
-			for (var a = 0; a < r.length; a++) {
-				for (var b = 0; b < r.length; b++) {
-					if (x + r[a] < _grid.length && x + r[a] >= 0 && y + r[b] < _grid[0].length && y + r[b] >= 0) {
-						if (_grid[x + r[a]][y + r[b]].info.climate.alt < 0) return 0;
-						g.push([x + r[a], y + r[b]]);
+			//get a Math.between tile with starting point as a multiple of some number
+			//to prevent cities from being built next to each other
+			x = Math.between(0, _grid.length - 1);
+			y = Math.between(0, _grid[0].length - 1);
+
+			//check if another city exists in an 11 cell block around x and y. 
+			//exit function if it exists
+			if (_scanGrid(x, y, 11, function(tile) {
+					return (tile.name === 'city' || tile.subtile === 'city');
+				})) {
+				return false;
+			}
+
+			if (_scanGrid(x, y, 1, function(tile, a, b) {
+					if (tile.info.climate.alt > 0) {
+						g.push([a, b])
 					} else {
-						return 0;
+						return true;
 					}
-				}
+				})) {
+				return false;
 			}
 
 			g = shuffle(g).slice(0, n);
 
 			for (var c = 0; c < g.length; c++) {
-				var tile = _grid[g[c][0]][g[c][1]];
-				var climate = tile.info.climate;
-				tile.subtile = opt.bank.get('city');
-				tile.subtile.info.climate = climate;
-				tile.sign = tile.subtile.sign;
-				tile.name = tile.subtile.name;
+				_grid[g[c][0]][g[c][1]].sub(opt.bank.get('city'), ['name', ['sign']]);
 			}
 
 			_cities.push([x, y]);
 
 			log.low('[WORLD]', 'created a city at', x, y);
 
-			return 1;
+			return true;
+		}
+
+		function _createRivers() {
+			log.med('[WORLD]', 'creating rivers');
+			var attempts = 0;
+
+			while (_rivers.length < Math.between(3, 6) && attempts++ < 5000) {
+				_createRiver();
+			}
+
+			log.med('[WORLD]', 'created', _rivers.length, 'rivers');
+		}
+
+		function _createRiver() {
+			var a, b, x, y, i, next,
+				g = [],
+				life = 100;
+
+			x = Math.between(0, _grid.length - 1);
+			y = Math.between(0, _grid[x].length - 1);
+
+			if (_grid[x][y].info.climate.alt < 4000) return false;
+
+			a = Math.between(0, _grid.length - 1);
+			b = Math.between(0, _grid[x].length - 1);
+
+			if (_grid[a][b].info.climate.alt > 0) return false;
+
+			var g = AStar.search(_grid, [x, y], [a, b], false, null, function(tile) {
+				return (tile.name === 'river') ? 0 : Math.pow(100, tile.info.tot);
+			});
+
+			var tot;
+			for (i = 0; i < g.length; i++) {
+				if (!_grid[g[i].x][g[i].y].name.match(/sea$/)) {
+					tot++;
+				}
+			}
+
+			if (tot < 30) return false;
+
+			for (i = 0; i < g.length; i++) {
+				if (!_grid[g[i].x][g[i].y].name.match(/sea$/)) {
+					_grid[g[i].x][g[i].y].sub(opt.bank.get('river'), ['name', 'sign']);
+				}
+			}
+
+			_rivers.push([x, y]);
+		}
+
+		function _scanGrid(centerx, centery, cells, func) {
+			var x, y, sx, sy, ex, ey;
+
+			sx = Math.max(0, centerx - cells);
+			sy = Math.max(0, centery - cells);
+			ex = Math.min(_grid.length - 1, centerx + cells);
+			ey = Math.min(_grid[0].length - 1, centery + cells);
+			for (x = sx; x <= ex; x++) {
+				for (y = sy; y <= ey; y++) {
+					if (func(_grid[x][y], x, y) === true) return true;
+				}
+			}
+			return false;
+		}
+
+		function _connectCities() {
+			log.med('[WORLD]', 'connecting cities and roads');
+			var attempts, x, y, result, r, done = [];
+
+			attempts = 0;
+
+			while (done.length < _cities.length * 1.8 && attempts++ < 1000) {
+				x = window.Math.between(0, _cities.length - 1);
+				y = window.Math.between(0, _cities.length - 1);
+
+				if (x === y || done.indexOf(x + '.' + y) >= 0 || done.indexOf(y + '.' + x) >= 0) {
+					continue;
+				} else {
+					result = AStar.search(_grid, _cities[x], _cities[y]);
+					if (result.length > 0) {
+						for (var r = 0; r < result.length; r++) {
+							var tile = (_grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : 'highway';
+							if (!_grid[result[r].x][result[r].y].name.match(/city|highway|ferry/)) {
+								_grid[result[r].x][result[r].y].sub(opt.bank.get(tile), ['name', 'sign', 'cost']);
+							}
+						}
+
+						done.push(x + '.' + y);
+
+						log.low('[WORLD]', 'connected 2 cities:', _cities[x], _cities[y]);
+					}
+				}
+			}
+
+			log.med('[WORLD]', 'total roads created:', done.length);
+		}
+
+		function _reSignRoads() {
+			log.med('[WORLD]', 'fixing road signs');
+			var h = 'highway';
+			var chars = ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'];
+			for (var x = 0; x < _grid.length; x++) {
+				for (var y = 0; y < _grid[x].length; y++) {
+					if (_grid[x][y].name === h || _grid[x][y].subtile.name === h) {
+						var n = _neighbours(x, y);
+						var s = chars[2];
+						if (n[0].name === h && n[1].name === h && n[2].name === h && n[3].name === h) {
+							s = chars[2]
+						} else if (n[0].name === h && n[1].name === h && n[2].name === h) {
+							s = chars[3];
+						} else if (n[1].name === h && n[2].name === h && n[3].name === h) {
+							s = chars[6];
+						} else if (n[2].name === h && n[3].name === h && n[0].name === h) {
+							s = chars[4]
+						} else if (n[3].name === h && n[0].name === h && n[1].name === h) {
+							s = chars[5];
+						} else if (n[0].name === h && n[2].name === h) {
+							s = chars[1];
+						} else if (n[1].name === h && n[3].name === h) {
+							s = chars[0];
+						} else if (n[0].name === h && n[1].name === h) {
+							s = chars[10];
+						} else if (n[1].name === h && n[2].name === h) {
+							s = chars[8];
+						} else if (n[2].name === h && n[3].name === h) {
+							s = chars[7];
+						} else if (n[3].name === h && n[0].name === h) {
+							s = chars[9];
+						} else if (!!n[1].name.match(/ferry|highway/) || !!n[3].name.match(/ferry|highway/)) {
+							s = chars[0]
+						} else if (!!n[0].name.match(/ferry|highway/) || !!n[2].name.match(/ferry|highway/)) {
+							s = chars[1]
+						}
+						_grid[x][y].sign = s || _grid[x][y].sign;
+						if (_grid[x][y].subtile.sign) _grid[x][y].subtile.sign = s;
+					}
+				}
+			}
+		}
+
+		function _neighbours(x, y) {
+			var ret = [];
+			var dir = [
+				[0, -1], //north
+				[-1, 0], //west
+				[0, 1], //south
+				[1, 0], //east
+			];
+
+			for (var d = 0; d < dir.length; d++) {
+				if (_grid[x + dir[d][0]] && _grid[x + dir[d][0]][y + dir[d][1]]) {
+					ret.push(_grid[x + dir[d][0]][y + dir[d][1]]);
+				} else {
+					ret.push({
+						name: 'unknown'
+					});
+				}
+			}
+
+			return ret;
 		}
 
 		function _axialParticles() {

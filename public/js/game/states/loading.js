@@ -1,7 +1,8 @@
 define([
 	'helpers/log',
 	"engine/states",
-	"settings"
+	"settings",
+	"helpers/maths"
 ], function(log, states, settings) {
 
 	'use strict';
@@ -23,14 +24,14 @@ define([
 		draw: function() {
 			this.screen.clear();
 			var str = 'Loading...';
-			this.screen.write(str, this.textx - ((str.length / 2) * settings.screen.block) , this.texty);
+			this.screen.write(str, this.textx - ((str.length / 2) * settings.screen.block), this.texty);
 		},
 		stop: function() {
 
 		},
 		_newOffset: function() {
-			this.textx = random(this.screen.width / 2 - 10, this.screen.width / 2 + 10);
-			this.texty = random(this.screen.height / 2 - 10, this.screen.height / 2 + 10);
+			this.textx = Math.between(this.screen.width / 2 - 10, this.screen.width / 2 + 10);
+			this.texty = Math.between(this.screen.height / 2 - 10, this.screen.height / 2 + 10);
 		}
 	});
 });
