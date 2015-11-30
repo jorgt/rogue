@@ -10,7 +10,11 @@ define([], function() {
 			width: 1000,
 			height: 600,
 			block: 15,
-			font: 'minecraftiaregular' //minecraftiaregular or minecraftmedium
+			iso: {
+				height: 8,
+				width: 15
+			},
+			font: 'profontwindowsregular' //minecraftiaregular, minecraftmedium, profontwindowsregular
 		}
 	};
 });

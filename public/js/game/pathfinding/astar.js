@@ -71,7 +71,7 @@ define([
 
 				// Find all neighbors for the current node. Optionally find diagonal neighbors as well (false by default).
 				var neighbors = astar.neighbors(grid, currentNode, diagonal);
-				
+
 				for (var i = 0, il = neighbors.length; i < il; i++) {
 					var neighbor = neighbors[i];
 					if (neighbor.closed || neighbor.blocking) {
@@ -134,49 +134,31 @@ define([
 			var ret = [];
 			var x = node.x;
 			var y = node.y;
+			var orthogonal = [
+				[0, -1], //south
+				[-1, 0], //west
+				[0, 1], //north
+				[1, 0], //east
+			];
+			var diagonal = [
+				[-1, -1], //southwest
+				[-1, 1], //northwest
+				[1, -1], //southeast
+				[1, 1], //northeast
+			];
 
-			// West
-			if (grid[x - 1] && grid[x - 1][y]) {
-				ret.push(grid[x - 1][y]);
-			}
-
-			// East
-			if (grid[x + 1] && grid[x + 1][y]) {
-				ret.push(grid[x + 1][y]);
-			}
-
-			// South
-			if (grid[x] && grid[x][y - 1]) {
-				ret.push(grid[x][y - 1]);
-			}
-
-			// North
-			if (grid[x] && grid[x][y + 1]) {
-				ret.push(grid[x][y + 1]);
+			for (var d = 0; d < orthogonal.length; d++) {
+				if (grid[x + orthogonal[d][0]] && grid[x + orthogonal[d][0]][y + orthogonal[d][1]]) {
+					ret.push(grid[x + orthogonal[d][0]][y + orthogonal[d][1]]);
+				}
 			}
 
 			if (diagonals) {
-
-				// Southwest
-				if (grid[x - 1] && grid[x - 1][y - 1]) {
-					ret.push(grid[x - 1][y - 1]);
+				for (var d = 0; d < diagonal.length; d++) {
+					if (grid[x + diagonal[d][0]] && grid[x + diagonal[d][0]][y + diagonal[d][1]]) {
+						ret.push(grid[x + diagonal[d][0]][y + diagonal[d][1]]);
+					}
 				}
-
-				// Southeast
-				if (grid[x + 1] && grid[x + 1][y - 1]) {
-					ret.push(grid[x + 1][y - 1]);
-				}
-
-				// Northwest
-				if (grid[x - 1] && grid[x - 1][y + 1]) {
-					ret.push(grid[x - 1][y + 1]);
-				}
-
-				// Northeast
-				if (grid[x + 1] && grid[x + 1][y + 1]) {
-					ret.push(grid[x + 1][y + 1]);
-				}
-
 			}
 
 			return ret;

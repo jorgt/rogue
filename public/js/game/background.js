@@ -1,4 +1,4 @@
-define(['settings', 'game/screenmanager'], function(settings, screenManager) {
+define(['settings', 'game/screenmanager', 'helpers/log'], function(settings, screenManager, log) {
 	'use strict';
 
 	//pixelratio, see util.js && https://github.com/jondavidjohn/hidpi-canvas-polyfill
@@ -20,7 +20,7 @@ define(['settings', 'game/screenmanager'], function(settings, screenManager) {
 
 			background.dark.onload = function() {
 				resolve(background);
-				//document.body.appendChild(ret.image);
+				//document.body.appendChild(background.light);
 			}.bind(this);
 
 			background.light.src = light.toDataURL('image/png');
@@ -43,6 +43,9 @@ define(['settings', 'game/screenmanager'], function(settings, screenManager) {
 		ctx.font = "bold " + size + "px monospace";
 		ctx.fillStyle = "black";
 		ctx.fillRect(0, 0, sizeWidth, sizeHeight);
+
+
+		log.med('[BACKGROUND]', 'start drawing the image');
 
 		for (x = 0; x < w.grid.length; x++) {
 			for (y = 0; y < w.grid[x].length; y++) {

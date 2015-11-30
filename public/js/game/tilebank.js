@@ -14,21 +14,21 @@ define(["helpers/log"], function(
 	/*
 		climate tiles
 	*/
-	_bank.add('shallowsea', '~', 1, false, true, false, [41, 72, 210]);
-	_bank.add('sea', '≈', 1, false, true, false, [20, 46, 166]);
+	_bank.add('shallowsea', '~', 20, false, true, false, [41, 72, 210]);
+	_bank.add('sea', '≈', 10, false, true, false, [20, 46, 166]);
 	_bank.add('deepsea', '≈', 1, false, true, false, [0, 25, 128]);
-	_bank.add('ice', '·', 10, true, true, false, [255, 255, 255], [200,200,255], [100, 100, 100], [70,70,100]);
-	_bank.add('polar', '·', 10, true, true, false, [238, 238, 238]);
-	_bank.add('tundra', '·', 50, true, true, false, [204, 219, 195]);
+	_bank.add('ice', arr(['·',' ']), 20, true, true, false, [255, 255, 255], [200, 200, 255], [100, 100, 100], [70, 70, 100]);
+	_bank.add('polar', arr(['·',' ']), 20, true, true, false, [238, 238, 238]);
+	_bank.add('tundra', arr(['·',' ']), 50, true, true, false, [204, 219, 195]);
 	_bank.add('taiga', '*', 50, true, true, false, [195, 218, 219]);
-	_bank.add('savannah', '·', 50, true, true, false, [211, 222, 0]);
-	_bank.add('shrubland', '·', 40, true, true, false, [142, 230, 0]);
-	_bank.add('forest', '♣', 50, true, true, false, [51, 181, 0]);
-	_bank.add('swamp', '·', 20, true, true, false, [0, 90, 30]);
-	_bank.add('desert', '·', 40, true, true, false, [255, 191, 0]);
+	_bank.add('savannah', arr(['·',' ']), 50, true, true, false, [211, 222, 0]);
+	_bank.add('shrubland', arr(['·',' ']), 40, true, true, false, [142, 230, 0]);
+	_bank.add('forest', tree, 60, true, true, false, [51, 181, 0]);
+	_bank.add('swamp', arr(['·',' ']), 30, true, true, false, [0, 90, 30]);
+	_bank.add('desert', arr(['·',' ']), 40, true, true, false, [255, 191, 0]);
 	_bank.add('plains', '*', 70, true, true, false, [212, 255, 0]);
-	_bank.add('seasonalforest', '♣', 70, true, true, false, [0, 163, 0]);
-	_bank.add('rainforest', '♣', 40, true, true, false, [0, 105, 0]);
+	_bank.add('seasonalforest', tree, 70, true, true, false, [0, 163, 0]);
+	_bank.add('rainforest', tree, 30, true, true, false, [0, 105, 0]);
 	_bank.add('mountain', 'Δ', 10, true, true, false, [51, 51, 51]);
 	_bank.add('snowymountain', 'Δ', 5, true, true, false, [170, 170, 170]);
 
@@ -36,9 +36,10 @@ define(["helpers/log"], function(
 		world objects
 	 */
 	_bank.add('city', "C", 90, null, null, null, [255, 255, 255], [0, 0, 0, 0.4], [0, 0, 0, 0.4], [0, 0, 0, 0.4]);
-	_bank.add('highway', 'x', 90, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], null, [0, 0, 0, 0.2]);
+	_bank.add('highway', 'x', 95, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], null, [0, 0, 0, 0.1]);
+	_bank.add('path', 'x', 90, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], null, [0, 0, 0, 0.1]);
 	_bank.add('ferry', '*', 40, true, true, false, [200, 200, 200], [0, 0, 0, 0.2], null, [0, 0, 0, 0.2]);
-	_bank.add('river', '*', 40, true, true, false, [0, , 0, 255], [0, 0, 255, 0.4], null, [0, 0, 0, 0.2]);
+	_bank.add('river', '*', 40, true, true, false, [0, 0, 255], [0, 0, 255, 0.1], null, [0, 0, 0, 0.1]);
 
 	/*
 		dungeons and caves
@@ -53,6 +54,23 @@ define(["helpers/log"], function(
 		objects
 	*/
 	return _bank;
+
+	function tree() {
+		var signs = ['¶', '♣'];
+		return signs[Math.between(0, signs.length - 1)];
+	}
+
+	function dots() {
+
+		var signs = ['¶', '♣'];
+		return signs[Math.between(0, signs.length - 1)];
+	}
+
+	function arr(a) {
+		return function() {
+			return a[Math.between(0, a.length - 1)];		
+		}
+	}
 
 	function TileBank() {
 		var _guid = guid();
@@ -88,7 +106,11 @@ define(["helpers/log"], function(
 			init: function(opt) {
 				this.guid = guid();
 				this.name = opt.name;
-				this.sign = opt.sign;
+				if (typeof opt.sign === 'function') {
+					this.sign = opt.sign();
+				} else {
+					this.sign = opt.sign;
+				}
 				this.blocking = opt.blocking;
 				this.speed = opt.speed;
 				this.cost = 100 - opt.speed;
@@ -96,6 +118,7 @@ define(["helpers/log"], function(
 				this.diggable = opt.diggable;
 				this.visited = false;
 				this.visible = false;
+				this.selected = false;
 				this.child = null;
 				this.color = opt.color;
 				this.background = opt.background;

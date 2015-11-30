@@ -36,8 +36,8 @@ define([
 
 	var sAlt = new Simplex({
 		octaves: 20,
-		persistence: 0.2,
-		level: 0.0065
+		persistence: 0.6,
+		level: 0.0035
 	});
 
 	var sAlt2 = new Simplex({
@@ -72,10 +72,11 @@ define([
 		_createBase();
 		_normalizeAltitude();
 		_createRivers();
-		_getStartAndEndTiles();
 		_createCities();
-		_connectCities();
+		_createRoadsBetweenCities();
+		_reSignRivers();
 		_reSignRoads();
+		_getStartAndEndTiles();
 
 		return new Base(_grid, _start, _end, _height, _width);
 
@@ -83,10 +84,10 @@ define([
 			var _gAltRadial = _rollingParticles();
 			var _gTemAxial = _axialParticles();
 
-			var _gAlt = _edges(_chunk(sAlt, ranges.altitude, _height, _width, 0, 0, _gAltRadial));
+			var _gAlt = _chunk(sAlt, ranges.altitude, _height, _width, 0, 0, _gAltRadial, true);
 			log.low('[WORLD]', 'first range of altitude done');
 
-			var _gAlt2 = _edges(_chunk(sAlt2, ranges.altitude, _height, _width, 0, 0));
+			var _gAlt2 = _chunk(sAlt2, ranges.altitude, _height, _width, 0, 0, null, true);
 			log.low('[WORLD]', 'second range of altitude done');
 
 			var _gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, _gTemAxial);
@@ -158,7 +159,7 @@ define([
 			}
 		}
 
-		function _chunk(noise, range, h, w, startx, starty, merge) {
+		function _chunk(noise, range, h, w, startx, starty, merge, edges) {
 			var generator = Grids({
 				type: Grids.tileable,
 				h: h,
@@ -169,6 +170,7 @@ define([
 			});
 
 			var grid = generator.grid();
+			if (edges) _edges(grid);
 			var world = [];
 
 			for (var x = 0; x < grid.length; x++) {
@@ -262,7 +264,7 @@ define([
 			log.med('[WORLD]', 'creating rivers');
 			var attempts = 0;
 
-			while (_rivers.length < Math.between(3, 6) && attempts++ < 5000) {
+			while (_rivers.length < Math.between(5, 7) && attempts++ < 5000) {
 				_createRiver();
 			}
 
@@ -277,7 +279,7 @@ define([
 			x = Math.between(0, _grid.length - 1);
 			y = Math.between(0, _grid[x].length - 1);
 
-			if (_grid[x][y].info.climate.alt < 4000) return false;
+			if (_grid[x][y].info.climate.alt < 4000 && _grid[x][y].info.climate.prec > 10000) return false;
 
 			a = Math.between(0, _grid.length - 1);
 			b = Math.between(0, _grid[x].length - 1);
@@ -292,6 +294,7 @@ define([
 			for (i = 0; i < g.length; i++) {
 				if (!_grid[g[i].x][g[i].y].name.match(/sea$/)) {
 					tot++;
+					break;
 				}
 			}
 
@@ -321,9 +324,10 @@ define([
 			return false;
 		}
 
-		function _connectCities() {
+		function _createRoadsBetweenCities() {
 			log.med('[WORLD]', 'connecting cities and roads');
-			var attempts, x, y, result, r, done = [];
+			var attempts, x, y, result, r, done = [],
+				path;
 
 			attempts = 0;
 
@@ -336,8 +340,10 @@ define([
 				} else {
 					result = AStar.search(_grid, _cities[x], _cities[y]);
 					if (result.length > 0) {
+						path = (Math.random() < 0.8) ? 'path' : 'highway';
+
 						for (var r = 0; r < result.length; r++) {
-							var tile = (_grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : 'highway';
+							var tile = (_grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : path;
 							if (!_grid[result[r].x][result[r].y].name.match(/city|highway|ferry/)) {
 								_grid[result[r].x][result[r].y].sub(opt.bank.get(tile), ['name', 'sign', 'cost']);
 							}
@@ -355,40 +361,59 @@ define([
 
 		function _reSignRoads() {
 			log.med('[WORLD]', 'fixing road signs');
-			var h = 'highway';
-			var chars = ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'];
+			_reSignSomething(/ferry|highway|path/, ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'], function(n, g) {
+				if (g.name === 'ferry') return g.sign;
+			});
+
+			_reSignSomething(/path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯'], function(n, g) {
+				if (g.name === 'ferry') return g.sign;
+			});
+		}
+
+		function _reSignRivers() {
+			log.med('[WORLD]', 'fixing river signs');
+			_reSignSomething(/river/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯']);
+		}
+
+		function _reSignSomething(h, chars, func) {
+			var r;
 			for (var x = 0; x < _grid.length; x++) {
 				for (var y = 0; y < _grid[x].length; y++) {
-					if (_grid[x][y].name === h || _grid[x][y].subtile.name === h) {
+					if (_grid[x][y].name.match(h) || (_grid[x][y].subtile.name && _grid[x][y].subtile.name.match(h))) {
 						var n = _neighbours(x, y);
-						var s = chars[2];
-						if (n[0].name === h && n[1].name === h && n[2].name === h && n[3].name === h) {
+						var s = '·';
+
+						if (n[0].name.match(h) && n[1].name.match(h) && n[2].name.match(h) && n[3].name.match(h)) {
 							s = chars[2]
-						} else if (n[0].name === h && n[1].name === h && n[2].name === h) {
+						} else if (n[0].name.match(h) && n[1].name.match(h) && n[2].name.match(h)) {
 							s = chars[3];
-						} else if (n[1].name === h && n[2].name === h && n[3].name === h) {
+						} else if (n[1].name.match(h) && n[2].name.match(h) && n[3].name.match(h)) {
 							s = chars[6];
-						} else if (n[2].name === h && n[3].name === h && n[0].name === h) {
+						} else if (n[2].name.match(h) && n[3].name.match(h) && n[0].name.match(h)) {
 							s = chars[4]
-						} else if (n[3].name === h && n[0].name === h && n[1].name === h) {
+						} else if (n[3].name.match(h) && n[0].name.match(h) && n[1].name.match(h)) {
 							s = chars[5];
-						} else if (n[0].name === h && n[2].name === h) {
+						} else if (n[0].name.match(h) && n[2].name.match(h)) {
 							s = chars[1];
-						} else if (n[1].name === h && n[3].name === h) {
+						} else if (n[1].name.match(h) && n[3].name.match(h)) {
 							s = chars[0];
-						} else if (n[0].name === h && n[1].name === h) {
+						} else if (n[0].name.match(h) && n[1].name.match(h)) {
 							s = chars[10];
-						} else if (n[1].name === h && n[2].name === h) {
+						} else if (n[1].name.match(h) && n[2].name.match(h)) {
 							s = chars[8];
-						} else if (n[2].name === h && n[3].name === h) {
+						} else if (n[2].name.match(h) && n[3].name.match(h)) {
 							s = chars[7];
-						} else if (n[3].name === h && n[0].name === h) {
+						} else if (n[3].name.match(h) && n[0].name.match(h)) {
 							s = chars[9];
-						} else if (!!n[1].name.match(/ferry|highway/) || !!n[3].name.match(/ferry|highway/)) {
-							s = chars[0]
-						} else if (!!n[0].name.match(/ferry|highway/) || !!n[2].name.match(/ferry|highway/)) {
-							s = chars[1]
+						} else if (!!n[1].name.match(h) || !!n[3].name.match(h)) {
+							s = chars[0];
+						} else if (!!n[0].name.match(h) || !!n[2].name.match(h)) {
+							s = chars[1];
 						}
+
+						r = (func) ? func(n, _grid[x][y]) : null;
+						s = (r) ? r : s;
+						//if(_grid[x][y].name === 'ferry') console.log(_grid[x][y], _grid[x][y].sign, s, r);
 						_grid[x][y].sign = s || _grid[x][y].sign;
 						if (_grid[x][y].subtile.sign) _grid[x][y].subtile.sign = s;
 					}
@@ -399,9 +424,9 @@ define([
 		function _neighbours(x, y) {
 			var ret = [];
 			var dir = [
-				[0, -1], //north
+				[0, -1], //south
 				[-1, 0], //west
-				[0, 1], //south
+				[0, 1], //north
 				[1, 0], //east
 			];
 
@@ -498,7 +523,7 @@ define([
 				}
 			}
 
-			return _normalize(grid);
+			return _edges(_normalize(grid));
 
 			function _range(min, max) {
 				return ~~((max - min) * Math.random() + min);
@@ -550,9 +575,9 @@ define([
 			for (var x = 0; x < grid.length; x++) {
 				for (var y = 0; y < grid[x].length; y++) {
 					if (x == 0 || x == _width - 1 || y == 0 || y == _height - 1) {
-						grid[x][y] *= (grid[x][y] > 0) ? 0.67 : 1;
+						grid[x][y] *= (grid[x][y] > 0.5) ? 0.45 : 1;
 					} else if (x == 1 || x == _width - 2 || y == 1 || y == _height - 2) {
-						grid[x][y] *= (grid[x][y] > 0) ? 0.75 : 1;
+						grid[x][y] *= (grid[x][y] > 0.4) ? 0.85 : 1;
 					}
 				}
 			}

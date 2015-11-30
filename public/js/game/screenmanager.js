@@ -111,7 +111,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var tile = world.getTile(x, y);
 					//don't bother if invisible
 					if (tile.visited === true || all === true) {
-						var o1 = (!tile.name.match(/sea$/)) ? (tile.info.tot - 0.5) * 3 + 0.25 : 1 - ((0.5 - tile.info.tot) * 2 + 0.25);
+						var o1 = (!tile.name.match(/sea$/)) ? (tile.info.tot - 0.5) * 2 + 0.25 : 1 - ((0.5 - tile.info.tot) * 2 + 0.25);
 						var o2 = (o1 * 0.3 + 0.1);
 
 						if (world.type === 'world') {
@@ -142,7 +142,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 							this.circle((tile.visible) ? 'rgba(100,100,255,1)' : 'rgba(50,50,190,0.5)', px + p / 2, py + p / 2, p / 3);
 						}
 
-						if (tile.name.match(/ferry|highway/)) {
+						if (tile.name.match(/path|ferry|highway/)) {
 							this.circle((tile.visible) ? 'rgba(255,255,255,0.4)' : 'rgba(190,190,190,0.4)', px + p / 2, py + p / 2, p / 3);
 						}
 
@@ -158,7 +158,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			var offset = this.offset(player, background);
 			this.clear();
 
-			this._background(background, offset.w, offset.h);
+			this._isoBackground(background, offset.w, offset.h);
 			this._entity(player, offset.w, offset.h);
 		},
 		drawSelectedTile: function(x, y, tile) {
@@ -210,6 +210,24 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			this.context.fillStyle = color || "rgba(255,255,255,1)";
 			this.context.fillText(ent.sign, nx, ny);
 		},
+		_isoBackground: function(world, offX, offY) {
+			var blx = settings.screen.iso.height;
+			var bly = settings.screen.iso.width;
+
+			for (var x = 0; x < this.width / bl; x++) {
+				for (var y = this.height / bl; y >= 0; y--) {
+					var xx = x + offX; //i
+					var yy = y + offY; //j
+					var px = xx * blx;
+					var py = yy * bly;
+					this.context.drawImage(world.light, (yy * bly / 2) + (xx * bly / 2), (xx * blx / 2) - (yy * blx / 2), blx * 2, bly * 2, x * blx * 2, y * bly * 2, blx * 2, bly * 2);
+					//draw(
+					//	tile_map[i][j], (j * tile_width / 2) + (i * tile_width / 2)
+					//	(i * tile_height / 2) - (j * tile_height / 2)
+					//)
+				}
+			}
+		},
 		_background: function(world, offX, offY) {
 			for (var x = 0; x < this.width / bl; x++) {
 				for (var y = 0; y < this.height / bl; y++) {
@@ -224,6 +242,11 @@ define(['settings', 'helpers/log'], function(settings, log) {
 						this.context.drawImage(world.light, px, py, bl, bl, x * bl, y * bl, bl, bl);
 					} else if (tile.visited === true) {
 						this.context.drawImage(world.dark, px, py, bl, bl, x * bl, y * bl, bl, bl);
+					}
+
+					if (tile.selected) {
+						this.box('rgba(255,0,0,1)', px, py, bl, bl);
+						this.rectangle('rgba(255,0,0,0.5)', px, py, bl, bl);
 					}
 				}
 			}
@@ -255,46 +278,75 @@ define(['settings', 'helpers/log'], function(settings, log) {
 	//bit hacky I guess but I wanted the tile image generating logic in the screen
 	//as well because this is where all the other visuals are
 	function tileToImage(ctx, tile, posx, posy, size, light) {
-		var cb, cf, color, background, dcolor, dbackground, sign, fcol, bcol;
-		var opac = (light === true) ? 1 : 0.2;
+		var cb, cf, fcol, bcol;
+		var opac = (light === true) ? 1 : 0.3;
 		var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
-
-		sign = tile.sign
-		color = tile.color;
-		background = tile.background;
-		dcolor = tile.dcolor;
-		dbackground = tile.dbackground;
 
 		//lightmap
 		if (light === true) {
-			cf = color;
-			cb = background || color.map(function(a) {
+			cf = tile.color;
+			cb = tile.background || tile.color.map(function(a) {
 				return ~~(a * opacb);
 			});
 		} else {
-			cf = dcolor || color.map(function(a) {
+			cf = tile.dcolor || tile.color.map(function(a) {
 				return ~~(a * opac);
 			});
-			cb = dbackground || color.map(function(a) {
+			cb = tile.dbackground || tile.color.map(function(a) {
 				return ~~(a * opacb);
 			});
 		}
 
-		tile.color = cf;
-		tile.background = background;
+		//if(!light) cb = cf;
+
+		//tile.color = cf;
+		//tile.background = tile.background;
 
 		bcol = "rgba(" + cb[0] + ", " + cb[1] + ", " + cb[2] + ", " + (cb[3] || 1) + ")";
 		fcol = "rgba(" + cf[0] + ", " + cf[1] + ", " + cf[2] + ", " + (cf[3] || 1) + ")";
 
-		ctx.fillStyle = bcol;
-		ctx.fillRect(posx * size, posy * size, size, size);
+		isoForm(ctx, tile, light, posx, posy, size, fcol, bcol)
+
+	}
+
+	function squareForm(ctx, tile, light, posx, posy, size, fcol, bcol) {
+		if (light === true) {
+			ctx.fillStyle = bcol;
+			ctx.fillRect(posx * size, posy * size, size, size);
+		}
 		//if (light === true) {
 		ctx.fillStyle = fcol;
-		ctx.fillText(sign, posx * size + 3, posy * size + 13);
+		ctx.fillText(tile.sign, posx * size + 3, posy * size + 13);
 		//}
-		if (tile.subtile.guid) {
+		if (tile.subtile.guid && light) {
 			tileToImage(ctx, tile.subtile, posx, posy, size, light);
 		}
+	}
+
+	function isoForm(ctx, tile, light, posx, posy, size, fcol, bcol) {
+		// hexagon
+		var numberOfSides = 4,
+			xsize = settings.screen.iso.width,
+			ysize = settings.screen.iso.height,
+			x = 2 + xsize + posx * xsize * 2,
+			y = 2 + ysize + posy * ysize * 2;
+
+		ctx.beginPath();
+		//console.log(x, y)
+		ctx.moveTo(x + xsize * Math.cos(0), y + ysize * Math.sin(0));
+
+		for (var i = 1; i <= numberOfSides; i += 1) {
+			ctx.lineTo(x + xsize * Math.cos(i * 2 * Math.PI / numberOfSides), y + ysize * Math.sin(i * 2 * Math.PI / numberOfSides));
+		}
+
+		ctx.strokeStyle = fcol;
+		ctx.lineWidth = 1;
+		ctx.stroke();
+		ctx.fillStyle = bcol;
+		ctx.fill();
+
+		ctx.fillStyle = fcol;
+		ctx.fillText(tile.sign, x - 4, y + 5);
 	}
 
 	Factory.tileToImage = tileToImage;

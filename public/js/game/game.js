@@ -93,7 +93,7 @@ define([
 				this.screen.background("rgba(0,0,0,0.8)");
 				this.screen.write('Paused', center.x, center.y, 'rgba(255,0,0,1)');
 			} else {
-				this._selectedTile();
+				//this._selectedTile();
 			}
 		},
 		drawSidebar: function(src) {
@@ -155,6 +155,10 @@ define([
 			if (this.paused === false) {
 				this.player.move(this.world, x, y);
 				this.time.update(this.player.cost);
+				if (this._mouseLocation.set) {
+					this._mouseLocation.px += -1 * x * settings.screen.block;
+					this._mouseLocation.py += -1 * y * settings.screen.block;
+				}
 			}
 		},
 		getTile: function(x, y) {
@@ -167,9 +171,13 @@ define([
 			var x = loc.width + this.offset.w,
 				y = loc.height + this.offset.h,
 				tile = this.world.getTile(x, y);
+				tile.selected = true;
 
 			if (!(this._mouseLocation.x === x && this._mouseLocation.y === y) && tile.visited === true) {
+				console.log(tile);
 				this._mouseLocation = {
+					tile:tile,
+					set: true,
 					x: x,
 					y: y,
 					px: loc.pixWidth,
@@ -178,26 +186,12 @@ define([
 				log.low('[PLAY]', 'mouse location: ', x, y);
 			} else if (this._mouseLocation.x === x && this._mouseLocation.y === y) {
 				log.low('[PLAY]', 'reset mouse location');
-				this._mouseLocation = {
-					x: -1,
-					y: -1,
-					px: -1,
-					py: -1
-				};
-			}
-		},
-		_selectedTile: function() {
-			var x, y, s = settings.screen.block;
-
-			if (this._mouseLocation.x > 0 && this._mouseLocation.y > 0) {
-				//this snaps the line to the grid
-				x = this._mouseLocation.px - this._mouseLocation.px % s;
-				y = this._mouseLocation.py - this._mouseLocation.py % s;
-				this.screen.box('rgba(255,0,0,1)', x, y, s, s);
-				this.screen.rectangle('rgba(255,0,0,0.5)', x, y, s, s);
+				this._mouseLocation.set = false;
+				this._mouseLocation.tile.selected = false;
 			}
 		},
 		_mouseLocation: {
+			set: false,
 			x: -1,
 			y: -1,
 			px: -1,
