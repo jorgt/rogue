@@ -288,7 +288,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			cf = tile.color;
 		} else {
 			cb = tile.dbackground;
-			cf = tile.dcolor;
+			cf = tile.dcolor || tile.background;
 		}
 
 		drawFunc = (settings.screen.type === 'iso') ? isoForm : squareForm;
@@ -305,11 +305,13 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			ctx.fillStyle = bcol;
 			ctx.fillRect(tile.x * sizex, tile.y * sizey, sizex, sizey);
 		}
-		//if (light === true) {
+
 		ctx.fillStyle = fcol;
+		ctx.strokeStyle = fcol;
 		ctx.fillText(tile.sign, tile.x * sizex + 3, tile.y * sizey + 13);
-		//}
-		if (tile.subtile.guid && light) {
+		ctx.strokeText(tile.sign, tile.x * sizex + 3, tile.y * sizey + 13);
+
+		if (tile.subtile.guid) {
 			tileToImage(ctx, tile.subtile, sizex, sizey, light);
 		}
 	}

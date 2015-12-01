@@ -113,7 +113,7 @@ define([
 						alt: ~~(2000 + _gAlt[x][y] + _gAlt2[x][y])
 					}
 					c.climate = climate(c.temp, c.prec, c.alt);
-					var obj = opt.bank.get(c.climate.replace(/\s/g, ''));
+					var obj = opt.bank.get(c.climate.replace(/\s/g, ''), x, y);
 					obj.info.climate = c;
 					if (obj.name === 'ice') obj.info.climate.alt = Math.abs(obj.info.climate.alt);
 					_grid[x][y] = obj;
@@ -250,7 +250,7 @@ define([
 			g = shuffle(g).slice(0, n);
 
 			for (var c = 0; c < g.length; c++) {
-				_grid[g[c][0]][g[c][1]].sub(opt.bank.get('city'), ['name', ['sign']]);
+				_grid[g[c][0]][g[c][1]].sub(opt.bank.get('city', g[c][0], g[c][1]), ['name', ['sign']]);
 			}
 
 			_cities.push([x, y]);
@@ -302,7 +302,7 @@ define([
 
 			for (i = 0; i < g.length; i++) {
 				if (!_grid[g[i].x][g[i].y].name.match(/sea$/)) {
-					_grid[g[i].x][g[i].y].sub(opt.bank.get('river'), ['name', 'sign']);
+					_grid[g[i].x][g[i].y].sub(opt.bank.get('river', g[i].x, g[i].y), ['name', 'sign']);
 				}
 			}
 
@@ -345,7 +345,7 @@ define([
 						for (var r = 0; r < result.length; r++) {
 							var tile = (_grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : path;
 							if (!_grid[result[r].x][result[r].y].name.match(/city|highway|ferry/)) {
-								_grid[result[r].x][result[r].y].sub(opt.bank.get(tile), ['name', 'sign', 'cost']);
+								_grid[result[r].x][result[r].y].sub(opt.bank.get(tile, result[r].x, result[r].y), ['name', 'sign', 'cost']);
 							}
 						}
 

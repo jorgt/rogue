@@ -130,8 +130,9 @@ define(["helpers/log"], function(
 				var backingStore, ratio,
 					context = _super.call(this, type);
 
-				if (type === '2d') {
-
+				if (type === '2d' && context.converted !== true) {
+					context.converted = true;
+					
 					backingStore = context.backingStorePixelRatio ||
 						context.webkitBackingStorePixelRatio ||
 						context.mozBackingStorePixelRatio ||

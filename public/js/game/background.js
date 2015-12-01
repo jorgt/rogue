@@ -14,18 +14,6 @@ define(['settings', 'game/screenmanager', 'helpers/log'], function(settings, scr
 			background.light = drawFunc(background, true);
 			background.dark = drawFunc(background, false);
 
-			//background.light.onload = function() {
-			//	var dark = drawFunc(background, false);
-			//	background.dark.src = dark.toDataURL('image/png');
-			//}.bind(this);
-
-			//background.dark.onload = function() {
-			//	resolve(background);
-			//document.body.appendChild(background.light);
-			//}.bind(this);
-
-			//background.light.src = light.toDataURL('image/png');
-			//
 			resolve(background);
 
 		});
@@ -55,8 +43,6 @@ define(['settings', 'game/screenmanager', 'helpers/log'], function(settings, scr
 		for (x = 0; x < w.grid.length; x++) {
 			for (y = 0; y < w.grid[x].length; y++) {
 				var tile = w.grid[x][y];
-				tile.x = x;
-				tile.y = y;
 				var opac = (light === true) ? 1 : 0.3;
 				var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
 

@@ -17,15 +17,15 @@ define(["helpers/log"], function(
 	_bank.add('shallowsea', '~', 20, false, true, false, [41, 72, 210]);
 	_bank.add('sea', '≈', 10, false, true, false, [20, 46, 166]);
 	_bank.add('deepsea', '≈', 1, false, true, false, [0, 25, 128]);
-	_bank.add('ice', arr(['·',' ']), 20, true, true, false, [255, 255, 255], [200, 200, 255], [100, 100, 100], [70, 70, 100]);
-	_bank.add('polar', arr(['·',' ']), 20, true, true, false, [238, 238, 238]);
-	_bank.add('tundra', arr(['·',' ']), 50, true, true, false, [204, 219, 195]);
+	_bank.add('ice', arr(['·', ' ']), 20, true, true, false, [255, 255, 255], [200, 200, 255], [100, 100, 100], [70, 70, 100]);
+	_bank.add('polar', arr(['·', ' ']), 20, true, true, false, [238, 238, 238]);
+	_bank.add('tundra', arr(['·', ' ']), 50, true, true, false, [204, 219, 195]);
 	_bank.add('taiga', '*', 50, true, true, false, [195, 218, 219]);
-	_bank.add('savannah', arr(['·',' ']), 50, true, true, false, [211, 222, 0]);
-	_bank.add('shrubland', arr(['·',' ']), 40, true, true, false, [142, 230, 0]);
+	_bank.add('savannah', arr(['·', ' ']), 50, true, true, false, [211, 222, 0]);
+	_bank.add('shrubland', arr(['·', ' ']), 40, true, true, false, [142, 230, 0]);
 	_bank.add('forest', tree, 60, true, true, false, [51, 181, 0]);
-	_bank.add('swamp', arr(['·',' ']), 30, true, true, false, [0, 90, 30]);
-	_bank.add('desert', arr(['·',' ']), 40, true, true, false, [255, 191, 0]);
+	_bank.add('swamp', arr(['·', ' ']), 30, true, true, false, [0, 90, 30]);
+	_bank.add('desert', arr(['·', ' ']), 40, true, true, false, [255, 191, 0]);
 	_bank.add('plains', '*', 70, true, true, false, [212, 255, 0]);
 	_bank.add('seasonalforest', tree, 70, true, true, false, [0, 163, 0]);
 	_bank.add('rainforest', tree, 30, true, true, false, [0, 105, 0]);
@@ -36,10 +36,10 @@ define(["helpers/log"], function(
 		world objects
 	 */
 	_bank.add('city', "C", 90, null, null, null, [255, 255, 255], [0, 0, 0, 0.4], [0, 0, 0, 0.4], [0, 0, 0, 0.4]);
-	_bank.add('highway', 'x', 95, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], null, [0, 0, 0, 0.1]);
-	_bank.add('path', 'x', 90, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], null, [0, 0, 0, 0.1]);
+	_bank.add('highway', 'x', 95, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], [60, 60, 60], [0, 0, 0, 0.1]);
+	_bank.add('path', 'x', 90, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], [60, 60, 60], [0, 0, 0, 0.1]);
 	_bank.add('ferry', '*', 40, true, true, false, [200, 200, 200], [0, 0, 0, 0.2], null, [0, 0, 0, 0.2]);
-	_bank.add('river', '*', 40, true, true, false, [0, 0, 255], [0, 0, 255, 0.1], null, [0, 0, 0, 0.1]);
+	_bank.add('river', '*', 40, true, true, false, [0, 0, 255], [0, 0, 255, 0.1], [0, 0, 100], [0, 0, 0, 0.1]);
 
 	/*
 		dungeons and caves
@@ -68,7 +68,7 @@ define(["helpers/log"], function(
 
 	function arr(a) {
 		return function() {
-			return a[Math.between(0, a.length - 1)];		
+			return a[Math.between(0, a.length - 1)];
 		}
 	}
 
@@ -95,19 +95,19 @@ define(["helpers/log"], function(
 			};
 		};
 
-		this.get = function(name) {
+		this.get = function(name, x, y) {
 			if (!_bank[name]) {
 				throw new Error("Tile type " + name + " is not defined");
 			}
-			return new Tile(_bank[name]);
+			return new Tile(_bank[name], x, y);
 		};
 
 		var Tile = Class.extend({
-			init: function(opt) {
+			init: function(opt, x, y) {
 				this.guid = guid();
 				this.name = opt.name;
-				this.x = 0;
-				this.y = 0;
+				this.x = x;
+				this.y = y;
 				if (typeof opt.sign === 'function') {
 					this.sign = opt.sign();
 				} else {
@@ -145,7 +145,8 @@ define(["helpers/log"], function(
 				this.subtile.x = tile.x;
 				this.subtile.y = tile.y;
 				for (var s = 0; s < stats.length; s++) {
-					this[stats[s]] = tile[stats[s]] || this[stats[s]]
+					this[stats[s]] = tile[stats[s]] || this[stats[s]];
+					tile[stats[s]] = ' ';
 				}
 			},
 			change: function(tile) {
