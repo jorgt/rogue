@@ -14,14 +14,15 @@ define([
 	var game, promise, started = false;
 
 	var Game = Class.extend({
+		updateQueue: [],
 		init: function() {
 			log.urgent('[GAME]', 'starting to put the game together');
 
 			Lands.createPlane({
 				type: 'world',
 				options: {
-					height: 75,
-					width: 100,
+					height: 40,
+					width: 40,
 					bank: tilebank
 				}
 			}).then(function(world) {
@@ -123,7 +124,7 @@ define([
 
 			no++
 
-			if (mx > -1) {
+			if (this._mouseLocation.tile && this._mouseLocation.tile.selected === true) {
 				tile = this.getTile(mx, my);
 				src.write('Tile at ' + mx + ',' + my + ': ' + tile.name, sidex, sidey + 20 * no++);
 
@@ -138,6 +139,9 @@ define([
 			}
 		},
 		update: function() {
+			var t = this.world.getTile(20, 20);
+			t.sign = ['1', '2', '3'][~~(Math.random() * 3)];
+			this.world.changeTile(t);
 			//the game paused thing is not very relevant after moving the key updates to their own loops.
 			if (this.paused === false) {
 				//update the grid with the player position, visible/visited grid
@@ -171,12 +175,12 @@ define([
 			var x = loc.width + this.offset.w,
 				y = loc.height + this.offset.h,
 				tile = this.world.getTile(x, y);
-				tile.selected = true;
 
-			if (!(this._mouseLocation.x === x && this._mouseLocation.y === y) && tile.visited === true) {
-				console.log(tile);
+			if ((!(this._mouseLocation.x === x && this._mouseLocation.y === y) || this._mouseLocation.set === false) && tile.visited === true) {
+				if (this._mouseLocation.tile) this._mouseLocation.tile.selected = false;
+				tile.selected = true;
 				this._mouseLocation = {
-					tile:tile,
+					tile: tile,
 					set: true,
 					x: x,
 					y: y,

@@ -9,10 +9,11 @@ define([], function() {
 		screen: {
 			width: 1000,
 			height: 600,
+			type: 'square',
 			block: 15,
 			iso: {
-				height: 8,
-				width: 15
+				height: 16,
+				width: 32
 			},
 			font: 'profontwindowsregular' //minecraftiaregular, minecraftmedium, profontwindowsregular
 		}

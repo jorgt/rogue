@@ -106,6 +106,8 @@ define(["helpers/log"], function(
 			init: function(opt) {
 				this.guid = guid();
 				this.name = opt.name;
+				this.x = 0;
+				this.y = 0;
 				if (typeof opt.sign === 'function') {
 					this.sign = opt.sign();
 				} else {
@@ -140,6 +142,8 @@ define(["helpers/log"], function(
 				stats = stats || [];
 				this.subtile = tile;
 				this.subtile.info = tile.info;
+				this.subtile.x = tile.x;
+				this.subtile.y = tile.y;
 				for (var s = 0; s < stats.length; s++) {
 					this[stats[s]] = tile[stats[s]] || this[stats[s]]
 				}
