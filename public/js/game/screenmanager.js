@@ -209,12 +209,14 @@ define(['settings', 'helpers/log'], function(settings, log) {
 				func(this.context, array[x])
 			}
 		},
-		_entity: function(ent, offX, offY, color) {
+		_entity: function(ent, offX, offY) {
 			var p = ent.getLocation();
 			var nx = (p.w - offX) * bl + 3;
 			var ny = (p.h - offY) * bl + 12;
-			this.context.fillStyle = color || "rgba(255,255,255,1)";
+			this.context.fillStyle = ent.color || "rgba(255,255,255,1)";
+			this.context.strokeStyle = ent.color || "rgba(255,255,255,1)";
 			this.context.fillText(ent.sign, nx, ny);
+			this.context.strokeText(ent.sign, nx, ny);
 		},
 		_isoBackground: function(world, offX, offY, player) {
 			var th = settings.screen.iso.height;
@@ -307,9 +309,12 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		}
 
 		ctx.fillStyle = fcol;
-		ctx.strokeStyle = fcol;
+		
 		ctx.fillText(tile.sign, tile.x * sizex + 3, tile.y * sizey + 13);
-		ctx.strokeText(tile.sign, tile.x * sizex + 3, tile.y * sizey + 13);
+		if(tile.name.match(/path|river/)) {
+			ctx.strokeStyle = fcol;
+			ctx.strokeText(tile.sign, tile.x * sizex + 3, tile.y * sizey + 13);
+		}
 
 		if (tile.subtile.guid) {
 			tileToImage(ctx, tile.subtile, sizex, sizey, light);

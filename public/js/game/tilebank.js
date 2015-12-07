@@ -146,7 +146,6 @@ define(["helpers/log"], function(
 				this.subtile.y = tile.y;
 				for (var s = 0; s < stats.length; s++) {
 					this[stats[s]] = tile[stats[s]] || this[stats[s]];
-					tile[stats[s]] = ' ';
 				}
 			},
 			change: function(tile) {

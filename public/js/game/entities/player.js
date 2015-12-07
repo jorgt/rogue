@@ -10,6 +10,7 @@ define([
 		init: function(grid) {
 			this._super.apply(this, arguments);
 			this.sign = '@';
+			this.color = 'rgba(255,0,0,1)';
 			this.radius = 10;
 			this.light = this._changeLight(grid);
 		},

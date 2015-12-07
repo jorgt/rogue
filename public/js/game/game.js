@@ -21,8 +21,8 @@ define([
 			Lands.createPlane({
 				type: 'world',
 				options: {
-					height: 40,
-					width: 40,
+					height: 75,
+					width: 100,
 					bank: tilebank
 				}
 			}).then(function(world) {

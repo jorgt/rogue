@@ -43,7 +43,7 @@ define(['settings', 'game/screenmanager', 'helpers/log'], function(settings, scr
 		for (x = 0; x < w.grid.length; x++) {
 			for (y = 0; y < w.grid[x].length; y++) {
 				var tile = w.grid[x][y];
-				var opac = (light === true) ? 1 : 0.3;
+				var opac = (light === true) ? 1 : 0.4;
 				var opacb = ((tile.info.tot + tile.info.alt / 5) / 1.8) * opac;
 
 				//lightmap

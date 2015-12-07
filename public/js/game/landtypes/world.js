@@ -18,83 +18,98 @@ define([
 
 	'use strict';
 
-	var ranges = {
-		altitude: {
-			min: -9000, //-10000,
-			max: 9000
+	var World = Base.extend({
+		grid: [],
+		width: 0,
+		height: 0,
+		start: null,
+		end: null,
+		cities: [],
+		roads: [],
+		rivers: [],
+		_bank: null,
+		getStartAndEndTiles: function() {
+			log.med('[WORLD]', 'getting start- and end tiles');
+
+			while (this.start === null || this.end === null) {
+				var sx = Math.between(0, this.grid.length - 1);
+				var sy = Math.between(0, this.grid[0].length - 1);
+				var ex = Math.between(0, this.grid.length - 1);
+				var ey = Math.between(0, this.grid[0].length - 1);
+
+				this.start = (this.grid[sx][sy].walkable === true) ? [sx, sy] : null;
+				this.end = (this.grid[ex][ey].walkable === true) ? [ex, ey] : null;
+			}
 		},
-		precipitation: {
-			min: 50,
-			max: 16000
+		init: function(opt) {
+			this.width = opt.width;
+			this.height = opt.height;
+			this._bank = opt.bank;
+
+			this._createBase();
+			this._normalizeAltitude();
+			this._createRivers();
+			this._createCities();
+			this._createRoadsBetweenCities();
+			this._reSignRivers();
+			this._reSignRoads();
+			this.getStartAndEndTiles();
 		},
-		temperature: {
-			min: -25,
-			max: 50
-		}
-	}
-	var chunk = 50;
+		_createBase: function() {
+			var ranges = {
+				altitude: {
+					min: -9000, //-10000,
+					max: 9000
+				},
+				precipitation: {
+					min: 50,
+					max: 16000
+				},
+				temperature: {
+					min: -25,
+					max: 50
+				}
+			}
+			var chunk = 50;
 
-	var sAlt = new Simplex({
-		octaves: 20,
-		persistence: 0.6,
-		level: 0.0035
-	});
+			var sAlt = new Simplex({
+				octaves: 20,
+				persistence: 0.6,
+				level: 0.0035
+			});
 
-	var sAlt2 = new Simplex({
-		octaves: 20,
-		persistence: 0.4,
-		level: 0.0095
-	});
+			var sAlt2 = new Simplex({
+				octaves: 20,
+				persistence: 0.4,
+				level: 0.0095
+			});
 
-	var sPre = new Simplex({
-		octaves: 20,
-		persistence: 0.2,
-		level: 0.0085
-	});
+			var sPre = new Simplex({
+				octaves: 20,
+				persistence: 0.2,
+				level: 0.0085
+			});
 
-	var sTem = new Simplex({
-		octaves: 20,
-		persistence: 0.4,
-		level: 0.0075
-	});
+			var sTem = new Simplex({
+				octaves: 20,
+				persistence: 0.4,
+				level: 0.0075
+			});
 
-	return function world(opt) {
-		log.med('[WORLD]', 'start building the overworld');
-		var _size = opt.size || Math.uneven(Math.between(60, 70));
-		var _width = opt.width || _size;
-		var _height = opt.height || _size;
-		var _grid = [];
-		var _start = null;
-		var _end = null;
-		var _cities = [];
-		var _rivers = [];
+			var _gAltRadial = this._rollingParticles();
+			var _gTemAxial = this._axialParticles();
 
-		_createBase();
-		_normalizeAltitude();
-		_createRivers();
-		_createCities();
-		_createRoadsBetweenCities();
-		_reSignRivers();
-		_reSignRoads();
-		_getStartAndEndTiles();
-
-		return new Base(_grid, _start, _end, _height, _width);
-
-		function _createBase() {
-			var _gAltRadial = _rollingParticles();
-			var _gTemAxial = _axialParticles();
-
-			var _gAlt = _chunk(sAlt, ranges.altitude, _height, _width, 0, 0, _gAltRadial, true);
+			var _gAlt = this._chunk(sAlt, ranges.altitude, this.height, this.width, 0, 0, _gAltRadial, true);
 			log.low('[WORLD]', 'first range of altitude done');
 
-			var _gAlt2 = _chunk(sAlt2, ranges.altitude, _height, _width, 0, 0, null, true);
+			var _gAlt2 = this._chunk(sAlt2, ranges.altitude, this.height, this.width, 0, 0, null, true);
 			log.low('[WORLD]', 'second range of altitude done');
 
-			var _gTem = _chunk(sTem, ranges.temperature, _height, _width, 0, 0, _gTemAxial);
+			var _gTem = this._chunk(sTem, ranges.temperature, this.height, this.width, 0, 0, _gTemAxial);
 			log.low('[WORLD]', 'temperature done');
 
-			var _gDir = _directionalParticles(_gAlt, _gTem);
-			var _gPre = _chunk(sPre, _randomize(ranges.precipitation), _height, _width, 0, 0, _gDir);
+			var _gDir = this._directionalParticles(_gAlt, _gTem);
+			var _gPre = this._chunk(sPre, this._randomize(ranges.precipitation), this.height, this.width, 0, 0, _gDir);
 			log.low('[WORLD]', 'precipitation done');
 
 			var aa = 0,
@@ -104,24 +119,31 @@ define([
 				y = 0;
 
 			//combine everything into base
-			for (x = 0; x < _width; x++) {
-				_grid[x] = [];
-				for (y = 0; y < _height; y++) {
+			for (x = 0; x < this.width; x++) {
+				this.grid[x] = [];
+				for (y = 0; y < this.height; y++) {
 					var c = {
 						temp: ~~(_gTem[x][y] * 1.8) + 5,
 						prec: ~~(Math.pow(_gPre[x][y], 1.1)),
 						alt: ~~(2000 + _gAlt[x][y] + _gAlt2[x][y])
 					}
 					c.climate = climate(c.temp, c.prec, c.alt);
-					var obj = opt.bank.get(c.climate.replace(/\s/g, ''), x, y);
+					var obj = this._bank.get(c.climate.replace(/\s/g, ''), x, y);
 					obj.info.climate = c;
 					if (obj.name === 'ice') obj.info.climate.alt = Math.abs(obj.info.climate.alt);
-					_grid[x][y] = obj;
+					this.grid[x][y] = obj;
 				}
 			}
-		}
+		},
 
-		function _normalizeAltitude() {
+		_randomize: function(range, variation) {
+			return {
+				min: ~~(range.min * (Math.random() * 0.4 + 0.8)),
+				max: ~~(range.max * (Math.random() * 0.4 + 0.8))
+			}
+		},
+
+		_normalizeAltitude: function() {
 			var x, y;
 
 			//normalize the colors
@@ -133,9 +155,9 @@ define([
 			};
 
 			//first determine minimum and maximum
-			for (x = 0; x < _width; x++) {
-				for (y = 0; y < _height; y++) {
-					var t = _grid[x][y];
+			for (x = 0; x < this.width; x++) {
+				for (y = 0; y < this.height; y++) {
+					var t = this.grid[x][y];
 					if (!cols[t.name]) {
 						cols[t.name] = {
 							min: Number.MAX_VALUE,
@@ -149,17 +171,17 @@ define([
 				}
 			}
 
-			for (x = 0; x < _width; x++) {
-				for (y = 0; y < _height; y++) {
-					var t = _grid[x][y];
+			for (x = 0; x < this.width; x++) {
+				for (y = 0; y < this.height; y++) {
+					var t = this.grid[x][y];
 					var c = cols[t.name];
 					t.info.alt = (t.info.climate.alt - c.min) / (c.max - c.min);
 					t.info.tot = (t.info.climate.alt - cols.total.min) / (cols.total.max - cols.total.min);
 				}
 			}
-		}
+		},
 
-		function _chunk(noise, range, h, w, startx, starty, merge, edges) {
+		_chunk: function(noise, range, h, w, startx, starty, merge, edges) {
 			var generator = Grids({
 				type: Grids.tileable,
 				h: h,
@@ -170,74 +192,51 @@ define([
 			});
 
 			var grid = generator.grid();
-			if (edges) _edges(grid);
+			if (edges) this._edges(grid);
 			var world = [];
 
 			for (var x = 0; x < grid.length; x++) {
 				world[x] = [];
 				for (var y = 0; y < grid[x].length; y++) {
 					var m = (merge instanceof Array) ? merge[x][y] : 1;
-					world[x][y] = Math.floor(_range(range, grid[x][y] * m));
+					world[x][y] = Math.floor(this._range(range, grid[x][y] * m));
 				}
 			}
 			return world;
-		}
+		},
 
-		function _randomize(range, variation) {
-			return {
-				min: ~~(range.min * (Math.random() * 0.4 + 0.8)),
-				max: ~~(range.max * (Math.random() * 0.4 + 0.8))
-			}
-		}
-
-		function _range(range, n) {
+		_range: function(range, n) {
 			return (range.max - range.min) * n + range.min;
-		}
+		},
 
-		function _getStartAndEndTiles() {
-			log.med('[WORLD]', 'getting start- and end tiles');
-			var start = null;
-			var end = null;
-			while (_start === null || _end === null) {
-				var sx = Math.between(0, _grid.length - 1);
-				var sy = Math.between(0, _grid[0].length - 1);
-				var ex = Math.between(0, _grid.length - 1);
-				var ey = Math.between(0, _grid[0].length - 1);
-				start = _grid[sx][sy];
-				end = _grid[ex][ey];
-				_start = (start.walkable === true) ? [sx, sy] : null;
-				_end = (end.walkable === true) ? [ex, ey] : null;
-			}
-		}
-
-		function _createCities() {
+		_createCities: function() {
 			log.med('[WORLD]', 'creating cities and towns');
 			var x, y;
 			var city = Math.random() > 0.85; // ratio towns/cities 7:3
 			var attempts = 0;
-			while (_cities.length < 15 && attempts++ < 5000) {
-				_createCity((city) ? 1 : Math.between(5, 9));
+			while (this.cities.length < 15 && attempts++ < 5000) {
+				this._createCity((city) ? 1 : Math.between(5, 9));
 			}
-			log.med('[WORLD]', 'created', _cities.length, 'cities and towns');
-		}
+			log.med('[WORLD]', 'created', this.cities.length, 'cities and towns');
+		},
 
-		function _createCity(n) {
+		_createCity: function(n) {
 			var c, d, x, y, r, g = [];
 
 			//get a Math.between tile with starting point as a multiple of some number
 			//to prevent cities from being built next to each other
-			x = Math.between(0, _grid.length - 1);
-			y = Math.between(0, _grid[0].length - 1);
+			x = Math.between(0, this.grid.length - 1);
+			y = Math.between(0, this.grid[0].length - 1);
 
 			//check if another city exists in an 11 cell block around x and y. 
 			//exit function if it exists
-			if (_scanGrid(x, y, 11, function(tile) {
+			if (this._scanGrid(x, y, 11, function(tile) {
 					return (tile.name === 'city' || tile.subtile === 'city');
 				})) {
 				return false;
 			}
 
-			if (_scanGrid(x, y, 1, function(tile, a, b) {
+			if (this._scanGrid(x, y, 1, function(tile, a, b) {
 					if (tile.info.climate.alt > 0) {
 						g.push([a, b])
 					} else {
@@ -250,49 +249,47 @@ define([
 			g = shuffle(g).slice(0, n);
 
 			for (var c = 0; c < g.length; c++) {
-				_grid[g[c][0]][g[c][1]].sub(opt.bank.get('city', g[c][0], g[c][1]), ['name', ['sign']]);
+				this.grid[g[c][0]][g[c][1]].sub(this._bank.get('city', g[c][0], g[c][1]), ['name', 'color', 'sign']);
 			}
 
-			_cities.push([x, y]);
+			this.cities.push([x, y]);
 
 			log.low('[WORLD]', 'created a city at', x, y);
 
 			return true;
-		}
-
-		function _createRivers() {
+		},
+		_createRivers: function() {
 			log.med('[WORLD]', 'creating rivers');
 			var attempts = 0;
 
-			while (_rivers.length < Math.between(5, 7) && attempts++ < 5000) {
-				_createRiver();
+			while (this.rivers.length < Math.between(5, 7) && attempts++ < 5000) {
+				this._createRiver();
 			}
 
-			log.med('[WORLD]', 'created', _rivers.length, 'rivers');
-		}
-
-		function _createRiver() {
+			log.med('[WORLD]', 'created', this.rivers.length, 'rivers');
+		},
+		_createRiver: function() {
 			var a, b, x, y, i, next,
 				g = [],
 				life = 100;
 
-			x = Math.between(0, _grid.length - 1);
-			y = Math.between(0, _grid[x].length - 1);
+			x = Math.between(0, this.grid.length - 1);
+			y = Math.between(0, this.grid[x].length - 1);
 
-			if (_grid[x][y].info.climate.alt < 4000 && _grid[x][y].info.climate.prec > 10000) return false;
+			if (this.grid[x][y].info.climate.alt < 4000 && this.grid[x][y].info.climate.prec > 10000) return false;
 
-			a = Math.between(0, _grid.length - 1);
-			b = Math.between(0, _grid[x].length - 1);
+			a = Math.between(0, this.grid.length - 1);
+			b = Math.between(0, this.grid[x].length - 1);
 
-			if (_grid[a][b].info.climate.alt > 0) return false;
+			if (this.grid[a][b].info.climate.alt > 0) return false;
 
-			var g = AStar.search(_grid, [x, y], [a, b], false, null, function(tile) {
+			var g = AStar.search(this.grid, [x, y], [a, b], false, null, function(tile) {
 				return (tile.name === 'river') ? 0 : Math.pow(100, tile.info.tot);
 			});
 
 			var tot;
 			for (i = 0; i < g.length; i++) {
-				if (!_grid[g[i].x][g[i].y].name.match(/sea$/)) {
+				if (!this.grid[g[i].x][g[i].y].name.match(/sea$/)) {
 					tot++;
 					break;
 				}
@@ -301,86 +298,82 @@ define([
 			if (tot < 30) return false;
 
 			for (i = 0; i < g.length; i++) {
-				if (!_grid[g[i].x][g[i].y].name.match(/sea$/)) {
-					_grid[g[i].x][g[i].y].sub(opt.bank.get('river', g[i].x, g[i].y), ['name', 'sign']);
+				if (!this.grid[g[i].x][g[i].y].name.match(/sea$/)) {
+					this.grid[g[i].x][g[i].y].sub(this._bank.get('river', g[i].x, g[i].y), ['name', 'sign']);
 				}
 			}
 
-			_rivers.push([x, y]);
-		}
-
-		function _scanGrid(centerx, centery, cells, func) {
+			this.rivers.push([x, y]);
+		},
+		_scanGrid: function(centerx, centery, cells, func) {
 			var x, y, sx, sy, ex, ey;
 
 			sx = Math.max(0, centerx - cells);
 			sy = Math.max(0, centery - cells);
-			ex = Math.min(_grid.length - 1, centerx + cells);
-			ey = Math.min(_grid[0].length - 1, centery + cells);
+			ex = Math.min(this.grid.length - 1, centerx + cells);
+			ey = Math.min(this.grid[0].length - 1, centery + cells);
 			for (x = sx; x <= ex; x++) {
 				for (y = sy; y <= ey; y++) {
-					if (func(_grid[x][y], x, y) === true) return true;
+					if (func(this.grid[x][y], x, y) === true) return true;
 				}
 			}
 			return false;
-		}
-
-		function _createRoadsBetweenCities() {
+		},
+		_createRoadsBetweenCities: function() {
 			log.med('[WORLD]', 'connecting cities and roads');
-			var attempts, x, y, result, r, done = [],
-				path;
+			var attempts, x, y;
 
 			attempts = 0;
 
-			while (done.length < _cities.length * 1.8 && attempts++ < 1000) {
-				x = window.Math.between(0, _cities.length - 1);
-				y = window.Math.between(0, _cities.length - 1);
+			while (this.roads.length < this.cities.length * 0.4 && attempts++ < 1000) {
+				x = window.Math.between(0, this.cities.length - 1);
+				y = window.Math.between(0, this.cities.length - 1);
 
-				if (x === y || done.indexOf(x + '.' + y) >= 0 || done.indexOf(y + '.' + x) >= 0) {
+				if (x === y || this.roads.indexOf(x + '.' + y) >= 0 || this.roads.indexOf(y + '.' + x) >= 0) {
 					continue;
 				} else {
-					result = AStar.search(_grid, _cities[x], _cities[y]);
-					if (result.length > 0) {
-						path = (Math.random() < 0.8) ? 'path' : 'highway';
-
-						for (var r = 0; r < result.length; r++) {
-							var tile = (_grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : path;
-							if (!_grid[result[r].x][result[r].y].name.match(/city|highway|ferry/)) {
-								_grid[result[r].x][result[r].y].sub(opt.bank.get(tile, result[r].x, result[r].y), ['name', 'sign', 'cost']);
-							}
-						}
-
-						done.push(x + '.' + y);
-
-						log.low('[WORLD]', 'connected 2 cities:', _cities[x], _cities[y]);
-					}
+					this.roads.push(this._createARoad(x, y, 'path'));
 				}
 			}
 
-			log.med('[WORLD]', 'total roads created:', done.length);
-		}
+			log.med('[WORLD]', 'total roads created:', this.roads.length);
+		},
+		_createARoad: function(city1, city2, type) {
+			var result, path;
 
-		function _reSignRoads() {
+			result = AStar.search(this.grid, this.cities[city1], this.cities[city2]);
+			if (result.length > 0) {
+
+				for (var r = 0; r < result.length; r++) {
+					var tile = (this.grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : type;
+					if (!this.grid[result[r].x][result[r].y].name.match(/city|highway|ferry/)) {
+						this.grid[result[r].x][result[r].y].sub(this._bank.get(tile, result[r].x, result[r].y), ['name', 'sign', 'cost']);
+					}
+				}
+				log.low('[WORLD]', 'connected 2 cities:', this.cities[city1], this.cities[city2]);
+				return city1 + '.' + city2;
+			}
+		},
+		_reSignRoads: function() {
 			log.med('[WORLD]', 'fixing road signs');
-			_reSignSomething(/ferry|highway|path/, ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'], function(n, g) {
+			this._reSignSomething(/ferry|highway|path/, ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'], function(n, g) {
 				if (g.name === 'ferry') return g.sign;
 			});
 
-			_reSignSomething(/path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯'], function(n, g) {
+			this._reSignSomething(/path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯'], function(n, g) {
 				if (g.name === 'ferry') return g.sign;
 			});
-		}
-
-		function _reSignRivers() {
+		},
+		_reSignRivers: function() {
 			log.med('[WORLD]', 'fixing river signs');
-			_reSignSomething(/river/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯']);
-		}
-
-		function _reSignSomething(h, chars, func) {
+			this._reSignSomething(/river/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯']);
+		},
+		_reSignSomething: function(h, chars, func) {
 			var r;
-			for (var x = 0; x < _grid.length; x++) {
-				for (var y = 0; y < _grid[x].length; y++) {
-					if (_grid[x][y].name.match(h) || (_grid[x][y].subtile.name && _grid[x][y].subtile.name.match(h))) {
-						var n = _neighbours(x, y);
+			for (var x = 0; x < this.grid.length; x++) {
+				for (var y = 0; y < this.grid[x].length; y++) {
+					if (this.grid[x][y].name.match(h) || (this.grid[x][y].subtile.name && this.grid[x][y].subtile.name.match(h))) {
+						var n = this._neighbours(x, y);
 						var s = '·';
 
 						if (n[0].name.match(h) && n[1].name.match(h) && n[2].name.match(h) && n[3].name.match(h)) {
@@ -411,17 +404,16 @@ define([
 							s = chars[1];
 						}
 
-						r = (func) ? func(n, _grid[x][y]) : null;
+						r = (func) ? func(n, this.grid[x][y]) : null;
 						s = (r) ? r : s;
-						//if(_grid[x][y].name === 'ferry') console.log(_grid[x][y], _grid[x][y].sign, s, r);
-						_grid[x][y].sign = s || _grid[x][y].sign;
-						if (_grid[x][y].subtile.sign) _grid[x][y].subtile.sign = s;
+
+						this.grid[x][y].sign = s || this.grid[x][y].sign;
+						if (this.grid[x][y].subtile.sign) this.grid[x][y].subtile.sign = s;
 					}
 				}
 			}
-		}
-
-		function _neighbours(x, y) {
+		},
+		_neighbours: function(x, y) {
 			var ret = [];
 			var dir = [
 				[0, -1], //south
@@ -431,8 +423,8 @@ define([
 			];
 
 			for (var d = 0; d < dir.length; d++) {
-				if (_grid[x + dir[d][0]] && _grid[x + dir[d][0]][y + dir[d][1]]) {
-					ret.push(_grid[x + dir[d][0]][y + dir[d][1]]);
+				if (this.grid[x + dir[d][0]] && this.grid[x + dir[d][0]][y + dir[d][1]]) {
+					ret.push(this.grid[x + dir[d][0]][y + dir[d][1]]);
 				} else {
 					ret.push({
 						name: 'unknown'
@@ -441,30 +433,28 @@ define([
 			}
 
 			return ret;
-		}
-
-		function _axialParticles() {
+		},
+		_axialParticles: function() {
 			var grid = [];
-			for (var x = 0; x < _width; x++) {
+			for (var x = 0; x < this.width; x++) {
 				grid[x] = [];
-				for (var y = 0; y < _height; y++) {
-					var n = 1 - (Math.abs(_height / 2 - y) / (_height));
+				for (var y = 0; y < this.height; y++) {
+					var n = 1 - (Math.abs(this.height / 2 - y) / (this.height));
 					grid[x][y] = n;
 				}
 			}
 			return grid;
-		}
-
-		function _directionalParticles(h, t) {
+		},
+		_directionalParticles: function(h, t) {
 			var dir = ((2 * Math.PI) / 360 * (Math.random() * 360));
-			h = _normalize(h, true);
-			t = _normalize(t, true);
+			h = this._normalize(h, true);
+			t = this._normalize(t, true);
 			var grid = [];
-			for (var x = 0; x < _width; x++) {
+			for (var x = 0; x < this.width; x++) {
 				grid[x] = [];
-				for (var y = 0; y < _height; y++) {
+				for (var y = 0; y < this.height; y++) {
 					var n1 = point(x, y, 2, dir);
-					var x1 = (n1.x >= 0 && n1.y >= 0 && n1.x < _width && n1.y < _height) ? h[n1.x][n1.y] : 0;
+					var x1 = (n1.x >= 0 && n1.y >= 0 && n1.x < this.width && n1.y < this.height) ? h[n1.x][n1.y] : 0;
 
 					var x3 = h[x][y];
 
@@ -473,7 +463,7 @@ define([
 			}
 
 			//return h;
-			return _normalize(grid);
+			return this._normalize(grid);
 
 			function point(x, y, length, rad) {
 				return {
@@ -481,60 +471,59 @@ define([
 					y: ~~(y + (length * Math.cos(rad)))
 				}
 			}
-		}
-
-		function _rollingParticles() {
-			var grid = [];
+		},
+		_rollingParticles: function() {
+			var _grid = [];
 			var _its = 10000;
 			var _life = 40;
-			var _edgex = _width * 0.15;
-			var _edgey = _height * 0.15;
+			var _edgex = this.width * 0.15;
+			var _edgey = this.height * 0.15;
 			var _blur1 = 0.35;
 			var _blur2 = 0.20;
 
-			for (var x = 0; x < _width; x++) {
-				grid[x] = [];
-				for (var y = 0; y < _height; y++) {
-					grid[x][y] = 0;
+			for (var x = 0; x < this.width; x++) {
+				_grid[x] = [];
+				for (var y = 0; y < this.height; y++) {
+					_grid[x][y] = 0;
 				}
 			}
 
 			for (var i = 0; i < _its; i++) {
-				var x = ~~(Math.random() * (_width - (_edgex * 2)) + _edgex);
-				var y = ~~(Math.random() * (_height - (_edgey * 2)) + _edgey);
+				var x = ~~(Math.random() * (this.width - (_edgex * 2)) + _edgex);
+				var y = ~~(Math.random() * (this.height - (_edgey * 2)) + _edgey);
 
 				for (var j = 0; j < _life; j++) {
 					x += Math.round(Math.random() * 2 - 1);
 					y += Math.round(Math.random() * 2 - 1);
 
-					if (x < 1 || x > _width - 2 || y < 1 || y > _height - 2) continue;
+					if (x < 1 || x > this.width - 2 || y < 1 || y > this.height - 2) continue;
 
-					var hood = _next(x, y);
+					var hood = _next(x, y, this.width, this.height);
 
 					for (var k = 0; k < hood.length; k++) {
-						if (grid[hood[k][0]][hood[k][1]] < grid[x][y]) {
+						if (_grid[hood[k][0]][hood[k][1]] < _grid[x][y]) {
 							x = hood[k][0];
 							y = hood[k][1];
 							continue;
 						}
 					}
 
-					grid[x][y]++;
+					_grid[x][y]++;
 				}
 			}
 
-			return _edges(_normalize(grid));
+			return this._edges(this._normalize(_grid));
 
 			function _range(min, max) {
 				return ~~((max - min) * Math.random() + min);
 			}
 
-			function _next(x, y) {
+			function _next(x, y, width, height) {
 				var result = [];
 
 				for (var a = -1; a <= 1; a++) {
 					for (var b = -1; b <= 1; b++) {
-						if (a || b && (x + a >= 0 && x + a < _width && y + b >= 0 && y + b < _height)) {
+						if (a || b && (x + a >= 0 && x + a < width && y + b >= 0 && y + b < height)) {
 							result.push([x + a, y + b]);
 						}
 					}
@@ -542,10 +531,8 @@ define([
 
 				return shuffle(result);
 			};
-		}
-
-
-		function _normalize(grid, copy) {
+		},
+		_normalize: function(grid, copy) {
 			var max = Number.MIN_VALUE;
 			var min = Number.MAX_VALUE;
 			for (var x = 0; x < grid.length; x++) {
@@ -569,20 +556,29 @@ define([
 				}
 			}
 			return (copy) ? ret : grid;
-		}
-
-		function _edges(grid) {
+		},
+		_edges: function(grid) {
 			for (var x = 0; x < grid.length; x++) {
 				for (var y = 0; y < grid[x].length; y++) {
-					if (x == 0 || x == _width - 1 || y == 0 || y == _height - 1) {
+					if (x == 0 || x == this.width - 1 || y == 0 || y == this.height - 1) {
 						grid[x][y] *= (grid[x][y] > 0.5) ? 0.45 : 1;
-					} else if (x == 1 || x == _width - 2 || y == 1 || y == _height - 2) {
+					} else if (x == 1 || x == this.width - 2 || y == 1 || y == this.height - 2) {
 						grid[x][y] *= (grid[x][y] > 0.4) ? 0.85 : 1;
 					}
 				}
 			}
 			return grid;
+
 		}
+	});
+
+	return function world(opt) {
+		log.med('[WORLD]', 'start building the overworld');
+		opt.size = opt.size || Math.uneven(Math.between(60, 70));
+		opt.width = opt.width || opt.size;
+		opt.height = opt.height || opt.size;
+
+		return new World(opt);
 	}
 
 });
