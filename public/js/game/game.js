@@ -23,7 +23,8 @@ define([
 				options: {
 					height: 75,
 					width: 100,
-					bank: tilebank
+					bank: tilebank,
+					time: time
 				}
 			}).then(function(world) {
 				this.world = world;
@@ -86,7 +87,7 @@ define([
 			this.screen.draw(this.world, this.player);
 
 			//uncomment this to have a day/night feel
-			//var h = Math.abs(12 - this.time.getTime().h) / 24;
+			//var h = Math.abs(12 - this.time.get().h) / 24;
 			//this.screen.background("rgba(0,0,0,"+h+")");
 
 			if (this.paused === true) {
@@ -104,7 +105,7 @@ define([
 			var no = 1;
 			var mx = this._mouseLocation.x;
 			var my = this._mouseLocation.y;
-			var t = this.time.getTime();
+			var t = this.time.get();
 			var tile;
 
 			src.write('Player', sidex, sidey + 20 * no++);
@@ -150,6 +151,7 @@ define([
 
 				//set the current player offset on the game object. 
 				this.offset = this.screen.offset(this.player, this.world);
+				this.world.update();
 
 				//update the time a tiny bit, to have a bit of real-time time
 				this.time.update(0.1, true);

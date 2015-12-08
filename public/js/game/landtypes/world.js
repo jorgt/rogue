@@ -28,6 +28,28 @@ define([
 		roads: {},
 		rivers: [],
 		_bank: null,
+		init: function(opt) {
+			this.width = opt.width;
+			this.height = opt.height;
+			this._bank = opt.bank;
+			this._time = opt.time;
+
+			this._createBase();
+			this._normalizeAltitude();
+			this._createRivers();
+			this._createCities();
+			this._createRoadsBetweenCities();
+			this._reSignRivers();
+			//this._reSignRoads();
+			this.getStartAndEndTiles();
+		},
+		update: function() {
+			var t = this._time().timer('addroad', {
+				m: 30
+			}, function() {
+
+			}.bind(this));
+		},
 		getStartAndEndTiles: function() {
 			log.med('[WORLD]', 'getting start- and end tiles');
 
@@ -40,20 +62,6 @@ define([
 				this.start = (this.grid[sx][sy].walkable === true) ? [sx, sy] : null;
 				this.end = (this.grid[ex][ey].walkable === true) ? [ex, ey] : null;
 			}
-		},
-		init: function(opt) {
-			this.width = opt.width;
-			this.height = opt.height;
-			this._bank = opt.bank;
-
-			this._createBase();
-			this._normalizeAltitude();
-			this._createRivers();
-			this._createCities();
-			this._createRoadsBetweenCities();
-			this._reSignRivers();
-			//this._reSignRoads();
-			this.getStartAndEndTiles();
 		},
 		_createBase: function() {
 			var ranges = {
@@ -326,7 +334,6 @@ define([
 			log.med('[WORLD]', 'total roads created:', Object.keys(this.roads).length / 2);
 		},
 		createThisManyRoads: function(a) {
-			debugger;
 			var attempts, x, y;
 
 			attempts = 0;
@@ -349,6 +356,7 @@ define([
 		createARoad: function(city1, city2, type) {
 			var result, path;
 
+			//split this so a single road tile can be added on a timer
 			result = AStar.search(this.grid, this.cities[city1], this.cities[city2]);
 			if (result.length > 0) {
 				for (var r = 0; r < result.length; r++) {
@@ -373,7 +381,6 @@ define([
 			return false;
 		},
 		_reSignFromArray: function(array, h, chars, func) {
-			console.log(array);
 			var x, y, a, r;
 
 			for (a = 0; a < array.length; a++) {

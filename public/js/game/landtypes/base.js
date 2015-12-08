@@ -20,6 +20,12 @@ define(['graphics/screenmanager', 'settings'], function(screenManager, settings)
 
 			return this.grid[x][y];
 		},
+		draw: function() {
+
+		},
+		update: function() {
+
+		},
 		changeTile: function(tile) {
 			var size = settings.screen.block;
 			screenManager.tileToImage(this.light.getContext('2d'), tile, size, size, true);
