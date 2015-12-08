@@ -4,11 +4,11 @@ define([
 	'game/landtypes/world',
 	'game/landtypes/landmanager',
 	'game/entities/player',
-	'game/screenmanager',
-	'game/background',
+	'graphics/screenmanager',
+	'graphics/worldbuilder',
 	'game/time',
 	'game/tilebank',
-], function(settings, log, world, Lands, player, screenManager, background, time, tilebank) {
+], function(settings, log, world, Lands, player, screenManager, worldbuilder, time, tilebank) {
 	'use strict';
 
 	var game, promise, started = false;

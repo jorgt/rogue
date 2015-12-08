@@ -1,4 +1,4 @@
-define(['game/screenmanager', 'settings'], function(screenManager, settings) {
+define(['graphics/screenmanager', 'settings'], function(screenManager, settings) {
 	'use strict';
 
 	var Base = Class.extend({

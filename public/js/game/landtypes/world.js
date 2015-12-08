@@ -25,7 +25,7 @@ define([
 		start: null,
 		end: null,
 		cities: [],
-		roads: [],
+		roads: {},
 		rivers: [],
 		_bank: null,
 		getStartAndEndTiles: function() {
@@ -52,7 +52,7 @@ define([
 			this._createCities();
 			this._createRoadsBetweenCities();
 			this._reSignRivers();
-			this._reSignRoads();
+			//this._reSignRoads();
 			this.getStartAndEndTiles();
 		},
 		_createBase: function() {
@@ -321,29 +321,36 @@ define([
 		},
 		_createRoadsBetweenCities: function() {
 			log.med('[WORLD]', 'connecting cities and roads');
+
+			this.createThisManyRoads(this.cities.length * 0.4);
+			log.med('[WORLD]', 'total roads created:', Object.keys(this.roads).length / 2);
+		},
+		createThisManyRoads: function(a) {
+			debugger;
 			var attempts, x, y;
 
 			attempts = 0;
 
-			while (this.roads.length < this.cities.length * 0.4 && attempts++ < 1000) {
+			while (Object.keys(this.roads).length / 2 < a && attempts++ < 1000) {
 				x = window.Math.between(0, this.cities.length - 1);
 				y = window.Math.between(0, this.cities.length - 1);
 
-				if (x === y || this.roads.indexOf(x + '.' + y) >= 0 || this.roads.indexOf(y + '.' + x) >= 0) {
+				if ((typeof this.roads[x + '.' + y] !== 'undefined' || typeof this.roads[y + '.' + x] !== 'undefined') || x === y) {
 					continue;
 				} else {
-					this.roads.push(this._createARoad(x, y, 'path'));
+					var result = this.createARoad(x, y, 'path');
+					if (result !== false) {
+						this.roads[x + '.' + y] = result;
+						this.roads[x + '.' + y] = result;
+					}
 				}
 			}
-
-			log.med('[WORLD]', 'total roads created:', this.roads.length);
 		},
-		_createARoad: function(city1, city2, type) {
+		createARoad: function(city1, city2, type) {
 			var result, path;
 
 			result = AStar.search(this.grid, this.cities[city1], this.cities[city2]);
 			if (result.length > 0) {
-
 				for (var r = 0; r < result.length; r++) {
 					var tile = (this.grid[result[r].x][result[r].y].name.match(/sea$/)) ? 'ferry' : type;
 					if (!this.grid[result[r].x][result[r].y].name.match(/city|highway|ferry/)) {
@@ -351,7 +358,63 @@ define([
 					}
 				}
 				log.low('[WORLD]', 'connected 2 cities:', this.cities[city1], this.cities[city2]);
-				return city1 + '.' + city2;
+
+				if (type === 'path') {
+					this._reSignFromArray(result, /path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '┌', '┐', '└', '┘'], function(n, g) {
+						if (g.name === 'ferry') return g.sign;
+					});
+				} else {
+					this._reSignFromArray(result, /ferry|highway|path/, ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'], function(n, g) {
+						if (g.name === 'ferry') return g.sign;
+					});
+				}
+				return result;
+			}
+			return false;
+		},
+		_reSignFromArray: function(array, h, chars, func) {
+			console.log(array);
+			var x, y, a, r;
+
+			for (a = 0; a < array.length; a++) {
+				x = array[a].x
+				y = array[a].y;
+				var n = this._neighbours(x, y);
+				var s = '·';
+
+				if (n[0].name.match(h) && n[1].name.match(h) && n[2].name.match(h) && n[3].name.match(h)) {
+					s = chars[2]
+				} else if (n[0].name.match(h) && n[1].name.match(h) && n[2].name.match(h)) {
+					s = chars[3];
+				} else if (n[1].name.match(h) && n[2].name.match(h) && n[3].name.match(h)) {
+					s = chars[6];
+				} else if (n[2].name.match(h) && n[3].name.match(h) && n[0].name.match(h)) {
+					s = chars[4]
+				} else if (n[3].name.match(h) && n[0].name.match(h) && n[1].name.match(h)) {
+					s = chars[5];
+				} else if (n[0].name.match(h) && n[2].name.match(h)) {
+					s = chars[1];
+				} else if (n[1].name.match(h) && n[3].name.match(h)) {
+					s = chars[0];
+				} else if (n[0].name.match(h) && n[1].name.match(h)) {
+					s = chars[10];
+				} else if (n[1].name.match(h) && n[2].name.match(h)) {
+					s = chars[8];
+				} else if (n[2].name.match(h) && n[3].name.match(h)) {
+					s = chars[7];
+				} else if (n[3].name.match(h) && n[0].name.match(h)) {
+					s = chars[9];
+				} else if (!!n[1].name.match(h) || !!n[3].name.match(h)) {
+					s = chars[0];
+				} else if (!!n[0].name.match(h) || !!n[2].name.match(h)) {
+					s = chars[1];
+				}
+
+				r = (func) ? func(n, this.grid[x][y]) : null;
+				s = (r) ? r : s;
+
+				this.grid[x][y].sign = s || this.grid[x][y].sign;
+				if (this.grid[x][y].subtile.sign) this.grid[x][y].subtile.sign = s;
 			}
 		},
 		_reSignRoads: function() {
@@ -360,13 +423,13 @@ define([
 				if (g.name === 'ferry') return g.sign;
 			});
 
-			this._reSignSomething(/path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯'], function(n, g) {
+			this._reSignSomething(/path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '┌', '┐', '└', '┘'], function(n, g) {
 				if (g.name === 'ferry') return g.sign;
 			});
 		},
 		_reSignRivers: function() {
 			log.med('[WORLD]', 'fixing river signs');
-			this._reSignSomething(/river/, ['─', '│', '┼', '┤', '├', '┴', '┬', '╭', '╮', '╰', '╯']);
+			this._reSignSomething(/river/, ['─', '│', '┼', '┤', '├', '┴', '┬', '┌', '┐', '└', '┘']);
 		},
 		_reSignSomething: function(h, chars, func) {
 			var r;

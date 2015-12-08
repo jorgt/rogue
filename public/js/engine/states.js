@@ -2,7 +2,7 @@ define([
 	"engine/keys",
 	"engine/mouse",
 	"helpers/log",
-	"game/screenmanager",
+	"graphics/screenmanager",
 	"settings"
 ], function(Keys, Mouse, log, screenManager, settings) {
 

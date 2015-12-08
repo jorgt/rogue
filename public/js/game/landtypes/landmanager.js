@@ -1,12 +1,12 @@
 define([
 	"helpers/log",
-	"game/background",
+	"graphics/worldbuilder",
 	"game/landtypes/world",
 	"game/landtypes/land",
 	"game/landtypes/dungeon",
 ], function(
 	log,
-	background,
+	worldbuilder,
 	world,
 	land,
 	dungeon) {
@@ -40,7 +40,7 @@ define([
 			o._guid = guid();
 			o.type = opt.type;
 			_planes[o.name] = o;
-			return background(o);
+			return worldbuilder(o);
 		}
 	};
 
