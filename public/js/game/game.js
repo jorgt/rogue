@@ -140,10 +140,6 @@ define([
 			}
 		},
 		update: function() {
-			var t = this.world.getTile(20, 20);
-			t.sign = ['1', '2', '3'][~~(Math.random() * 3)];
-
-			this.world.changeTile(t);
 			//the game paused thing is not very relevant after moving the key updates to their own loops.
 			if (this.paused === false) {
 				//update the grid with the player position, visible/visited grid

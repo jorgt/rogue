@@ -39,8 +39,8 @@ define([
 				return node.f;
 			});
 		},
-		search: function(grid, start, end, diagonal, heuristic, costfunction) {
-			grid = astar.init(grid, costfunction);
+		search: function(originalgrid, start, end, diagonal, heuristic, costfunction) {
+			var grid = astar.init(originalgrid, costfunction);
 			heuristic = heuristic || astar.tiebreaking;
 			diagonal = !!diagonal;
 
@@ -92,6 +92,7 @@ define([
 						neighbor.h = neighbor.h || heuristic(neighbor, start, end, neighbor.speed);
 						neighbor.g = gScore;
 						neighbor.f = neighbor.g + neighbor.h;
+						neighbor.tile = originalgrid[neighbor.x][neighbor.y];
 
 						if (!beenVisited) {
 							// Pushing to heap will put it in proper place based on the 'f' value.

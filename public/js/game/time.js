@@ -11,12 +11,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			secondsPerMovement = 85,
 			last = {},
 			timers = {},
-			current = 0,
-			minutes = 0,
-			hours = 0,
-			days = 0,
-			months = 0,
-			years = 0;
+			current = 0
 
 		this.update = function(movement, incremental) {
 			if (incremental === true) {
@@ -24,14 +19,6 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			} else {
 				current = movement * secondsPerMovement;
 			}
-
-			//console.log(movement, current, secondsPerMovement)
-
-			minutes = Math.floor(current / 60);
-			hours = Math.floor(minutes / 60);
-			minutes = minutes % 60;
-			days = Math.floor(hours / 24);
-			hours = hours % 24;
 
 			for (var x in timers) {
 				if (timers.hasOwnProperty(x)) {
@@ -45,6 +32,12 @@ define(['settings', 'helpers/log'], function(settings, log) {
 
 		};
 		this.get = function(id, retrieve) {
+			var minutes = Math.floor(current / 60);
+			var hours = Math.floor(minutes / 60);
+			var minutes = minutes % 60;
+			var days = Math.floor(hours / 24);
+			var hours = hours % 24;
+			
 			var ret = {
 				m: minutes,
 				h: hours,
@@ -61,42 +54,79 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			return last[id];
 		}
 		this.toSeconds = function(t) {
-			t.m = t.m || 0;
-			t.h = t.h || 0;
-			t.d = t.d || 0;
-			return t.m * 60 + t.h * 60 * 60 + t.d * 60 * 60 * 24;
-		}
-		this.timer = function(id, t, c) {
-			if (!timers[id]) {
+			if (typeof t === 'object') {
 				t.m = t.m || 0;
+				t.h = t.h || 0;
 				t.d = t.d || 0;
-				t.y = t.y || 0;
-				var self = this;
-
-				var s = clone(this.get());
-				timers[id] = new Timer(this, s, t, c);
-
-				function Timer(time, start, target, callback) {
-					var _g = Math.random() * 100000;
-					var s = time.toSeconds(start);
-					var t = time.toSeconds(target);
-					this.update = function() {
-						var c = time.toSeconds(time.get());
-
-						if (c < s + t) {
-							return false;
-						} else {
-							var x = Math.ceil((c - s - t) / t) + 1;
-							while (x--) {
-								callback();
-							}
-							return true;
-						}
-					}
-				}
+				return t.m * 60 + t.h * 60 * 60 + t.d * 60 * 60 * 24;
+			} else if (typeof t === 'number') {
+				return t;
+			}
+			throw new Error('Feed this a time object in s,h,d or just a number of seconds');
+		}
+		this.timer = function(id, target, callback) {
+			if (!timers[id]) {
+				var t = this.toSeconds(target);
+				var s = this.toSeconds(clone(this.get()));
+				timers[id] = new Timer(this, s, t, callback);
 			}
 
 			return timers[id];
+		}
+
+		this.interval = function(id, target, interval, callback) {
+			if (!timers[id]) {
+				var i = this.toSeconds(interval);
+				var s = this.toSeconds(clone(this.get()));
+				timers[id] = new Interval(this, s, target, i, callback);
+			}
+
+			return timers[id];
+		}
+	}
+
+	//in target number of in game time, do execute function
+	function Timer(time, start, target, callback) {
+		var _g = Math.random() * 100000;
+		this.update = function() {
+			var current = time.toSeconds(clone(time.get()));
+
+			if (current < start + target) {
+				return false;
+			} else {
+				callback();
+				return true;
+			}
+		}
+	}
+
+	//for the next [target number of in game time], execute callback every [interval
+	//number of in game time]s
+	function Interval(time, start, target, interval, callback) {
+		var _g = ~~(Math.random() * 100000);
+		var times = 0;
+		this.update = function() {
+
+			var current = time.toSeconds(time.get());
+
+			//if its within the interval
+			if (times < target) {
+				var passed = current - start;
+				if (passed > interval * times) {
+					var x = Math.floor((passed - interval * times) / interval);
+					x = (times + x > target) ? target - times : x;
+					var y = times + x;
+					if (x > 0) {
+						while (times < y) {
+							times += 1;
+							callback(times);
+						}
+					}
+				}
+				return false;
+			} else {
+				return true;
+			}
 		}
 	}
 
