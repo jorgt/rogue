@@ -4,35 +4,49 @@ define([
 	"helpers/maths"
 ], function(log, settings) {
 
-	var factory;
+	var creator;
 
 	var Town = Class.extend({
 		type: null,
-		init: function() {
+		init: function(tiles) {
 			this.type = 'town';
 			this.size = 1;
+			this.tiles = tiles;
 		},
-		setup: function(grid) {
-
+		setup: function(grid, bank) {
+			for (var x = 0; x < this.tiles.length; x++) {
+				var t = this.tiles[x];
+				grid[t[0]][t[1]] = bank.get(this.type, t[0], t[1]), ['name', 'color', 'sign'];
+			}
+			return this;
 		}
 	});
 
-	function Factory() {
-		this.towns = {};
-
-		this.town = function(grid) {
-			var tiles = _start(grid, 1);
-
-			return new Town(tiles) {
-				
-			}
+	var City = Town.extend({
+		init: function(tiles) {
+			_super.call(this, tiles);
+			this.type = 'city'
 		}
+	});
 
-		this.city = function(grid) {
-			var tiles = _start(grid, 3);
-		}
-
-		function _start(grid, size) {
+	var TownCreator = Class.extend({
+		towns: [],
+		town: function(grid, bank) {
+			return this._create(Town, 0, grid, bank);
+		},
+		city: function(grid, bank) {
+			return this._create(City, 3, grid, bank);
+		},
+		getClosest: function(town) {
+			
+		},
+		_create: function(cls, size, grid, bank) {
+			var tiles = this._start(grid, size);
+			var town = new cls(tiles).setup(grid, bank);
+			this.towns.push(town);
+			return town;
+		},
+		_start: function(grid, size) {
 			var g = [];
 			var attempts = 0;
 
@@ -41,12 +55,12 @@ define([
 				var y = Math.between(0, grid[0].length - 1);
 				g = [];
 				//see if there's another city or town within 11 tiles
-				if (!_scanGrid(grid, x, y, 11, function(tile) {
+				if (!this._scanGrid(grid, x, y, 11, function(tile) {
 						return (tile.name === 'city' || tile.name === 'town');
 					})) {
 
 					//scoop at an n-sized chunk of land only. 
-					_scanGrid(grid, x, y, 0, function(tile, a, b) {
+					this._scanGrid(grid, x, y, size, function(tile, a, b) {
 						if (tile.info.climate.alt > 0) {
 							g.push([a, b])
 						} else {
@@ -57,9 +71,9 @@ define([
 			}
 
 			return g;
-		}
+		},
 
-		function _scanGrid(grid, centerx, centery, cells, func) {
+		_scanGrid: function(grid, centerx, centery, cells, func) {
 			var x, y, sx, sy, ex, ey;
 
 			sx = Math.max(0, centerx - cells);
@@ -74,11 +88,11 @@ define([
 			return false;
 		}
 
-	}
+	});
 
 	return function() {
-		if (!factory) factory = new Factory();
+		if (!creator) creator = new TownCreator();
 
-		return factory;
+		return creator;
 	}
 });

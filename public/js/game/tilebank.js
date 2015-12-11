@@ -36,6 +36,7 @@ define(["helpers/log"], function(
 		world objects
 	 */
 	_bank.add('city', "C", 90, null, null, null, [255, 255, 255], [0, 0, 0, 0.4], [0, 0, 0, 0.4], [0, 0, 0, 0.4]);
+	_bank.add('town', "T", 90, null, null, null, [255, 255, 255], [0, 0, 0, 0.4], [0, 0, 0, 0.4], [0, 0, 0, 0.4]);
 	_bank.add('highway', 'x', 95, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], [60, 60, 60], [0, 0, 0, 0.1]);
 	_bank.add('path', 'x', 90, true, true, false, [200, 200, 200], [0, 0, 0, 0.4], [60, 60, 60], [0, 0, 0, 0.1]);
 	_bank.add('ferry', '*', 40, true, true, false, [200, 200, 200], [0, 0, 0, 0.2], null, [0, 0, 0, 0.2]);

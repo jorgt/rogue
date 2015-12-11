@@ -244,7 +244,7 @@ define([
 		},
 
 		_createCities: function() {
-			townFactory().town(this.grid);
+			console.log(townFactory().city(this.grid, this._bank));
 			log.med('[WORLD]', 'creating cities and towns');
 			var x, y;
 			var attempts = 0;
