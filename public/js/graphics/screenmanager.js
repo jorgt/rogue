@@ -137,7 +137,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 							this.rectangle(color, px, py, p);
 						}
 
-						if (tile.name === 'city') {
+						if (tile.name === 'city' || tile.name === 'town') {
 							this.circle((tile.visible) ? 'rgba(255,255,255,1)' : 'rgba(190,190,190,1)', px + p / 2, py + p / 2, p / 3);
 						}
 
@@ -192,7 +192,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			};
 		},
 		write: function(text, x, y, color) {
-			var oldfont = this.context.font;
+			this.context.save();
 			this.context.font = "bold " + settings.screen.block + "px " + font
 			x = x || 0;
 			y = y || 0;
@@ -202,7 +202,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			for (var t = 0; t < array.length; t++) {
 				this.context.fillText(array[t], (x + t * settings.screen.block), y);
 			}
-			this.context.font = oldfont;
+			this.context.restore();
 		},
 		special: function(array, func) {
 			for (var x = 0; x < array.length; x++) {
@@ -221,7 +221,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 		_isoBackground: function(world, offX, offY, player) {
 			var th = settings.screen.iso.height;
 			var tw = settings.screen.iso.width;
-			//console.log(player);
+
 			for (var x = 0; x < world.width; x++) {
 				for (var y = (world.height - 1); y >= 0; y--) {
 					var xx = x - offX; //i
@@ -229,7 +229,6 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					var xxx = (y * tw / 2) + (x * tw / 2) - tw * world.width / 2 // + player.position.w * tw;
 					var yyy = (x * th / 2) - (y * th / 2) // + player.position.h * th - th / 2;
 					this.context.drawImage(world.light, x * tw, y * th, tw, th, xxx, yyy, tw, th);
-					//console.log(xxx, yyy, offX, offY);
 
 				}
 			}

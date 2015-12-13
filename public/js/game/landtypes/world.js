@@ -7,6 +7,7 @@ define([
 	"game/landtypes/base",
 	"game/pathfinding/astar",
 	'game/landtypes/worlds/town',
+	'game/landtypes/worlds/road',
 	"helpers/maths"
 ], function(
 	log,
@@ -16,7 +17,8 @@ define([
 	Grids,
 	Base,
 	AStar,
-	townFactory) {
+	townFactory,
+	roadFactory) {
 
 	'use strict';
 
@@ -40,41 +42,31 @@ define([
 			this._normalizeAltitude();
 			this._createRivers();
 			this._createCities();
-			this._createRoadsBetweenCities();
 			this._reSignRivers();
 			this._getStartAndEndTiles();
 		},
 		update: function() {
-			var t = this.getTile(20, 20);
-			t.sign = ['1', '2', '3'][~~(Math.random() * 3)];
+			var nt = townFactory().numberOfTownsAndCities();
+			var rt = roadFactory().numberOfRoads();
 
-			this.changeTile(t);
-			if (Object.keys(this.roads).length < this.cities.length * 2) {
+			if (rt < (rt * (rt + 1)) / 2) {
 				this._time().timer('addroadtimer', {
-					h: 5
+					d: 10
 				}, function() {
-					var road = this.createOneRoad();
-					var id = ~~(Math.random() * 10000000);
-
-					if (road.length > 0) {
-						log.med('[WORLD]', 'Adding a new road with length', road.length);
-						this._time().interval(id, road.length, {
-							m: 30
-						}, function(times) {
-							var x = road[times - 1].x;
-							var y = road[times - 1].y;
-							this._addRoadTile(x, y, 'path');
-							this._reSignFromArray([road[times - 1].tile], /path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '┌', '┐', '└', '┘'], function(n, g) {
-								if (g.name === 'ferry' || g.name === 'city') return g.sign;
-							});
-
-							this.changeTile(road[times - 1].tile);
-							if (road.length === times) log.med('[WORLD]', 'Road of length', road.length, 'done');
-						}.bind(this));
-					}
+					var t1 = townFactory().getRandom();
+					var t2 = townFactory().getClosestNotConnected(t1);
+					if (t1 && t2) {
+						var road = roadFactory().road(this, this._bank, [t1.x, t1.y], [t2.x, t2.y], this._time());
+						t1.connectTo(t2);
+					} 
 				}.bind(this));
 			}
 
+			this._time().timer('addcitytimer', {
+				h: 1
+			}, function() {
+				townFactory().upgradeRandomTownToCity(this);
+			}.bind(this));
 		},
 		_getStartAndEndTiles: function() {
 			log.med('[WORLD]', 'getting start- and end tiles');
@@ -244,54 +236,30 @@ define([
 		},
 
 		_createCities: function() {
-			console.log(townFactory().city(this.grid, this._bank));
 			log.med('[WORLD]', 'creating cities and towns');
 			var x, y;
 			var attempts = 0;
-			while (this.cities.length < 15 && attempts++ < 5000) {
-				this._createCity('town');
+			var numberOfCities = Math.ceil((this.height * this.width) / (150 * Math.pow((this.height * this.width), 0.15)));
+
+			while (townFactory().numberOfTownsAndCities() < numberOfCities && attempts++ < 5000) {
+				townFactory().town(this, this._bank)
 			}
-			log.med('[WORLD]', 'created', this.cities.length, 'cities and towns');
+			log.med('[WORLD]', 'created', townFactory().numberOfTownsAndCities(), 'cities and towns');
+
+			log.med('[WORLD]', 'connecting towns, creating roads');
+
+			attempts = 0;
+
+			while (roadFactory().numberOfRoads() < numberOfCities * 0.4 && attempts++ < 10000) {
+				var t1 = townFactory().getRandom();
+				var t2 = townFactory().getClosestNotConnected(t1);
+				var road = roadFactory().road(this, this._bank, [t1.x, t1.y], [t2.x, t2.y]);
+				t1.connectTo(t2);
+			}
+
+			log.med('[WORLD]', 'created', roadFactory().numberOfRoads(), 'roads');
 		},
 
-		_createCity: function(type) {
-			var c, d, x, y, r, g = [];
-
-			//get a Math.between tile with starting point as a multiple of some number
-			//to prevent cities from being built next to each other
-			x = Math.between(0, this.grid.length - 1);
-			y = Math.between(0, this.grid[0].length - 1);
-
-			//check if another city exists in an 11 cell block around x and y. 
-			//exit function if it exists
-			if (this._scanGrid(x, y, 11, function(tile) {
-					return (tile.name === 'city' || tile.subtile === 'city');
-				})) {
-				return false;
-			}
-
-			if (this._scanGrid(x, y, 1, function(tile, a, b) {
-					if (tile.info.climate.alt > 0) {
-						g.push([a, b])
-					} else {
-						return true;
-					}
-				})) {
-				return false;
-			}
-
-			g = shuffle(g).slice(0, 1);
-
-			for (var c = 0; c < g.length; c++) {
-				this.grid[g[c][0]][g[c][1]].sub(this._bank.get('city', g[c][0], g[c][1]), ['name', 'color', 'sign']);
-			}
-
-			this.cities.push([x, y]);
-
-			log.low('[WORLD]', 'created a city at', x, y);
-
-			return true;
-		},
 		_createRivers: function() {
 			log.med('[WORLD]', 'creating rivers');
 			var attempts = 0;
@@ -339,117 +307,6 @@ define([
 
 			this.rivers.push([x, y]);
 		},
-		_scanGrid: function(centerx, centery, cells, func) {
-			var x, y, sx, sy, ex, ey;
-
-			sx = Math.max(0, centerx - cells);
-			sy = Math.max(0, centery - cells);
-			ex = Math.min(this.grid.length - 1, centerx + cells);
-			ey = Math.min(this.grid[0].length - 1, centery + cells);
-			for (x = sx; x <= ex; x++) {
-				for (y = sy; y <= ey; y++) {
-					if (func(this.grid[x][y], x, y) === true) return true;
-				}
-			}
-			return false;
-		},
-		_createRoadsBetweenCities: function() {
-			log.med('[WORLD]', 'connecting cities and roads');
-
-			this.createThisManyRoads(this.cities.length * 0.4, 'path');
-			log.med('[WORLD]', 'total roads created:', Object.keys(this.roads).length / 2);
-		},
-		createOneRoad: function() {
-			var city1, city2, result = false,
-				attemps = 0;
-
-			while (result === false && Object.keys(this.roads).length < this.cities.length * 2 && attemps++ < 200) {
-				var x = window.Math.between(0, this.cities.length - 1);
-				var y = window.Math.between(0, this.cities.length - 1);
-
-				if ((typeof this.roads[x + '.' + y] !== 'undefined' || typeof this.roads[y + '.' + x] !== 'undefined') || x === y) {
-					continue;
-				} else {
-					result = this.createARoad(x, y, 'path', false);
-					if (result !== false) {
-						this.roads[x + '.' + y] = {
-							type: 'path',
-							tiles: result
-						}
-						this.roads[x + '.' + y] = {
-							type: 'path',
-							tiles: result
-						};
-					}
-				}
-			}
-
-			return result;
-
-		},
-		createThisManyRoads: function(a, type) {
-			var attempts, x, y;
-			type = type || 'path'
-			attempts = 0;
-
-			while (Object.keys(this.roads).length / 2 < a && attempts++ < 1000) {
-				x = window.Math.between(0, this.cities.length - 1);
-				y = window.Math.between(0, this.cities.length - 1);
-
-				if ((typeof this.roads[x + '.' + y] !== 'undefined' || typeof this.roads[y + '.' + x] !== 'undefined') || x === y) {
-					continue;
-				} else {
-					var result = this.createARoad(x, y, type, true);
-					if (result !== false) {
-						this.roads[x + '.' + y] = {
-							type: 'path',
-							tiles: result
-						};
-						this.roads[y + '.' + x] = {
-							type: 'path',
-							tiles: result
-						};
-					}
-				}
-			}
-		},
-		getRoadResultSet: function(city1, city2) {
-			return AStar.search(this.grid, this.cities[city1], this.cities[city2]);
-		},
-		createARoad: function(city1, city2, type, create) {
-			var result, path;
-
-
-			result = this.getRoadResultSet(city1, city2);
-			if (create === true, result.length > 0) {
-				for (var r = 0; r < result.length; r++) {
-					this._addRoadTile(result[r].x, result[r].y, type)
-				}
-				log.low('[WORLD]', 'connected 2 cities:', this.cities[city1], this.cities[city2]);
-
-				if (type === 'path') {
-					this._reSignFromArray(result, /path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '┌', '┐', '└', '┘'], function(n, g) {
-						if (g.name === 'ferry' || g.name === 'city') return g.sign;
-					});
-				} else {
-					this._reSignFromArray(result, /ferry|highway|path/, ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'], function(n, g) {
-						if (g.name === 'ferry' || g.name === 'city') return g.sign;
-					});
-				}
-
-				return result;
-			} else if (result.length > 0 && create === false) {
-				return result;
-			}
-			return false;
-		},
-		_addRoadTile: function(x, y, type) {
-			var tile = (this.grid[x][y].name.match(/sea$/)) ? 'ferry' : type;
-
-			if (!this.grid[x][y].name.match(/city|highway|ferry/)) {
-				this.grid[x][y].sub(this._bank.get(tile, x, y), ['name', 'sign', 'cost']);
-			}
-		},
 		_reSignFromArray: function(array, h, chars, func) {
 			var x, y, a, r;
 
@@ -493,16 +350,6 @@ define([
 				this.grid[x][y].sign = s || this.grid[x][y].sign;
 				if (this.grid[x][y].subtile.sign) this.grid[x][y].subtile.sign = s;
 			}
-		},
-		_reSignRoads: function() {
-			log.med('[WORLD]', 'fixing road signs');
-			this._reSignSomething(/ferry|highway|path/, ['═', '║', '╬', '╣', '╠', '╩', '╦', '╔', '╗', '╚', '╝'], function(n, g) {
-				if (g.name === 'ferry') return g.sign;
-			});
-
-			this._reSignSomething(/path/, ['─', '│', '┼', '┤', '├', '┴', '┬', '┌', '┐', '└', '┘'], function(n, g) {
-				if (g.name === 'ferry') return g.sign;
-			});
 		},
 		_reSignRivers: function() {
 			log.med('[WORLD]', 'fixing river signs');
