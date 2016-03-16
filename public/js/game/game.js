@@ -82,13 +82,13 @@ define([
 			keyboard.press('p', function(e) {
 				this.pause();
 			}.bind(this));
+
+			keyboard.press('space', function(e) {
+				this.player.attack();
+			}.bind(this))
 		},
 		draw: function() {
 			this.screen.draw(this.world, this.player);
-
-			//uncomment this to have a day/night feel
-			//var h = Math.abs(12 - this.time.get().h) / 24;
-			//this.screen.background("rgba(0,0,0,"+h+")");
 
 			if (this.paused === true) {
 				var center = this.screen.center();

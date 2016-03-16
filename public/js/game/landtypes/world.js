@@ -49,6 +49,10 @@ define([
 			var nt = townFactory().numberOfTownsAndCities();
 			var rt = roadFactory().numberOfRoads();
 
+			/*
+				road animations. every 10 in-game days, this checks if 
+				there is a road to update. if there is, animate building that road
+			 */
 			if (rt < (rt * (rt + 1)) / 2) {
 				this._time().timer('addroadtimer', {
 					d: 10
@@ -62,8 +66,11 @@ define([
 				}.bind(this));
 			}
 
+			/*
+				every 30 in-game days, this upgrade a city to a town
+			 */
 			this._time().timer('addcitytimer', {
-				h: 1
+				d: 30
 			}, function() {
 				townFactory().upgradeRandomTownToCity(this);
 			}.bind(this));

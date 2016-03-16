@@ -1,4 +1,4 @@
-define([], function() {
+define(['game/time'], function(time) {
 	'use strict';
 
 	var Entity = Class.extend({
@@ -55,8 +55,14 @@ define([], function() {
 				}
 			}
 		},
-		draw: function(/* ctx, offx, offw */) {
+		draw: function(ctx, offx, offw) {
 			//draw
+		},
+		attack: function() {
+			var text = 'pew!'
+			time().realtime(2000, function(p, i, loop) {
+				console.log(p, i, loop)
+			});
 		}
 	});
 

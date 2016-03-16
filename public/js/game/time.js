@@ -29,15 +29,15 @@ define(['settings', 'helpers/log'], function(settings, log) {
 					}
 				}
 			}
-
 		};
+
 		this.get = function(id, retrieve) {
 			var minutes = Math.floor(current / 60);
 			var hours = Math.floor(minutes / 60);
 			var minutes = minutes % 60;
 			var days = Math.floor(hours / 24);
 			var hours = hours % 24;
-			
+
 			var ret = {
 				m: minutes,
 				h: hours,
@@ -49,10 +49,12 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			}
 
 			return ret;
-		}
+		};
+
 		this.last = function(id) {
 			return last[id];
-		}
+		};
+
 		this.toSeconds = function(t) {
 			if (typeof t === 'object') {
 				t.m = t.m || 0;
@@ -63,7 +65,8 @@ define(['settings', 'helpers/log'], function(settings, log) {
 				return t;
 			}
 			throw new Error('Feed this a time object in s,h,d or just a number of seconds');
-		}
+		};
+
 		this.timer = function(id, target, callback) {
 			if (!timers[id]) {
 				var t = this.toSeconds(target);
@@ -72,7 +75,7 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			}
 
 			return timers[id];
-		}
+		};
 
 		this.interval = function(id, target, interval, callback) {
 			if (!timers[id]) {
@@ -82,12 +85,16 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			}
 
 			return timers[id];
+		};
+
+		this.realtime = function(duration, callback) {
+			var id = ~~(Math.random() * 100000000)
+			timers[id] = new RealTime(duration, callback)
 		}
 	}
 
 	//in target number of in game time, do execute function
 	function Timer(time, start, target, callback) {
-		var _g = Math.random() * 100000;
 		this.update = function() {
 			var current = time.toSeconds(clone(time.get()));
 
@@ -103,7 +110,6 @@ define(['settings', 'helpers/log'], function(settings, log) {
 	//for the next [target number of in game time], execute callback every [interval
 	//number of in game time]s
 	function Interval(time, start, target, interval, callback) {
-		var _g = ~~(Math.random() * 100000);
 		var times = 0;
 		this.update = function() {
 
@@ -127,6 +133,24 @@ define(['settings', 'helpers/log'], function(settings, log) {
 			} else {
 				return true;
 			}
+		}
+	}
+
+	function RealTime(duration, callback) {
+		var start = new Date();
+		var loop = 0;
+		var last;
+
+		this.update = function() {
+			loop++;
+			var current = new Date();
+			var passed = current - start;
+			var increment = current - last;
+
+			callback((passed / duration > 1) ? 1 : passed / duration, (increment / duration) || 0, loop);
+			last = current;
+
+			return (passed >= duration) ? true : false;
 		}
 	}
 
