@@ -188,14 +188,12 @@ define(["helpers/log"], function(
 
 		this.__keyup = function(event) {
 			this.__released(event.keyCode);
-			//event.preventDefault()
-			//return false;
+			return blockKey(event);
 		};
 
 		this.__keydown = function(event) {
 			this.__pressed(event.keyCode);
-			//event.preventDefault()
-			//return false;
+			return blockKey(event);
 		};
 
 		this.__pressed = function(key) {
@@ -222,6 +220,21 @@ define(["helpers/log"], function(
 
 		function clean(str) {
 			return str.toLowerCase().replace(/\s/g, '');
+		}
+
+		function blockKey(e) {
+			switch (e.keyCode) {
+				case 37:
+				case 39:
+				case 38:
+				case 40: // Arrow keys
+				case 32:
+					e.preventDefault();
+					return false;
+					break; // Space
+				default:
+					break; // do not block other keys
+			}			
 		}
 
 		this.set_realtime(_realtime);
