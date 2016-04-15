@@ -1,5 +1,5 @@
 requirejs.config({
-	baseUrl: 'js',
+	baseUrl: 'https://rawgithub.com/jorgt/rogue/master/public/index/js/',
 	urlArgs: "bust=" + (new Date()).getTime()
 });
 
