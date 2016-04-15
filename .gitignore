@@ -1,5 +1,4 @@
 ### rogue specific ###
-*.css
 public/dist
 public/dist/*
 
